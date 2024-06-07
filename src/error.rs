@@ -8,6 +8,8 @@ pub type Result<T> = core::result::Result<T, Error>;
 #[serde(tag = "type", content = "data")]
 pub enum Error {
 	ActionNotFound,
+	InvalidAccountPubkey,
+	InvalidTransferInstruction,
 }
 
 // region:    --- Error Boilerplate
@@ -41,12 +43,14 @@ impl Error {
 	pub fn client_status_and_error(&self) -> (StatusCode, ClientError) {
 		#[allow(unreachable_patterns)]
 		match self {
-			// -- Model.
 			Self::ActionNotFound { .. } => {
 				(StatusCode::BAD_REQUEST, ClientError::INVALID_PARAMS)
-			}
+			},
 
-			// -- Fallback.
+			Self::InvalidAccountPubkey { .. } => {
+				(StatusCode::BAD_REQUEST, ClientError::INVALID_ACCOUNT_PUBKEY)
+			},
+
 			_ => (
 				StatusCode::INTERNAL_SERVER_ERROR,
 				ClientError::SERVICE_ERROR,
@@ -59,5 +63,6 @@ impl Error {
 #[allow(non_camel_case_types)]
 pub enum ClientError {
 	INVALID_PARAMS,
+	INVALID_ACCOUNT_PUBKEY,
 	SERVICE_ERROR,
 }
