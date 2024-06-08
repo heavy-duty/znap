@@ -2,11 +2,7 @@ use std::str::FromStr;
 
 pub use self::error::{Error, Result};
 
-use axum::{
-    extract::Query,
-    routing::get,
-    Json, Router,
-};
+use axum::{extract::Query, routing::get, Json, Router};
 use base64::prelude::*;
 use bincode::serialize;
 use serde::{Deserialize, Serialize};
@@ -66,17 +62,7 @@ struct CreateFixedTransferQuery {
 async fn handle_get_fixed_transfer() -> Result<Json<GetActionResponse>> {
     println!("->> get_fixed_transfer");
 
-    let icon = String::from("https://url.com");
-    let title = String::from("Send a fixed transfer");
-    let description = String::from("This action allows you to send a fixed transfer");
-    let label = String::from("Send");
-
-    let response = GetActionResponse {
-        icon,
-        title,
-        description,
-        label,
-    };
+    let response = FixedTransferAction::create_metadata();
 
     Ok(Json(response))
 }
@@ -88,29 +74,40 @@ async fn handle_create_fixed_transfer(
 ) -> Result<Json<CreateActionResponse>> {
     println!("->> - create_fixed_transfer - {payload:?}");
 
-    let fixed_transfer_action = FixedTransferAction::new(query.amount);
-    let response = fixed_transfer_action.create_transaction(payload)?;
+    let response = FixedTransferAction::create_transaction(payload.account, query.amount)?;
 
     Ok(Json(response))
 }
 
 trait CreateTransaction {
-    fn create_transaction(&self, payload: CreateActionPayload) -> Result<CreateActionResponse>;
+    fn create_transaction(account: String, amount: u64) -> Result<CreateActionResponse>;
 }
 
-struct FixedTransferAction {
-    amount: u64,
+trait CreateMetadata {
+    fn create_metadata() -> GetActionResponse;
 }
 
-impl FixedTransferAction {
-    fn new(amount: u64) -> Self {
-        Self { amount }
+struct FixedTransferAction {}
+
+impl CreateMetadata for FixedTransferAction {
+    fn create_metadata() -> GetActionResponse {
+        let icon = String::from("https://url.com");
+        let title = String::from("Send a fixed transfer");
+        let description = String::from("This action allows you to send a fixed transfer");
+        let label = String::from("Send");
+
+        GetActionResponse {
+            icon,
+            title,
+            description,
+            label,
+        }
     }
 }
 
 impl CreateTransaction for FixedTransferAction {
-    fn create_transaction(&self, payload: CreateActionPayload) -> Result<CreateActionResponse> {
-        let account_pubkey = match Pubkey::from_str(&payload.account) {
+    fn create_transaction(account: String, amount: u64) -> Result<CreateActionResponse> {
+        let account_pubkey = match Pubkey::from_str(&account) {
             Ok(account_pubkey) => account_pubkey,
             _ => return Err(Error::InvalidAccountPubkey),
         };
@@ -132,7 +129,7 @@ impl CreateTransaction for FixedTransferAction {
             &destination_pubkey,
             &account_pubkey,
             &[&account_pubkey],
-            self.amount,
+            amount,
         ) {
             Ok(transfer_instruction) => transfer_instruction,
             _ => return Err(Error::InvalidTransferInstruction),
