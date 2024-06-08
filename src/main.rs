@@ -40,7 +40,7 @@ fn routes_actions() -> Router {
 }
 
 #[derive(Debug, Serialize)]
-struct GetActionResponse {
+struct ActionMetadata {
     icon: String,
     title: String,
     description: String,
@@ -59,12 +59,10 @@ struct CreateActionResponse {
 }
 
 // e.g., `/actions/fixed_transfer`
-async fn handle_get_fixed_transfer() -> Result<Json<GetActionResponse>> {
+async fn handle_get_fixed_transfer() -> Result<Json<ActionMetadata>> {
     println!("->> get_fixed_transfer");
 
-    let response = FixedTransferAction::to_metadata();
-
-    Ok(Json(response))
+    Ok(Json(FixedTransferAction::to_metadata()))
 }
 
 // e.g., `/actions/fixed_transfer`
@@ -73,20 +71,19 @@ async fn handle_create_fixed_transfer(
 ) -> Result<Json<CreateActionResponse>> {
     println!("->> - create_fixed_transfer - {payload:?}");
 
-    let response = FixedTransferAction::create_transaction(FixedTransferParams {
-        account: payload.account,
-    })?;
-
-    Ok(Json(response))
+    Ok(Json(CreateActionResponse {
+        transaction: FixedTransferAction::create_transaction(FixedTransferParams {
+            account: payload.account,
+        })?,
+        message: None,
+    }))
 }
 
 // e.g., `/actions/dynamic_transfer`
-async fn handle_get_dynamic_transfer() -> Result<Json<GetActionResponse>> {
+async fn handle_get_dynamic_transfer() -> Result<Json<ActionMetadata>> {
     println!("->> get_dynamic_transfer");
 
-    let response = DynamicTransferAction::to_metadata();
-
-    Ok(Json(response))
+    Ok(Json(DynamicTransferAction::to_metadata()))
 }
 
 #[derive(Debug, Deserialize)]
@@ -101,18 +98,19 @@ async fn handle_create_dynamic_transfer(
 ) -> Result<Json<CreateActionResponse>> {
     println!("->> - create_dynamic_transfer - {payload:?}");
 
-    let response = DynamicTransferAction::create_transaction(DynamicTransferParams {
-        account: payload.account,
-        amount: query.amount,
-    })?;
-
-    Ok(Json(response))
+    Ok(Json(CreateActionResponse {
+        transaction: DynamicTransferAction::create_transaction(DynamicTransferParams {
+            account: payload.account,
+            amount: query.amount,
+        })?,
+        message: None,
+    }))
 }
 
 trait Action<T> {
-    fn create_transaction(params: T) -> Result<CreateActionResponse>;
+    fn create_transaction(params: T) -> Result<String>;
 
-    fn to_metadata() -> GetActionResponse;
+    fn to_metadata() -> ActionMetadata;
 }
 
 struct DynamicTransferParams {
@@ -123,13 +121,13 @@ struct DynamicTransferParams {
 struct DynamicTransferAction {}
 
 impl Action<DynamicTransferParams> for DynamicTransferAction {
-    fn to_metadata() -> GetActionResponse {
+    fn to_metadata() -> ActionMetadata {
         let icon = String::from("https://url.com");
         let title = String::from("Send a dynamic transfer");
         let description = String::from("This action allows you to send a dynamic transfer");
         let label = String::from("Send");
 
-        GetActionResponse {
+        ActionMetadata {
             icon,
             title,
             description,
@@ -137,7 +135,7 @@ impl Action<DynamicTransferParams> for DynamicTransferAction {
         }
     }
 
-    fn create_transaction(params: DynamicTransferParams) -> Result<CreateActionResponse> {
+    fn create_transaction(params: DynamicTransferParams) -> Result<String> {
         let account_pubkey = match Pubkey::from_str(&params.account) {
             Ok(account_pubkey) => account_pubkey,
             _ => return Err(Error::InvalidAccountPubkey),
@@ -163,20 +161,16 @@ impl Action<DynamicTransferParams> for DynamicTransferAction {
             params.amount,
         ) {
             Ok(transfer_instruction) => transfer_instruction,
-            _ => return Err(Error::InvalidTransferInstruction),
+            _ => return Err(Error::InvalidInstruction),
         };
         let transaction_message = Message::new(&[transfer_instruction], None);
         let transaction: Transaction = Transaction::new_unsigned(transaction_message);
         let serialized_transaction = match serialize(&transaction) {
             Ok(serialized_transaction) => serialized_transaction,
-            _ => return Err(Error::InvalidTransferInstruction),
+            _ => return Err(Error::InvalidInstruction),
         };
-        let encoded_transaction = BASE64_STANDARD.encode(serialized_transaction);
 
-        Ok(CreateActionResponse {
-            transaction: encoded_transaction,
-            message: None,
-        })
+        Ok(BASE64_STANDARD.encode(serialized_transaction))
     }
 }
 
@@ -187,13 +181,13 @@ struct FixedTransferParams {
 struct FixedTransferAction {}
 
 impl Action<FixedTransferParams> for FixedTransferAction {
-    fn to_metadata() -> GetActionResponse {
+    fn to_metadata() -> ActionMetadata {
         let icon = String::from("https://url.com");
         let title = String::from("Send a fixed transfer");
         let description = String::from("This action allows you to send a fixed transfer");
         let label = String::from("Send");
 
-        GetActionResponse {
+        ActionMetadata {
             icon,
             title,
             description,
@@ -201,7 +195,7 @@ impl Action<FixedTransferParams> for FixedTransferAction {
         }
     }
 
-    fn create_transaction(params: FixedTransferParams) -> Result<CreateActionResponse> {
+    fn create_transaction(params: FixedTransferParams) -> Result<String> {
         let account_pubkey = match Pubkey::from_str(&params.account) {
             Ok(account_pubkey) => account_pubkey,
             _ => return Err(Error::InvalidAccountPubkey),
@@ -227,19 +221,15 @@ impl Action<FixedTransferParams> for FixedTransferAction {
             1,
         ) {
             Ok(transfer_instruction) => transfer_instruction,
-            _ => return Err(Error::InvalidTransferInstruction),
+            _ => return Err(Error::InvalidInstruction),
         };
         let transaction_message = Message::new(&[transfer_instruction], None);
         let transaction: Transaction = Transaction::new_unsigned(transaction_message);
         let serialized_transaction = match serialize(&transaction) {
             Ok(serialized_transaction) => serialized_transaction,
-            _ => return Err(Error::InvalidTransferInstruction),
+            _ => return Err(Error::InvalidInstruction),
         };
-        let encoded_transaction = BASE64_STANDARD.encode(serialized_transaction);
 
-        Ok(CreateActionResponse {
-            transaction: encoded_transaction,
-            message: None,
-        })
+        Ok(BASE64_STANDARD.encode(serialized_transaction))
     }
 }

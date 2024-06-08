@@ -9,7 +9,7 @@ pub type Result<T> = core::result::Result<T, Error>;
 pub enum Error {
 	ActionNotFound,
 	InvalidAccountPubkey,
-	InvalidTransferInstruction,
+	InvalidInstruction,
 }
 
 // region:    --- Error Boilerplate
