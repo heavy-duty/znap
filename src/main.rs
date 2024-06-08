@@ -28,10 +28,15 @@ async fn main() -> Result<()> {
 
 // region:    --- Routes Hello
 fn routes_actions() -> Router {
-    Router::new().route(
-        "/actions/fixed_transfer",
-        get(handle_get_fixed_transfer).post(handle_create_fixed_transfer),
-    )
+    Router::new()
+        .route(
+            "/actions/fixed_transfer",
+            get(handle_get_fixed_transfer).post(handle_create_fixed_transfer),
+        )
+        .route(
+            "/actions/dynamic_transfer",
+            get(handle_get_dynamic_transfer).post(handle_create_dynamic_transfer),
+        )
 }
 
 #[derive(Debug, Serialize)]
@@ -53,47 +58,75 @@ struct CreateActionResponse {
     message: Option<String>,
 }
 
-#[derive(Debug, Deserialize)]
-struct CreateFixedTransferQuery {
-    amount: u64,
-}
-
 // e.g., `/actions/fixed_transfer`
 async fn handle_get_fixed_transfer() -> Result<Json<GetActionResponse>> {
     println!("->> get_fixed_transfer");
 
-    let response = FixedTransferAction::create_metadata();
+    let response = FixedTransferAction::to_metadata();
 
     Ok(Json(response))
 }
 
 // e.g., `/actions/fixed_transfer`
 async fn handle_create_fixed_transfer(
-    Query(query): Query<CreateFixedTransferQuery>,
     Json(payload): Json<CreateActionPayload>,
 ) -> Result<Json<CreateActionResponse>> {
     println!("->> - create_fixed_transfer - {payload:?}");
 
-    let response = FixedTransferAction::create_transaction(payload.account, query.amount)?;
+    let response = FixedTransferAction::create_transaction(FixedTransferParams {
+        account: payload.account,
+    })?;
 
     Ok(Json(response))
 }
 
-trait CreateTransaction {
-    fn create_transaction(account: String, amount: u64) -> Result<CreateActionResponse>;
+// e.g., `/actions/dynamic_transfer`
+async fn handle_get_dynamic_transfer() -> Result<Json<GetActionResponse>> {
+    println!("->> get_dynamic_transfer");
+
+    let response = DynamicTransferAction::to_metadata();
+
+    Ok(Json(response))
 }
 
-trait CreateMetadata {
-    fn create_metadata() -> GetActionResponse;
+#[derive(Debug, Deserialize)]
+struct CreateDynamicTransferQuery {
+    amount: u64,
 }
 
-struct FixedTransferAction {}
+// e.g., `/actions/dynamic_transfer`
+async fn handle_create_dynamic_transfer(
+    Query(query): Query<CreateDynamicTransferQuery>,
+    Json(payload): Json<CreateActionPayload>,
+) -> Result<Json<CreateActionResponse>> {
+    println!("->> - create_dynamic_transfer - {payload:?}");
 
-impl CreateMetadata for FixedTransferAction {
-    fn create_metadata() -> GetActionResponse {
+    let response = DynamicTransferAction::create_transaction(DynamicTransferParams {
+        account: payload.account,
+        amount: query.amount,
+    })?;
+
+    Ok(Json(response))
+}
+
+trait Action<T> {
+    fn create_transaction(params: T) -> Result<CreateActionResponse>;
+
+    fn to_metadata() -> GetActionResponse;
+}
+
+struct DynamicTransferParams {
+    account: String,
+    amount: u64,
+}
+
+struct DynamicTransferAction {}
+
+impl Action<DynamicTransferParams> for DynamicTransferAction {
+    fn to_metadata() -> GetActionResponse {
         let icon = String::from("https://url.com");
-        let title = String::from("Send a fixed transfer");
-        let description = String::from("This action allows you to send a fixed transfer");
+        let title = String::from("Send a dynamic transfer");
+        let description = String::from("This action allows you to send a dynamic transfer");
         let label = String::from("Send");
 
         GetActionResponse {
@@ -103,11 +136,9 @@ impl CreateMetadata for FixedTransferAction {
             label,
         }
     }
-}
 
-impl CreateTransaction for FixedTransferAction {
-    fn create_transaction(account: String, amount: u64) -> Result<CreateActionResponse> {
-        let account_pubkey = match Pubkey::from_str(&account) {
+    fn create_transaction(params: DynamicTransferParams) -> Result<CreateActionResponse> {
+        let account_pubkey = match Pubkey::from_str(&params.account) {
             Ok(account_pubkey) => account_pubkey,
             _ => return Err(Error::InvalidAccountPubkey),
         };
@@ -129,7 +160,71 @@ impl CreateTransaction for FixedTransferAction {
             &destination_pubkey,
             &account_pubkey,
             &[&account_pubkey],
-            amount,
+            params.amount,
+        ) {
+            Ok(transfer_instruction) => transfer_instruction,
+            _ => return Err(Error::InvalidTransferInstruction),
+        };
+        let transaction_message = Message::new(&[transfer_instruction], None);
+        let transaction: Transaction = Transaction::new_unsigned(transaction_message);
+        let serialized_transaction = match serialize(&transaction) {
+            Ok(serialized_transaction) => serialized_transaction,
+            _ => return Err(Error::InvalidTransferInstruction),
+        };
+        let encoded_transaction = BASE64_STANDARD.encode(serialized_transaction);
+
+        Ok(CreateActionResponse {
+            transaction: encoded_transaction,
+            message: None,
+        })
+    }
+}
+
+struct FixedTransferParams {
+    account: String,
+}
+
+struct FixedTransferAction {}
+
+impl Action<FixedTransferParams> for FixedTransferAction {
+    fn to_metadata() -> GetActionResponse {
+        let icon = String::from("https://url.com");
+        let title = String::from("Send a fixed transfer");
+        let description = String::from("This action allows you to send a fixed transfer");
+        let label = String::from("Send");
+
+        GetActionResponse {
+            icon,
+            title,
+            description,
+            label,
+        }
+    }
+
+    fn create_transaction(params: FixedTransferParams) -> Result<CreateActionResponse> {
+        let account_pubkey = match Pubkey::from_str(&params.account) {
+            Ok(account_pubkey) => account_pubkey,
+            _ => return Err(Error::InvalidAccountPubkey),
+        };
+        let mint_pubkey =
+            Pubkey::from_str(&"4PYnraBJbdPXeMXdgL5k1m3TCcfNMaEWycvEQu2cteEV").unwrap();
+        let receiver_pubkey =
+            Pubkey::from_str(&"6GBLiSwAPhDMttmdjo3wvEsssEnCiW3yZwVyVZnhFm3G").unwrap();
+        let source_pubkey = spl_associated_token_account::get_associated_token_address(
+            &account_pubkey,
+            &mint_pubkey,
+        );
+        let destination_pubkey = spl_associated_token_account::get_associated_token_address(
+            &receiver_pubkey,
+            &mint_pubkey,
+        );
+        let transfer_instruction = match spl_token::instruction::transfer(
+            &spl_token::ID,
+            &source_pubkey,
+            &destination_pubkey,
+            &account_pubkey,
+            &[&account_pubkey],
+            1,
         ) {
             Ok(transfer_instruction) => transfer_instruction,
             _ => return Err(Error::InvalidTransferInstruction),
