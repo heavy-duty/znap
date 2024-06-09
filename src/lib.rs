@@ -1,4 +1,4 @@
-pub use action_api_derive::Action;
+pub use action_derive::Action;
 
 pub trait Action {
     fn icon(&self) -> &'static str;

@@ -1,4 +1,4 @@
-workspace = { members = ["action-api-derive"] }
+workspace = { members = ["action-derive"] }
 
 [package]
 name = "action-api"
@@ -19,4 +19,4 @@ spl-associated-token-account = "2.3.0"
 url = { version = "2.5.0", features = ["serde"] }
 bincode = "1.3.3"
 base64 = "0.22.1"
-action-api-derive = { path = "action-api-derive" }
+action-derive = { path = "action-derive" }
