@@ -1,16 +1,48 @@
-use std::str::FromStr;
-
 pub use self::error::{Error, Result};
 
-use axum::{extract::Query, routing::get, Json, Router};
-use base64::prelude::*;
-use bincode::serialize;
-use serde::{Deserialize, Serialize};
-use solana_sdk::{message::Message, pubkey::Pubkey, transaction::Transaction};
-use tokio::net::TcpListener;
+use action_api::Action;
 
 mod error;
 
+fn main() {
+    let fixed_transfer_action = FixedTransferAction2;
+
+    println!("\nicon: {}", fixed_transfer_action.icon());
+    println!("title: {}", fixed_transfer_action.title());
+    println!("description: {}", fixed_transfer_action.description());
+    println!("label: {}", fixed_transfer_action.label());
+
+    let dynamic_transfer_action = DynamicTransferAction2;
+
+    println!("\nicon: {}", dynamic_transfer_action.icon());
+    println!("title: {}", dynamic_transfer_action.title());
+    println!("description: {}", dynamic_transfer_action.description());
+    println!("label: {}", dynamic_transfer_action.label());
+}
+
+
+#[derive(Action)]
+#[action(
+    icon = "https://google.com",
+    title = "Fixed transfer",
+    description = "Send a fixed transfer fee to the treasury",
+    label = "Send"
+)]
+struct FixedTransferAction2;
+
+
+#[derive(Action)]
+#[action(
+    icon = "https://google.com",
+    title = "Dynamic transfer",
+    description = "Send a dynamic transfer fee to the treasury",
+    label = "Send"
+)]
+struct DynamicTransferAction2;
+
+
+
+/* 
 #[tokio::main]
 async fn main() -> Result<()> {
     let routes_all = Router::new().merge(routes_actions());
@@ -20,7 +52,7 @@ async fn main() -> Result<()> {
     println!("->> LISTENING on {:?}\n", listener.local_addr());
     axum::serve(listener, routes_all.into_make_service())
         .await
-        .unwrap();
+        .unwrap(); 
     // endregion: --- Start Server
 
     Ok(())
@@ -233,3 +265,6 @@ impl Action<FixedTransferParams> for FixedTransferAction {
         Ok(BASE64_STANDARD.encode(serialized_transaction))
     }
 }
+ */
+
+
