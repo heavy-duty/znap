@@ -9,7 +9,7 @@ struct ActionStructAttributes {
     label: String,
 }
 
-fn actions_derive_macro2(
+fn action_derive_macro2(
     item: proc_macro2::TokenStream,
 ) -> deluxe::Result<proc_macro2::TokenStream> {
     // parse
@@ -49,7 +49,7 @@ fn actions_derive_macro2(
     })
 }
 
-#[proc_macro_derive(Action, attributes(action, query))]
-pub fn actions_derive_macro(item: proc_macro::TokenStream) -> proc_macro::TokenStream {
-    actions_derive_macro2(item.into()).unwrap().into()
+#[proc_macro_derive(Action, attributes(action))]
+pub fn action_derive_macro(item: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    action_derive_macro2(item.into()).unwrap().into()
 }

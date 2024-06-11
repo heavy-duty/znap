@@ -1,0 +1,13 @@
+[package]
+name = "collection-attribute"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+deluxe = "0.5.0"
+proc-macro2 = "1.0.85"
+quote = "1.0.36"
+syn = "2.0.66"
+
+[lib]
+proc-macro = true

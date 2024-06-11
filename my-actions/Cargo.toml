@@ -1,0 +1,15 @@
+[package]
+name = "my-actions"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+action-derive = { path = "../action-derive" }
+axum = "0.7.5"
+base64 = "0.22.1"
+bincode = "1.3.3"
+collection-attribute = { path = "../collection-attribute" }
+serde = "1.0.203"
+solana-sdk = "1.18.16"
+spl-associated-token-account = "3.0.2"
+spl-token = "4.0.1"
