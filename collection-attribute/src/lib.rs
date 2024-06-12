@@ -1,5 +1,5 @@
-use proc_macro2::{Ident, Span};
-use syn::{Type, FnArg, GenericArgument, Item, ItemMod, PathArguments};
+use proc_macro2::Ident;
+use syn::{FnArg, GenericArgument, Item, ItemMod, PathArguments, Type};
 
 fn collection_attribute_macro2(
     input: proc_macro::TokenStream,
@@ -22,19 +22,18 @@ fn collection_attribute_macro2(
     // Generate implementation for create_transaction for the actions
     let trait_impls = generate_trait_impl(&functions);
 
-    // Generate the trait implementation based on the found functions
-    let handlers = generate_handlers(&functions);
-
     // TODO: Handle queries for handlers
 
-    // TODO: Base handler methods names on the Action rather than fn name
+    // TODO: Make sure action handlers return a Transaction
+
+    // TODO: Generate Routes and main
 
     // TODO: Remove original function on behalf of generated one
 
     // Combine the original module with the generated trait implementation
     let result = quote::quote! {
         #input_module
-        #handlers
+        // #handlers
         #trait_impls
     };
 
@@ -72,51 +71,39 @@ fn extract_action_ident(f: &syn::ItemFn) -> Option<Ident> {
     Some(inner_type_path.path.segments.first()?.ident.clone())
 }
 
-
 fn generate_trait_impl(functions: &[syn::ItemFn]) -> proc_macro2::TokenStream {
-    let impls: Vec<proc_macro2::TokenStream> = functions.iter().map(|f| {
-        let action_ident = extract_action_ident(&f).unwrap();
-        let fn_block = &f.block;
+    let impls: Vec<proc_macro2::TokenStream> = functions
+        .iter()
+        .map(|f| {
+            let action_ident = extract_action_ident(&f).unwrap();
+            let fn_block = &f.block;
 
-        quote::quote! {
-            impl CreateTransaction for #action_ident {
-                fn create_transaction() -> Result<String, Error> {
-                    #fn_block
+            quote::quote! {
+                impl CreateTransaction for #action_ident {
+                    fn create_transaction() -> Result<String, Error> {
+                        #fn_block
+                    }
+                }
+
+                impl HandleGetAction for #action_ident {
+                    fn handle_get_action() -> Result<Json<ActionMetadata>, Error> {
+                        Ok(Json(#action_ident::to_metadata()))
+                    }
+                }
+
+                impl HandlePostAction for #action_ident {
+                    fn handle_post_action() -> Result<Json<ActionTransaction>, Error> {
+                        let transaction = #action_ident::create_transaction().unwrap();
+
+                        Ok(Json(ActionTransaction {
+                            transaction,
+                            message: None
+                        }))
+                    }
                 }
             }
-        }
-    }).collect();
-
-    quote::quote! {
-        #(#impls)*
-    }
-}
-
-fn generate_handlers(functions: &[syn::ItemFn]) -> proc_macro2::TokenStream {
-    let impls: Vec<proc_macro2::TokenStream> = functions.iter().map(|f| {
-        let action_ident = extract_action_ident(&f).unwrap();
-        let fn_name = &f.sig.ident;
-
-        let get_handler_fn_name: String = format!("handle_get_{}", fn_name.to_string());
-        let get_handler_ident = &Ident::new(&get_handler_fn_name, Span::call_site());
-        let post_handler_fn_name: String = format!("handle_post_{}", fn_name.to_string());
-        let post_handler_ident = &Ident::new(&post_handler_fn_name, Span::call_site());
-
-        quote::quote! {
-            async fn #get_handler_ident() -> Result<axum::Json<ActionMetadata>, axum::Error> {
-                Ok(axum::Json(#action_ident::to_metadata()))
-            }
-    
-            async fn #post_handler_ident(
-                axum::Json(payload): axum::Json<CreateActionPayload>,
-            ) -> Result<axum::Json<CreateActionResponse>, Error> {
-                Ok(axum::Json(CreateActionResponse {
-                    transaction: #action_ident::create_transaction().unwrap(),
-                    message: None
-                }))
-            }
-        }
-    }).collect();
+        })
+        .collect();
 
     quote::quote! {
         #(#impls)*
