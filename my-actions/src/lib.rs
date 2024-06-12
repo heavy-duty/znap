@@ -7,6 +7,7 @@ pub trait Action {
     fn title(&self) -> &'static str;
     fn description(&self) -> &'static str;
     fn label(&self) -> &'static str;
+    fn to_metadata(&self) -> ActionMetadata;
 }
 
 pub trait CreateTransaction {
@@ -28,10 +29,10 @@ pub struct FixedTransferAction;
 
 #[derive(Debug, Serialize)]
 pub struct ActionMetadata {
-    icon: String,
-    title: String,
-    description: String,
-    label: String,
+    icon: &'static str,
+    title: &'static str,
+    description: &'static str,
+    label: &'static str,
 }
 
 #[derive(Debug, Deserialize)]

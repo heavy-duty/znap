@@ -101,7 +101,7 @@ fn generate_handlers(functions: &[syn::ItemFn]) -> proc_macro2::TokenStream {
 
         quote::quote! {
             async fn #get_handler_ident() -> Result<axum::Json<ActionMetadata>, axum::Error> {
-                Ok(axum::Json(ActionMetadata { title: "".to_string(), description: "".to_string(), icon: "".to_string(), label: "".to_string() }))
+                Ok(axum::Json(ActionMetadata { title: "", description: "", icon: "", label: "" }))
             }
     
             async fn #post_handler_ident(

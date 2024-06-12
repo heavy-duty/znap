@@ -45,6 +45,15 @@ fn action_derive_macro2(
             fn label(&self) -> &'static str {
                 #label
             }
+
+            fn to_metadata(&self) -> ActionMetadata {
+                ActionMetadata {
+                    icon: self.icon(),
+                    title: self.title(),
+                    description: self.description(),
+                    label: self.label(),
+                }
+            }
         }
     })
 }
