@@ -30,28 +30,12 @@ fn action_derive_macro2(
     // generate
     Ok(quote::quote! {
         impl #impl_generics Action for #ident #type_generics #where_clause {
-            fn icon(&self) -> &'static str {
-                #icon
-            }
-
-            fn title(&self) -> &'static str {
-                #title
-            }
-
-            fn description(&self) -> &'static str {
-                #description
-            }
-
-            fn label(&self) -> &'static str {
-                #label
-            }
-
-            fn to_metadata(&self) -> ActionMetadata {
+            fn to_metadata() -> ActionMetadata {
                 ActionMetadata {
-                    icon: self.icon(),
-                    title: self.title(),
-                    description: self.description(),
-                    label: self.label(),
+                    icon: #icon,
+                    title: #title,
+                    description: #description,
+                    label: #label,
                 }
             }
         }

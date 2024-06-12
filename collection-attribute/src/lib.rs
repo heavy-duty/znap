@@ -25,7 +25,9 @@ fn collection_attribute_macro2(
     // Generate the trait implementation based on the found functions
     let handlers = generate_handlers(&functions);
 
-    // TODO: Connect handler methods with the concrete action implementations
+    // TODO: Handle queries for handlers
+
+    // TODO: Base handler methods names on the Action rather than fn name
 
     // TODO: Remove original function on behalf of generated one
 
@@ -73,12 +75,12 @@ fn extract_action_ident(f: &syn::ItemFn) -> Option<Ident> {
 
 fn generate_trait_impl(functions: &[syn::ItemFn]) -> proc_macro2::TokenStream {
     let impls: Vec<proc_macro2::TokenStream> = functions.iter().map(|f| {
-        let action_ident = extract_action_ident(&functions[0]).unwrap();
+        let action_ident = extract_action_ident(&f).unwrap();
         let fn_block = &f.block;
 
         quote::quote! {
             impl CreateTransaction for #action_ident {
-                fn create_transaction(&self) -> Result<String, Error> {
+                fn create_transaction() -> Result<String, Error> {
                     #fn_block
                 }
             }
@@ -92,6 +94,7 @@ fn generate_trait_impl(functions: &[syn::ItemFn]) -> proc_macro2::TokenStream {
 
 fn generate_handlers(functions: &[syn::ItemFn]) -> proc_macro2::TokenStream {
     let impls: Vec<proc_macro2::TokenStream> = functions.iter().map(|f| {
+        let action_ident = extract_action_ident(&f).unwrap();
         let fn_name = &f.sig.ident;
 
         let get_handler_fn_name: String = format!("handle_get_{}", fn_name.to_string());
@@ -101,14 +104,14 @@ fn generate_handlers(functions: &[syn::ItemFn]) -> proc_macro2::TokenStream {
 
         quote::quote! {
             async fn #get_handler_ident() -> Result<axum::Json<ActionMetadata>, axum::Error> {
-                Ok(axum::Json(ActionMetadata { title: "", description: "", icon: "", label: "" }))
+                Ok(axum::Json(#action_ident::to_metadata()))
             }
     
             async fn #post_handler_ident(
                 axum::Json(payload): axum::Json<CreateActionPayload>,
             ) -> Result<axum::Json<CreateActionResponse>, Error> {
                 Ok(axum::Json(CreateActionResponse {
-                    transaction: "".to_string(),
+                    transaction: #action_ident::create_transaction().unwrap(),
                     message: None
                 }))
             }
@@ -121,7 +124,7 @@ fn generate_handlers(functions: &[syn::ItemFn]) -> proc_macro2::TokenStream {
 }
 
 #[proc_macro_attribute]
-pub fn collection_attribute_macro(
+pub fn collection(
     _args: proc_macro::TokenStream,
     input: proc_macro::TokenStream,
 ) -> proc_macro::TokenStream {

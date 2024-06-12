@@ -1,17 +1,13 @@
 pub use action_derive::Action;
-pub use collection_attribute::collection_attribute_macro;
+pub use collection_attribute::collection;
 use serde::{Deserialize, Serialize};
 
 pub trait Action {
-    fn icon(&self) -> &'static str;
-    fn title(&self) -> &'static str;
-    fn description(&self) -> &'static str;
-    fn label(&self) -> &'static str;
-    fn to_metadata(&self) -> ActionMetadata;
+    fn to_metadata() -> ActionMetadata;
 }
 
 pub trait CreateTransaction {
-    fn create_transaction(&self) -> Result<String, Error>;
+    fn create_transaction() -> Result<String, Error>;
 }
 
 pub struct Context<T> {
@@ -46,7 +42,7 @@ pub struct CreateActionResponse {
     message: Option<String>,
 }
 
-#[collection_attribute_macro]
+#[collection]
 pub mod my_actions {
     use super::*;
 
@@ -67,12 +63,13 @@ mod tests {
 
     #[test]
     fn it_works() {
-        let fixed_transfer_action = FixedTransferAction {};
-        
-        assert_eq!("Fixed transfer", fixed_transfer_action.title());
-        
-        let transaction = fixed_transfer_action.create_transaction().unwrap();
+        let fixed_transfer_action_metadata = FixedTransferAction::to_metadata();
 
-        assert_eq!("2", transaction);
+        assert_eq!("Fixed transfer", fixed_transfer_action_metadata.title);
+        
+        let fixed_transfer_action_transaction = FixedTransferAction::create_transaction().unwrap();
+
+        assert_eq!("2", fixed_transfer_action_transaction);
+
     }
 }
