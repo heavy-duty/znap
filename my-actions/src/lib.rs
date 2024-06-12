@@ -2,6 +2,7 @@ pub use action_derive::Action;
 pub use collection_attribute::collection;
 use serde::{Deserialize, Serialize};
 
+// START OF BOILERPLATE
 pub trait Action {
     fn to_metadata() -> ActionMetadata;
 }
@@ -12,23 +13,6 @@ pub trait CreateTransaction {
 
 pub struct Context<T> {
     value: T,
-}
-
-#[derive(Action)]
-#[action(
-    icon = "https://google.com",
-    title = "Fixed transfer",
-    description = "Send a fixed transfer fee to the treasury",
-    label = "Send"
-)]
-pub struct FixedTransferAction;
-
-#[derive(Debug, Serialize)]
-pub struct ActionMetadata {
-    icon: &'static str,
-    title: &'static str,
-    description: &'static str,
-    label: &'static str,
 }
 
 #[derive(Debug, Deserialize)]
@@ -42,6 +26,16 @@ pub struct CreateActionResponse {
     message: Option<String>,
 }
 
+#[derive(Debug, Serialize)]
+pub struct ActionMetadata {
+    icon: &'static str,
+    title: &'static str,
+    description: &'static str,
+    label: &'static str,
+}
+// END OF BOILERPLATE
+
+// START OF ACTUAL CODE
 #[collection]
 pub mod my_actions {
     use super::*;
@@ -51,12 +45,23 @@ pub mod my_actions {
     }
 }
 
+#[derive(Action)]
+#[action(
+    icon = "https://google.com",
+    title = "Fixed transfer",
+    description = "Send a fixed transfer fee to the treasury",
+    label = "Send"
+)]
+pub struct FixedTransferAction;
+
 #[derive(Debug)]
 pub enum Error {
     InvalidAccountPubkey,
     InvalidInstruction,
 }
+// END OF ACTUAL CODE
 
+// START TESTING
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -73,3 +78,4 @@ mod tests {
 
     }
 }
+// END TESTING
