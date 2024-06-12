@@ -79,23 +79,27 @@ fn generate_trait_impl(functions: &[syn::ItemFn]) -> proc_macro2::TokenStream {
             let fn_block = &f.block;
 
             quote::quote! {
-                impl CreateTransaction for #action_ident {
-                    fn create_transaction() -> Result<String, Error> {
+                impl CreateTransaction<#action_ident> for #action_ident {
+                    fn create_transaction(ctx: Context<#action_ident>) -> Result<String, Error> {
                         #fn_block
                     }
                 }
 
                 impl HandleGetAction for #action_ident {
-                    fn handle_get_action() -> Result<Json<ActionMetadata>, Error> {
-                        Ok(Json(#action_ident::to_metadata()))
+                    fn handle_get_action() -> Result<axum::Json<ActionMetadata>, Error> {
+                        Ok(axum::Json(#action_ident::to_metadata()))
                     }
                 }
 
                 impl HandlePostAction for #action_ident {
-                    fn handle_post_action() -> Result<Json<ActionTransaction>, Error> {
-                        let transaction = #action_ident::create_transaction().unwrap();
+                    fn handle_post_action(axum::Json(payload): axum::Json<CreateActionPayload>) -> Result<axum::Json<ActionTransaction>, Error> {
+                        let context = Context::<#action_ident> {
+                            payload,
+                            action: #action_ident {}
+                        };
+                        let transaction = #action_ident::create_transaction(context).unwrap();
 
-                        Ok(Json(ActionTransaction {
+                        Ok(axum::Json(ActionTransaction {
                             transaction,
                             message: None
                         }))

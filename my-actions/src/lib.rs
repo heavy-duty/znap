@@ -12,12 +12,13 @@ pub trait Action {
     fn to_metadata() -> ActionMetadata;
 }
 
-pub trait CreateTransaction {
-    fn create_transaction() -> Result<String, Error>;
+pub trait CreateTransaction<T> {
+    fn create_transaction(ctx: Context<T>) -> Result<String, Error>;
 }
 
-pub struct Context<T> {
-    value: T,
+pub struct Context<TAction> {
+    payload: CreateActionPayload,
+    action: TAction,
 }
 
 #[derive(Debug, Deserialize)]
@@ -44,7 +45,9 @@ pub trait HandleGetAction {
 }
 
 pub trait HandlePostAction {
-    fn handle_post_action() -> Result<Json<ActionTransaction>, Error>;
+    fn handle_post_action(
+        payload: Json<CreateActionPayload>,
+    ) -> Result<Json<ActionTransaction>, Error>;
 }
 
 // END OF BOILERPLATE
@@ -54,9 +57,8 @@ pub trait HandlePostAction {
 pub mod my_actions {
     use super::*;
 
-    pub fn fixed_transfer2(_ctx: Context<FixedTransferAction>) -> Result<String, Error> {
-        let account_pubkey = match Pubkey::from_str(&"4PYnraBJbdPXeMXdgL5k1m3TCcfNMaEWycvEQu2cteEV")
-        {
+    pub fn fixed_transfer2(ctx: Context<FixedTransferAction>) -> Result<String, Error> {
+        let account_pubkey = match Pubkey::from_str(&ctx.payload.account) {
             Ok(account_pubkey) => account_pubkey,
             _ => return Err(Error::InvalidAccountPubkey),
         };
@@ -122,10 +124,13 @@ mod tests {
 
         assert_eq!("Fixed transfer", fixed_transfer_action_metadata.title);
 
-        let fixed_transfer_action_transaction = FixedTransferAction::create_transaction().unwrap();
+        let fixed_transfer_action_transaction =
+            FixedTransferAction::handle_post_action(Json::from(CreateActionPayload {
+                account: "4PYnraBJbdPXeMXdgL5k1m3TCcfNMaEWycvEQu2cteEV".to_string(),
+            }))
+            .unwrap();
 
-        assert_eq!("AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAQEEMlnIyV1k2VNRqM4x48htBRRy5jUZ2umQgMwoQ53uf4q5cX+QxKq3dF2j8lUSI+G9tMrUBw/nxQWe4oaNVv7qhPxCeH+W3dRh/wUfr48nA/12tCHT4rv2+H/cXKS0IZgdBt324ddloZPZy+FGzut5rBy0he1fWzeROoz1hX7/AKkAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEDBAECAAAJAwEAAAAAAAAA", fixed_transfer_action_transaction);
-
+        assert_eq!("AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAQEEMlnIyV1k2VNRqM4x48htBRRy5jUZ2umQgMwoQ53uf4q5cX+QxKq3dF2j8lUSI+G9tMrUBw/nxQWe4oaNVv7qhPxCeH+W3dRh/wUfr48nA/12tCHT4rv2+H/cXKS0IZgdBt324ddloZPZy+FGzut5rBy0he1fWzeROoz1hX7/AKkAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEDBAECAAAJAwEAAAAAAAAA", fixed_transfer_action_transaction.transaction);
     }
 }
 // END TESTING
