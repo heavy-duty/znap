@@ -1,11 +1,6 @@
 pub use action_derive::Action;
-use base64::prelude::*;
-use bincode::serialize;
 pub use collection_attribute::collection_attribute_macro;
 use serde::{Deserialize, Serialize};
-use solana_sdk::{message::Message, pubkey::Pubkey, transaction::Transaction};
-use std::str::FromStr;
-
 
 pub trait Action {
     fn icon(&self) -> &'static str;
@@ -15,7 +10,7 @@ pub trait Action {
 }
 
 pub trait CreateTransaction {
-    fn create_transaction(&self) -> &'static str;
+    fn create_transaction(&self) -> Result<String, Error>;
 }
 
 pub struct Context<T> {
@@ -55,12 +50,11 @@ pub mod my_actions {
     use super::*;
 
     pub fn fixed_transfer2(_ctx: Context<FixedTransferAction>) -> Result<String, Error> {
-        
-
-        Ok("".to_string())
+        Ok(String::from("2"))
     }
 }
 
+#[derive(Debug)]
 pub enum Error {
     InvalidAccountPubkey,
     InvalidInstruction,
@@ -76,5 +70,8 @@ mod tests {
         
         assert_eq!("Fixed transfer", fixed_transfer_action.title());
         
+        let transaction = fixed_transfer_action.create_transaction().unwrap();
+
+        assert_eq!("2", transaction);
     }
 }

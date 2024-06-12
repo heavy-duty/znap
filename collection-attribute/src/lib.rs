@@ -1,5 +1,5 @@
 use proc_macro2::{Ident, Span};
-use syn::{Item, ItemMod};
+use syn::{Type, FnArg, GenericArgument, Item, ItemMod, PathArguments};
 
 fn collection_attribute_macro2(
     input: proc_macro::TokenStream,
@@ -19,7 +19,8 @@ fn collection_attribute_macro2(
         }
     }
 
-    // TODO: Generate implementation for create_transaction for the actions
+    // Generate implementation for create_transaction for the actions
+    let trait_impls = generate_trait_impl(&functions);
 
     // Generate the trait implementation based on the found functions
     let handlers = generate_handlers(&functions);
@@ -32,9 +33,61 @@ fn collection_attribute_macro2(
     let result = quote::quote! {
         #input_module
         #handlers
+        #trait_impls
     };
 
     Ok(result.into())
+}
+
+fn extract_action_ident(f: &syn::ItemFn) -> Option<Ident> {
+    let arg = f.sig.inputs.first()?;
+
+    let pattern_type = match arg {
+        FnArg::Typed(pt) => pt,
+        _ => return None,
+    };
+
+    let type_path = match pattern_type.ty.as_ref() {
+        Type::Path(tp) => tp,
+        _ => return None,
+    };
+
+    let inner_path = match &type_path.path.segments.first()?.arguments {
+        PathArguments::AngleBracketed(ip) => ip,
+        _ => return None,
+    };
+
+    let inner_type = match inner_path.args.first()? {
+        GenericArgument::Type(it) => it,
+        _ => return None,
+    };
+
+    let inner_type_path = match inner_type {
+        Type::Path(itp) => itp,
+        _ => return None,
+    };
+
+    Some(inner_type_path.path.segments.first()?.ident.clone())
+}
+
+
+fn generate_trait_impl(functions: &[syn::ItemFn]) -> proc_macro2::TokenStream {
+    let impls: Vec<proc_macro2::TokenStream> = functions.iter().map(|f| {
+        let action_ident = extract_action_ident(&functions[0]).unwrap();
+        let fn_block = &f.block;
+
+        quote::quote! {
+            impl CreateTransaction for #action_ident {
+                fn create_transaction(&self) -> Result<String, Error> {
+                    #fn_block
+                }
+            }
+        }
+    }).collect();
+
+    quote::quote! {
+        #(#impls)*
+    }
 }
 
 fn generate_handlers(functions: &[syn::ItemFn]) -> proc_macro2::TokenStream {
