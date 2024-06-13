@@ -1,74 +1,10 @@
+use action::*;
 use action_derive::Action;
-use axum::{extract::Query, Json};
 use base64::prelude::*;
 use collection_attribute::collection;
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 use solana_sdk::{message::Message, pubkey::Pubkey, transaction::Transaction};
 use std::{marker::PhantomData, str::FromStr};
-
-// START OF BOILERPLATE
-pub trait Action {}
-
-pub trait ToMetadata {
-    fn to_metadata(&self) -> ActionMetadata;
-}
-
-pub trait CreateTransaction<T> {
-    fn create_transaction(&self, ctx: Context<T>) -> Result<Transaction, Error>;
-}
-
-pub trait CreateTransactionWithQuery<T, U> {
-    fn create_transaction(&self, ctx: ContextWithQuery<T, U>) -> Result<Transaction, Error>;
-}
-
-pub struct Context<TAction> {
-    payload: CreateActionPayload,
-    action: PhantomData<TAction>,
-}
-
-pub struct ContextWithQuery<TAction, TQuery> {
-    payload: CreateActionPayload,
-    action: PhantomData<TAction>,
-    query: TQuery,
-}
-
-#[derive(Debug, Deserialize)]
-pub struct CreateActionPayload {
-    account: String,
-}
-
-#[derive(Debug, Serialize)]
-pub struct ActionTransaction {
-    transaction: String,
-    message: Option<String>,
-}
-
-#[derive(Debug, Serialize)]
-pub struct ActionMetadata {
-    icon: &'static str,
-    title: &'static str,
-    description: &'static str,
-    label: &'static str,
-}
-
-pub trait HandleGetAction {
-    fn handle_get_action() -> Result<Json<ActionMetadata>, Error>;
-}
-
-pub trait HandlePostAction {
-    fn handle_post_action(
-        payload: Json<CreateActionPayload>,
-    ) -> Result<Json<ActionTransaction>, Error>;
-}
-
-pub trait HandlePostActionWithQuery<T> {
-    fn handle_post_action(
-        payload: Json<CreateActionPayload>,
-        query: Query<T>,
-    ) -> Result<Json<ActionTransaction>, Error>;
-}
-
-// END OF BOILERPLATE
 
 // START OF ACTUAL CODE
 #[collection]
@@ -166,18 +102,12 @@ pub struct DynamicTransferAction;
 pub struct DynamicTransferQuery {
     pub amount: u64,
 }
-
-#[derive(Debug, Serialize)]
-pub enum Error {
-    InvalidAccountPubkey,
-    InvalidInstruction,
-}
 // END OF ACTUAL CODE
 
 // START TESTING
 #[cfg(test)]
 mod tests {
-    use axum::http::Uri;
+    use axum::{extract::Query, http::Uri, Json};
 
     use super::*;
 

@@ -3,6 +3,15 @@
 version = 3
 
 [[package]]
+name = "action"
+version = "0.1.0"
+dependencies = [
+ "axum",
+ "serde",
+ "solana-sdk",
+]
+
+[[package]]
 name = "action-api"
 version = "0.1.0"
 dependencies = [
@@ -1457,6 +1466,7 @@ dependencies = [
 name = "my-actions"
 version = "0.1.0"
 dependencies = [
+ "action",
  "action-derive",
  "axum",
  "base64 0.22.1",

@@ -1,0 +1,9 @@
+[package]
+name = "action"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+axum = "0.7.5"
+serde = "1.0.203"
+solana-sdk = "1.18.16"

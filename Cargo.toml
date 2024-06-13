@@ -1,4 +1,4 @@
-workspace = { members = ["action-derive", "collection-attribute", "my-actions"] }
+workspace = { members = [ "action","action-derive", "collection-attribute", "my-actions"] }
 
 [package]
 name = "action-api"
