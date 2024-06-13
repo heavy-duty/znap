@@ -1,6 +1,36 @@
 use proc_macro2::Ident;
 use syn::{Block, FnArg, GenericArgument, Item, ItemMod, PathArguments, Type};
 
+fn collection_attribute_macro2(
+    input: proc_macro::TokenStream,
+) -> Result<proc_macro::TokenStream, syn::Error> {
+    // Parse the input tokens into a syntax tree
+    let input_module: ItemMod = syn::parse(input)?;
+
+    // Initialize an empty vector to hold function names
+    let mut functions = Vec::new();
+
+    // If the module has content, iterate over it to find function items
+    if let Some((_, items)) = &input_module.content {
+        for item in items {
+            if let Item::Fn(item_fn) = item {
+                functions.push(item_fn.clone());
+            }
+        }
+    }
+
+    // Generate implementation for create_transaction for the actions
+    let trait_impls = generate_trait_impl(&functions);
+
+    // Combine the original module with the generated trait implementation
+    let result = quote::quote! {
+        #input_module
+        #trait_impls
+    };
+
+    Ok(result.into())
+}
+
 fn extract_action_ident(f: &syn::ItemFn) -> Option<&Ident> {
     if let FnArg::Typed(pt) = f.sig.inputs.first()? {
         if let Type::Path(type_path) = pt.ty.as_ref() {
@@ -155,29 +185,5 @@ pub fn collection(
     _args: proc_macro::TokenStream,
     input: proc_macro::TokenStream,
 ) -> proc_macro::TokenStream {
-    // Parse the input tokens into a syntax tree
-    let input_module: ItemMod = syn::parse(input).unwrap();
-
-    // Initialize an empty vector to hold function names
-    let mut functions = Vec::new();
-
-    // If the module has content, iterate over it to find function items
-    if let Some((_, items)) = &input_module.content {
-        for item in items {
-            if let Item::Fn(item_fn) = item {
-                functions.push(item_fn.clone());
-            }
-        }
-    }
-
-    // Generate implementation for create_transaction for the actions
-    let trait_impls = generate_trait_impl(&functions);
-
-    // Combine the original module with the generated trait implementation
-    let result = quote::quote! {
-        #input_module
-        #trait_impls
-    };
-
-    result.into()
+    collection_attribute_macro2(input.into()).unwrap().into()
 }
