@@ -1,24 +1,36 @@
-pub use action_derive::Action;
-use axum::Json;
+use action_derive::Action;
+use axum::{extract::Query, Json};
 use base64::prelude::*;
 use bincode::serialize;
-pub use collection_attribute::collection;
+use collection_attribute::collection;
 use serde::{Deserialize, Serialize};
 use solana_sdk::{message::Message, pubkey::Pubkey, transaction::Transaction};
-use std::str::FromStr;
+use std::{marker::PhantomData, str::FromStr};
 
 // START OF BOILERPLATE
-pub trait Action {
-    fn to_metadata() -> ActionMetadata;
+pub trait Action {}
+
+pub trait ToMetadata {
+    fn to_metadata(&self) -> ActionMetadata;
 }
 
 pub trait CreateTransaction<T> {
-    fn create_transaction(ctx: Context<T>) -> Result<String, Error>;
+    fn create_transaction(&self, ctx: Context<T>) -> Result<String, Error>;
+}
+
+pub trait CreateTransactionWithQuery<T, U> {
+    fn create_transaction(&self, ctx: ContextWithQuery<T, U>) -> Result<String, Error>;
 }
 
 pub struct Context<TAction> {
     payload: CreateActionPayload,
-    action: TAction,
+    action: PhantomData<TAction>,
+}
+
+pub struct ContextWithQuery<TAction, TQuery> {
+    payload: CreateActionPayload,
+    action: PhantomData<TAction>,
+    query: TQuery,
 }
 
 #[derive(Debug, Deserialize)]
@@ -47,6 +59,13 @@ pub trait HandleGetAction {
 pub trait HandlePostAction {
     fn handle_post_action(
         payload: Json<CreateActionPayload>,
+    ) -> Result<Json<ActionTransaction>, Error>;
+}
+
+pub trait HandlePostActionWithQuery<T> {
+    fn handle_post_action(
+        payload: Json<CreateActionPayload>,
+        query: Query<T>,
     ) -> Result<Json<ActionTransaction>, Error>;
 }
 
@@ -96,7 +115,9 @@ pub mod my_actions {
         Ok(encoded_transaction)
     }
 
-    pub fn dynamic_transfer(ctx: Context<DynamicTransferAction>) -> Result<String, Error> {
+    pub fn dynamic_transfer(
+        ctx: ContextWithQuery<DynamicTransferAction, DynamicTransferQuery>,
+    ) -> Result<String, Error> {
         let account_pubkey = match Pubkey::from_str(&ctx.payload.account) {
             Ok(account_pubkey) => account_pubkey,
             _ => return Err(Error::InvalidAccountPubkey),
@@ -119,7 +140,7 @@ pub mod my_actions {
             &destination_pubkey,
             &account_pubkey,
             &[&account_pubkey],
-            1,
+            ctx.query.amount,
         ) {
             Ok(transfer_instruction) => transfer_instruction,
             _ => return Err(Error::InvalidInstruction),
@@ -154,6 +175,11 @@ pub struct FixedTransferAction;
 )]
 pub struct DynamicTransferAction;
 
+#[derive(Deserialize)]
+pub struct DynamicTransferQuery {
+    pub amount: u64,
+}
+
 #[derive(Debug, Serialize)]
 pub enum Error {
     InvalidAccountPubkey,
@@ -164,36 +190,42 @@ pub enum Error {
 // START TESTING
 #[cfg(test)]
 mod tests {
+    use axum::http::Uri;
+
     use super::*;
 
     #[test]
     fn it_handles_fixed_transfer_action() {
-        let fixed_transfer_action_metadata = FixedTransferAction::to_metadata();
+        let action = FixedTransferAction {};
+        let action_metadata = action.to_metadata();
 
-        assert_eq!("Fixed transfer", fixed_transfer_action_metadata.title);
+        assert_eq!("Fixed transfer", action_metadata.title);
 
-        let fixed_transfer_action_transaction =
+        let action_transaction =
             FixedTransferAction::handle_post_action(Json::from(CreateActionPayload {
                 account: "4PYnraBJbdPXeMXdgL5k1m3TCcfNMaEWycvEQu2cteEV".to_string(),
             }))
             .unwrap();
 
-        assert_eq!("AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAQEEMlnIyV1k2VNRqM4x48htBRRy5jUZ2umQgMwoQ53uf4q5cX+QxKq3dF2j8lUSI+G9tMrUBw/nxQWe4oaNVv7qhPxCeH+W3dRh/wUfr48nA/12tCHT4rv2+H/cXKS0IZgdBt324ddloZPZy+FGzut5rBy0he1fWzeROoz1hX7/AKkAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEDBAECAAAJAwEAAAAAAAAA", fixed_transfer_action_transaction.transaction);
+        assert_eq!("AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAQEEMlnIyV1k2VNRqM4x48htBRRy5jUZ2umQgMwoQ53uf4q5cX+QxKq3dF2j8lUSI+G9tMrUBw/nxQWe4oaNVv7qhPxCeH+W3dRh/wUfr48nA/12tCHT4rv2+H/cXKS0IZgdBt324ddloZPZy+FGzut5rBy0he1fWzeROoz1hX7/AKkAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEDBAECAAAJAwEAAAAAAAAA", action_transaction.transaction);
     }
 
     #[test]
     fn it_handles_dynamic_transfer_action() {
-        let dynamic_transfer_action_metadata = DynamicTransferAction::to_metadata();
+        let action = DynamicTransferAction {};
+        let action_metadata = action.to_metadata();
 
-        assert_eq!("Dynamic transfer", dynamic_transfer_action_metadata.title);
+        // DynamicTransferAction.create_transaction(ctx);
+        assert_eq!("Dynamic transfer", action_metadata.title);
 
-        let dynamic_transfer_action_transaction =
-            DynamicTransferAction::handle_post_action(Json::from(CreateActionPayload {
-                account: "4PYnraBJbdPXeMXdgL5k1m3TCcfNMaEWycvEQu2cteEV".to_string(),
-            }))
-            .unwrap();
+        let payload = Json::from(CreateActionPayload {
+            account: "4PYnraBJbdPXeMXdgL5k1m3TCcfNMaEWycvEQu2cteEV".to_string(),
+        });
+        let uri = Uri::from_str("http://example.com/path?amount=5").unwrap();
+        let query: Query<DynamicTransferQuery> = Query::try_from_uri(&uri).unwrap();
+        let action_transaction = DynamicTransferAction::handle_post_action(payload, query).unwrap();
 
-        assert_eq!("AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAQEEMlnIyV1k2VNRqM4x48htBRRy5jUZ2umQgMwoQ53uf4q5cX+QxKq3dF2j8lUSI+G9tMrUBw/nxQWe4oaNVv7qhPxCeH+W3dRh/wUfr48nA/12tCHT4rv2+H/cXKS0IZgdBt324ddloZPZy+FGzut5rBy0he1fWzeROoz1hX7/AKkAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEDBAECAAAJAwEAAAAAAAAA", dynamic_transfer_action_transaction.transaction);
+        assert_eq!("AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAQEEMlnIyV1k2VNRqM4x48htBRRy5jUZ2umQgMwoQ53uf4q5cX+QxKq3dF2j8lUSI+G9tMrUBw/nxQWe4oaNVv7qhPxCeH+W3dRh/wUfr48nA/12tCHT4rv2+H/cXKS0IZgdBt324ddloZPZy+FGzut5rBy0he1fWzeROoz1hX7/AKkAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEDBAECAAAJAwUAAAAAAAAA", action_transaction.transaction);
     }
 }
 // END TESTING

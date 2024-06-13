@@ -25,12 +25,10 @@ fn action_derive_macro2(
 
     // define impl variables
     let ident = &ast.ident;
-    let (impl_generics, type_generics, where_clause) = ast.generics.split_for_impl();
 
-    // generate
-    Ok(quote::quote! {
-        impl #impl_generics Action for #ident #type_generics #where_clause {
-            fn to_metadata() -> ActionMetadata {
+    let to_metadata_impl = quote::quote! {
+        impl ToMetadata for #ident {
+            fn to_metadata(&self) -> ActionMetadata {
                 ActionMetadata {
                     icon: #icon,
                     title: #title,
@@ -39,10 +37,15 @@ fn action_derive_macro2(
                 }
             }
         }
+    };
+
+    // generate
+    Ok(quote::quote! {
+        #to_metadata_impl
     })
 }
 
-#[proc_macro_derive(Action, attributes(action))]
+#[proc_macro_derive(Action, attributes(action, query))]
 pub fn action_derive_macro(item: proc_macro::TokenStream) -> proc_macro::TokenStream {
     action_derive_macro2(item.into()).unwrap().into()
 }
