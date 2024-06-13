@@ -22,8 +22,6 @@ fn collection_attribute_macro2(
     // Generate implementation for create_transaction for the actions
     let trait_impls = generate_trait_impl(&functions);
 
-    // TODO: Make sure action handlers return a Transaction
-
     // TODO: Generate Routes and main
 
     // TODO: Remove original function on behalf of generated one
@@ -31,7 +29,6 @@ fn collection_attribute_macro2(
     // Combine the original module with the generated trait implementation
     let result = quote::quote! {
         #input_module
-        // #handlers
         #trait_impls
     };
 
@@ -127,7 +124,7 @@ fn generate_trait_impl(functions: &[syn::ItemFn]) -> proc_macro2::TokenStream {
             if let Some(action_query_type_ident) = extract_action_query(&f) {
                 create_transaction_impl = quote::quote! {
                     impl CreateTransactionWithQuery<#action_ident, #action_query_type_ident> for #action_ident {
-                        fn create_transaction(&self, ctx: ContextWithQuery<#action_ident, #action_query_type_ident>) -> Result<String, Error> {
+                        fn create_transaction(&self, ctx: ContextWithQuery<#action_ident, #action_query_type_ident>) -> Result<solana_sdk::transaction::Transaction, Error> {
                             #fn_block
                         }
                     }
@@ -146,9 +143,11 @@ fn generate_trait_impl(functions: &[syn::ItemFn]) -> proc_macro2::TokenStream {
                                 query
                             };
                             let transaction = action.create_transaction(context_with_query).unwrap();
-    
+                            let serialized_transaction = bincode::serialize(&transaction).unwrap();
+                            let encoded_transaction = BASE64_STANDARD.encode(serialized_transaction);
+                    
                             Ok(axum::Json(ActionTransaction {
-                                transaction,
+                                transaction: encoded_transaction,
                                 message: None
                             }))
                         }
@@ -157,7 +156,7 @@ fn generate_trait_impl(functions: &[syn::ItemFn]) -> proc_macro2::TokenStream {
             } else {
                 create_transaction_impl = quote::quote! {
                     impl CreateTransaction<#action_ident> for #action_ident {
-                        fn create_transaction(&self, ctx: Context<#action_ident>) -> Result<String, Error> {
+                        fn create_transaction(&self, ctx: Context<#action_ident>) -> Result<solana_sdk::transaction::Transaction, Error> {
                             #fn_block
                         }
                     }
@@ -172,9 +171,11 @@ fn generate_trait_impl(functions: &[syn::ItemFn]) -> proc_macro2::TokenStream {
                                 action: PhantomData,
                             };
                             let transaction = action.create_transaction(context).unwrap();
+                            let serialized_transaction = bincode::serialize(&transaction).unwrap();
+                            let encoded_transaction = BASE64_STANDARD.encode(serialized_transaction);
         
                             Ok(axum::Json(ActionTransaction {
-                                transaction,
+                                transaction: encoded_transaction,
                                 message: None
                             }))
                         }

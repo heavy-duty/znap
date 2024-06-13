@@ -650,9 +650,11 @@ dependencies = [
 name = "collection-attribute"
 version = "0.1.0"
 dependencies = [
+ "bincode",
  "deluxe",
  "proc-macro2",
  "quote",
+ "solana-sdk",
  "syn 2.0.66",
 ]
 
