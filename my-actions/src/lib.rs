@@ -116,13 +116,20 @@ mod tests {
         let action = FixedTransferAction {};
         let action_metadata = action.to_metadata();
 
-        assert_eq!("Fixed transfer", action_metadata.title);
+        assert_eq!(
+            action_metadata,
+            ActionMetadata {
+                icon: "https://google.com",
+                title: "Fixed transfer",
+                description: "Send a fixed transfer to the treasury",
+                label: "Send",
+            }
+        );
 
-        let action_transaction =
-            FixedTransferAction::handle_post_action(Json::from(CreateActionPayload {
-                account: "4PYnraBJbdPXeMXdgL5k1m3TCcfNMaEWycvEQu2cteEV".to_string(),
-            }))
-            .unwrap();
+        let payload = Json::from(CreateActionPayload {
+            account: "4PYnraBJbdPXeMXdgL5k1m3TCcfNMaEWycvEQu2cteEV".to_string(),
+        });
+        let action_transaction = FixedTransferAction::handle_post_action(payload).unwrap();
 
         assert_eq!("AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAQEEMlnIyV1k2VNRqM4x48htBRRy5jUZ2umQgMwoQ53uf4q5cX+QxKq3dF2j8lUSI+G9tMrUBw/nxQWe4oaNVv7qhPxCeH+W3dRh/wUfr48nA/12tCHT4rv2+H/cXKS0IZgdBt324ddloZPZy+FGzut5rBy0he1fWzeROoz1hX7/AKkAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEDBAECAAAJAwEAAAAAAAAA", action_transaction.transaction);
     }
@@ -132,8 +139,15 @@ mod tests {
         let action = DynamicTransferAction {};
         let action_metadata = action.to_metadata();
 
-        // DynamicTransferAction.create_transaction(ctx);
-        assert_eq!("Dynamic transfer", action_metadata.title);
+        assert_eq!(
+            action_metadata,
+            ActionMetadata {
+                icon: "https://google.com",
+                title: "Dynamic transfer",
+                description: "Send a dynamic transfer to the treasury",
+                label: "Send",
+            }
+        );
 
         let payload = Json::from(CreateActionPayload {
             account: "4PYnraBJbdPXeMXdgL5k1m3TCcfNMaEWycvEQu2cteEV".to_string(),

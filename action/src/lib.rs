@@ -40,7 +40,7 @@ pub struct ActionTransaction {
     pub message: Option<String>,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, PartialEq)]
 pub struct ActionMetadata {
     pub icon: &'static str,
     pub title: &'static str,
