@@ -1,6 +1,5 @@
 use crate::CollectionMod;
 use quote::quote;
-pub mod common;
 mod create_transaction;
 mod handle_get;
 mod handle_post;
