@@ -1,6 +1,6 @@
 use serde::Deserialize;
 use solana_sdk::{message::Message, pubkey::Pubkey, transaction::Transaction};
-use std::{marker::PhantomData, str::FromStr};
+use std::str::FromStr;
 use znap_lang::*;
 
 // START OF ACTUAL CODE

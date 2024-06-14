@@ -1,4 +1,4 @@
-use std::marker::PhantomData;
+pub use std::marker::PhantomData;
 
 pub use znap_attribute_collection::collection;
 pub use znap_derive_action::Action;
