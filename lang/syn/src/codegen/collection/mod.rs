@@ -1,11 +1,18 @@
 use crate::CollectionMod;
 use quote::quote;
+mod handle_post;
+mod handle_get;
+mod create_transaction;
+pub mod common;
 
 pub fn generate(collection_mod: &CollectionMod) -> proc_macro2::TokenStream {
-    let mod_name = &collection_mod.name;
-
+    let handle_post = handle_post::generate(collection_mod);
+    let handle_get = handle_get::generate(collection_mod);
+    let create_transaction = create_transaction::generate(collection_mod);
+    
     quote! {
-        // TODO: remove once we allow segmented paths in `Accounts` structs.
-        
+        #handle_post
+        #handle_get
+        #create_transaction 
     }
 }
