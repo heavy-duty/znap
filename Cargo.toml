@@ -1,10 +1,13 @@
 [workspace]
 members = [ 
-    "my-actions", 
+    "examples/my-actions", 
     "lang", 
     "lang/attribute/*",
     "lang/derive/*",
     "lang/syn",
+]
+exclude = [
+    "examples/api", 
 ]
 
 [package]
