@@ -14,7 +14,7 @@ pub mod my_actions {
             _ => return Err(ActionError::new(StatusCode::BAD_REQUEST, "Invalid account public key")),
         };
         let mint_pubkey =
-            Pubkey::from_str(&"4PYnraBJbdPXeMXdgL5k1m3TCcfNMaEWycvEQu2cteEV").unwrap();
+            Pubkey::from_str(&"7jfe8e75i7dwiyYQVEhYUgyqWP3i96mFievsrAaVGw2n").unwrap();
         let receiver_pubkey =
             Pubkey::from_str(&"6GBLiSwAPhDMttmdjo3wvEsssEnCiW3yZwVyVZnhFm3G").unwrap();
         let source_pubkey = spl_associated_token_account::get_associated_token_address(
@@ -49,7 +49,7 @@ pub mod my_actions {
             _ => return Err(ActionError::new(StatusCode::BAD_REQUEST, "Invalid account public key")),
         };
         let mint_pubkey =
-            Pubkey::from_str(&"4PYnraBJbdPXeMXdgL5k1m3TCcfNMaEWycvEQu2cteEV").unwrap();
+            Pubkey::from_str(&"7jfe8e75i7dwiyYQVEhYUgyqWP3i96mFievsrAaVGw2n").unwrap();
         let receiver_pubkey =
             Pubkey::from_str(&"6GBLiSwAPhDMttmdjo3wvEsssEnCiW3yZwVyVZnhFm3G").unwrap();
         let source_pubkey = spl_associated_token_account::get_associated_token_address(

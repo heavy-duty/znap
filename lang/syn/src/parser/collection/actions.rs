@@ -9,6 +9,8 @@ use syn::{
     Item, ItemFn, ItemMod,
 };
 
+use super::common::action_name_without_suffix;
+
 pub fn parse(collection_mod: &ItemMod) -> ParseResult<Vec<ActionFn>> {
     let mod_content = &collection_mod
         .content
@@ -24,20 +26,16 @@ pub fn parse(collection_mod: &ItemMod) -> ParseResult<Vec<ActionFn>> {
         })
         .map(|method: &ItemFn| {
             let action_ident = extract_action_ident(&method).unwrap();
-            let handle_get_name = format!(
-                "handle_get_{}",
-                action_ident.to_string().to_case(Case::Snake)
-            );
-            let handle_get_ident = Ident::new(&handle_get_name, Span::call_site());
-            let handle_post_name = format!(
-                "handle_post_{}",
-                action_ident.to_string().to_case(Case::Snake)
-            );
-            let handle_post_ident = Ident::new(&handle_post_name, Span::call_site());
+            let action_name = action_ident.to_string().to_case(Case::Snake);
+            let handle_get_ident =
+                Ident::new(&format!("handle_get_{}", action_name), Span::call_site());
+            let handle_post_ident =
+                Ident::new(&format!("handle_post_{}", action_name), Span::call_site());
             let action_query_ident = match extract_action_query(&method) {
                 Some(ident) => Some(ident.clone()),
-                _ => None
+                _ => None,
             };
+            let route_path = action_name_without_suffix(action_name);
 
             Ok(ActionFn {
                 raw_method: method.clone(),
@@ -46,6 +44,7 @@ pub fn parse(collection_mod: &ItemMod) -> ParseResult<Vec<ActionFn>> {
                 handle_post_ident,
                 action_ident: action_ident.clone(),
                 action_query_ident,
+                route_path,
             })
         })
         .collect::<ParseResult<Vec<ActionFn>>>()?;

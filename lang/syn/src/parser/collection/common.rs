@@ -35,3 +35,12 @@ pub fn extract_action_query(f: &ItemFn) -> Option<&Ident> {
     }
     None
 }
+
+pub fn action_name_without_suffix(action_name: String) -> String {
+    let action_name_splitted: Vec<&str> = action_name
+        .split("_")
+        .collect();
+    let (_, action_name_without_suffix) = action_name_splitted.split_last().unwrap();
+    
+    format!("/actions/{}", action_name_without_suffix.join("_"))
+}
