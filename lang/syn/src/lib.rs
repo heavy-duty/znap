@@ -1,6 +1,5 @@
 pub mod codegen;
 pub mod parser;
-
 use codegen::action as action_codegen;
 use codegen::collection as collection_codegen;
 use deluxe::ExtractAttributes;
@@ -46,7 +45,7 @@ pub struct ActionFn {
     pub handle_get_ident: Ident,
     pub handle_post_ident: Ident,
     pub action_ident: Ident,
-    pub action_query_ident: Option<Ident>
+    pub action_query_ident: Option<Ident>,
 }
 
 #[derive(Debug)]
