@@ -7,6 +7,8 @@ use solana_sdk::transaction::Transaction;
 pub use std::marker::PhantomData;
 pub use znap_attribute_collection::collection;
 pub use znap_derive_action::Action;
+pub use bincode;
+pub use std::str::FromStr;
 
 pub trait Action {}
 

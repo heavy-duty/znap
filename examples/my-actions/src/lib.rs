@@ -1,30 +1,31 @@
+use axum::http::StatusCode;
 use serde::Deserialize;
 use solana_sdk::{message::Message, pubkey::Pubkey, transaction::Transaction};
-use std::str::FromStr;
+use spl_associated_token_account::get_associated_token_address;
+use spl_token::{instruction::transfer, ID as TOKEN_PROGRAM_ID};
 use znap_lang::*;
-use axum::http::StatusCode;
 
 #[collection]
 pub mod my_actions {
+
     use super::*;
 
     pub fn fixed_transfer(ctx: Context<FixedTransferAction>) -> Result<Transaction, ActionError> {
         let account_pubkey = match Pubkey::from_str(&ctx.payload.account) {
             Ok(account_pubkey) => account_pubkey,
-            _ => return Err(ActionError::new(StatusCode::BAD_REQUEST, "Invalid account public key")),
+            _ => {
+                return Err(ActionError::new(
+                    StatusCode::BAD_REQUEST,
+                    "Invalid account public key",
+                ))
+            }
         };
         let mint_pubkey =
             Pubkey::from_str(&"7jfe8e75i7dwiyYQVEhYUgyqWP3i96mFievsrAaVGw2n").unwrap();
         let receiver_pubkey =
             Pubkey::from_str(&"6GBLiSwAPhDMttmdjo3wvEsssEnCiW3yZwVyVZnhFm3G").unwrap();
-        let source_pubkey = spl_associated_token_account::get_associated_token_address(
-            &account_pubkey,
-            &mint_pubkey,
-        );
-        let destination_pubkey = spl_associated_token_account::get_associated_token_address(
-            &receiver_pubkey,
-            &mint_pubkey,
-        );
+        let source_pubkey = get_associated_token_address(&account_pubkey, &mint_pubkey);
+        let destination_pubkey = get_associated_token_address(&receiver_pubkey, &mint_pubkey);
         let transfer_instruction = match spl_token::instruction::transfer(
             &spl_token::ID,
             &source_pubkey,
@@ -34,7 +35,12 @@ pub mod my_actions {
             1,
         ) {
             Ok(transfer_instruction) => transfer_instruction,
-            _ => return Err(ActionError::new(StatusCode::BAD_REQUEST, "Invalid instruction")),
+            _ => {
+                return Err(ActionError::new(
+                    StatusCode::BAD_REQUEST,
+                    "Invalid instruction",
+                ))
+            }
         };
         let transaction_message = Message::new(&[transfer_instruction], None);
 
@@ -46,22 +52,21 @@ pub mod my_actions {
     ) -> Result<Transaction, ActionError> {
         let account_pubkey = match Pubkey::from_str(&ctx.payload.account) {
             Ok(account_pubkey) => account_pubkey,
-            _ => return Err(ActionError::new(StatusCode::BAD_REQUEST, "Invalid account public key")),
+            _ => {
+                return Err(ActionError::new(
+                    StatusCode::BAD_REQUEST,
+                    "Invalid account public key",
+                ))
+            }
         };
         let mint_pubkey =
             Pubkey::from_str(&"7jfe8e75i7dwiyYQVEhYUgyqWP3i96mFievsrAaVGw2n").unwrap();
         let receiver_pubkey =
             Pubkey::from_str(&"6GBLiSwAPhDMttmdjo3wvEsssEnCiW3yZwVyVZnhFm3G").unwrap();
-        let source_pubkey = spl_associated_token_account::get_associated_token_address(
-            &account_pubkey,
-            &mint_pubkey,
-        );
-        let destination_pubkey = spl_associated_token_account::get_associated_token_address(
-            &receiver_pubkey,
-            &mint_pubkey,
-        );
-        let transfer_instruction = match spl_token::instruction::transfer(
-            &spl_token::ID,
+        let source_pubkey = get_associated_token_address(&account_pubkey, &mint_pubkey);
+        let destination_pubkey = get_associated_token_address(&receiver_pubkey, &mint_pubkey);
+        let transfer_instruction = match transfer(
+            &TOKEN_PROGRAM_ID,
             &source_pubkey,
             &destination_pubkey,
             &account_pubkey,
@@ -69,7 +74,12 @@ pub mod my_actions {
             ctx.query.amount,
         ) {
             Ok(transfer_instruction) => transfer_instruction,
-            _ => return Err(ActionError::new(StatusCode::BAD_REQUEST, "Invalid instruction")),
+            _ => {
+                return Err(ActionError::new(
+                    StatusCode::BAD_REQUEST,
+                    "Invalid instruction",
+                ))
+            }
         };
         let transaction_message = Message::new(&[transfer_instruction], None);
 
