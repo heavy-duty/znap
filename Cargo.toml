@@ -3,7 +3,8 @@ members = [
     "my-actions", 
     "lang", 
     "lang/attribute/*",
-    "lang/derive/*"
+    "lang/derive/*",
+    "lang/syn",
 ]
 
 [package]

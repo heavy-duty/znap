@@ -9,6 +9,7 @@ proc-macro2 = "1.0.85"
 quote = "1.0.36"
 solana-sdk = "1.18.16"
 syn = "2.0.66"
+znap-syn = { path = "../../syn" }
 
 [lib]
 proc-macro = true

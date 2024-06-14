@@ -1,34 +1,22 @@
 use proc_macro2::Ident;
-use syn::{Block, FnArg, GenericArgument, Item, ItemMod, PathArguments, Type};
+use syn::{parse_macro_input, Block, FnArg, GenericArgument, PathArguments, Type};
+use znap_syn::{ActionFn, CollectionMod};
 
-fn collection_attribute_macro2(
-    input: proc_macro::TokenStream,
-) -> Result<proc_macro::TokenStream, syn::Error> {
-    // Parse the input tokens into a syntax tree
-    let input_module: ItemMod = syn::parse(input)?;
+fn collection_attribute_macro2(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    let collection_mod: CollectionMod = parse_macro_input!(input as znap_syn::CollectionMod);
 
-    // Initialize an empty vector to hold function names
-    let mut functions = Vec::new();
+    // println!("{:?}", collection_mod);
+    
+    let trait_impls = generate_trait_impl(&collection_mod.action_fns);
 
-    // If the module has content, iterate over it to find function items
-    if let Some((_, items)) = &input_module.content {
-        for item in items {
-            if let Item::Fn(item_fn) = item {
-                functions.push(item_fn.clone());
-            }
-        }
-    }
-
-    // Generate implementation for create_transaction for the actions
-    let trait_impls = generate_trait_impl(&functions);
-
-    // Combine the original module with the generated trait implementation
     let result = quote::quote! {
-        #input_module
+        #collection_mod
         #trait_impls
     };
 
-    Ok(result.into())
+    // println!("{:?}", result);
+
+    result.into()
 }
 
 fn extract_action_ident(f: &syn::ItemFn) -> Option<&Ident> {
@@ -152,20 +140,23 @@ fn generate_handle_get_action_impl(action_ident: &Ident) -> proc_macro2::TokenSt
     }
 }
 
-fn generate_trait_impl(functions: &[syn::ItemFn]) -> proc_macro2::TokenStream {
-    let impls: Vec<proc_macro2::TokenStream> = functions
+fn generate_trait_impl(action_fns: &[ActionFn]) -> proc_macro2::TokenStream {
+    let impls: Vec<proc_macro2::TokenStream> = action_fns
         .iter()
-        .map(|f| {
-            let action_ident = extract_action_ident(&f).unwrap();
-            let fn_block = &f.block;
+        .map(|action_fn| {
+            let action_ident = extract_action_ident(&action_fn.raw_method).unwrap();
+            let fn_block = &action_fn.raw_method.block;
             let handle_get_action_impl = generate_handle_get_action_impl(action_ident);
 
-            let (create_transaction_impl, handle_post_action_impl) =
-                if let Some(action_query_type_ident) = extract_action_query(&f) {
-                    generate_impls_with_query(action_ident, fn_block, action_query_type_ident)
-                } else {
-                    generate_impls_without_query(action_ident, fn_block)
-                };
+            let (create_transaction_impl, handle_post_action_impl) = if let Some(
+                action_query_type_ident,
+            ) =
+                extract_action_query(&action_fn.raw_method)
+            {
+                generate_impls_with_query(action_ident, fn_block, action_query_type_ident)
+            } else {
+                generate_impls_without_query(action_ident, fn_block)
+            };
 
             quote::quote! {
                 #create_transaction_impl
@@ -185,5 +176,5 @@ pub fn collection(
     _args: proc_macro::TokenStream,
     input: proc_macro::TokenStream,
 ) -> proc_macro::TokenStream {
-    collection_attribute_macro2(input.into()).unwrap().into()
+    collection_attribute_macro2(input.into()).into()
 }

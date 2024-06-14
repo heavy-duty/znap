@@ -3306,6 +3306,7 @@ dependencies = [
  "quote",
  "solana-sdk",
  "syn 2.0.66",
+ "znap-syn",
 ]
 
 [[package]]
@@ -3328,4 +3329,13 @@ dependencies = [
  "solana-sdk",
  "znap-attribute-collection",
  "znap-derive-action",
+]
+
+[[package]]
+name = "znap-syn"
+version = "0.1.0"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.66",
 ]
