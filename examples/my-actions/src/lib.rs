@@ -2,16 +2,17 @@ use serde::Deserialize;
 use solana_sdk::{message::Message, pubkey::Pubkey, transaction::Transaction};
 use std::str::FromStr;
 use znap_lang::*;
+use axum::http::StatusCode;
 
 // START OF ACTUAL CODE
 #[collection]
 pub mod my_actions {
     use super::*;
 
-    pub fn fixed_transfer(ctx: Context<FixedTransferAction>) -> Result<Transaction, Error> {
+    pub fn fixed_transfer(ctx: Context<FixedTransferAction>) -> Result<Transaction, ActionError> {
         let account_pubkey = match Pubkey::from_str(&ctx.payload.account) {
             Ok(account_pubkey) => account_pubkey,
-            _ => return Err(Error::InvalidAccountPubkey),
+            _ => return Err(ActionError::new(StatusCode::BAD_REQUEST, "Invalid account public key")),
         };
         let mint_pubkey =
             Pubkey::from_str(&"4PYnraBJbdPXeMXdgL5k1m3TCcfNMaEWycvEQu2cteEV").unwrap();
@@ -34,7 +35,7 @@ pub mod my_actions {
             1,
         ) {
             Ok(transfer_instruction) => transfer_instruction,
-            _ => return Err(Error::InvalidInstruction),
+            _ => return Err(ActionError::new(StatusCode::BAD_REQUEST, "Invalid instruction")),
         };
         let transaction_message = Message::new(&[transfer_instruction], None);
 
@@ -43,10 +44,10 @@ pub mod my_actions {
 
     pub fn dynamic_transfer(
         ctx: ContextWithQuery<DynamicTransferAction, DynamicTransferQuery>,
-    ) -> Result<Transaction, Error> {
+    ) -> Result<Transaction, ActionError> {
         let account_pubkey = match Pubkey::from_str(&ctx.payload.account) {
             Ok(account_pubkey) => account_pubkey,
-            _ => return Err(Error::InvalidAccountPubkey),
+            _ => return Err(ActionError::new(StatusCode::BAD_REQUEST, "Invalid account public key")),
         };
         let mint_pubkey =
             Pubkey::from_str(&"4PYnraBJbdPXeMXdgL5k1m3TCcfNMaEWycvEQu2cteEV").unwrap();
@@ -69,7 +70,7 @@ pub mod my_actions {
             ctx.query.amount,
         ) {
             Ok(transfer_instruction) => transfer_instruction,
-            _ => return Err(Error::InvalidInstruction),
+            _ => return Err(ActionError::new(StatusCode::BAD_REQUEST, "Invalid instruction")),
         };
         let transaction_message = Message::new(&[transfer_instruction], None);
 

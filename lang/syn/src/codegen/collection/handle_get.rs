@@ -10,7 +10,7 @@ pub fn generate(collection_mod: &CollectionMod) -> TokenStream {
 
             quote::quote! {
                 impl HandleGetAction for #action_ident {
-                    fn handle_get_action() -> Result<axum::Json<ActionMetadata>, Error> {
+                    fn handle_get_action() -> Result<axum::Json<ActionMetadata>, znap_lang::ActionError> {
                         let action = #action_ident;
 
                         Ok(axum::Json(action.to_metadata()))
