@@ -1,7 +1,8 @@
 use crate::{codegen::collection::common::extract_action_ident, CollectionMod};
+use proc_macro2::TokenStream;
 
-pub fn generate(collection_mod: &CollectionMod) -> proc_macro2::TokenStream {
-    let impls: Vec<proc_macro2::TokenStream> = collection_mod
+pub fn generate(collection_mod: &CollectionMod) -> TokenStream {
+    let impls: Vec<TokenStream> = collection_mod
         .action_fns
         .iter()
         .map(|action_fn| {

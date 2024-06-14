@@ -1,7 +1,9 @@
+use proc_macro2::TokenStream;
+use quote::quote;
 use crate::{codegen::collection::common::{extract_action_ident, extract_action_query}, CollectionMod};
 
-pub fn generate(collection_mod: &CollectionMod) -> proc_macro2::TokenStream {
-    let impls: Vec<proc_macro2::TokenStream> = collection_mod.action_fns
+pub fn generate(collection_mod: &CollectionMod) -> TokenStream {
+    let impls: Vec<TokenStream> = collection_mod.action_fns
         .iter()
         .map(|action_fn| {
             let action_ident = extract_action_ident(&action_fn.raw_method).unwrap();
@@ -11,7 +13,7 @@ pub fn generate(collection_mod: &CollectionMod) -> proc_macro2::TokenStream {
             ) =
                 extract_action_query(&action_fn.raw_method)
             {
-                quote::quote! {
+                quote! {
                     impl HandlePostActionWithQuery<#action_query_type_ident> for #action_ident {
                         fn handle_post_action(
                             axum::Json(payload): axum::Json<CreateActionPayload>,
@@ -35,7 +37,7 @@ pub fn generate(collection_mod: &CollectionMod) -> proc_macro2::TokenStream {
                     }
                 }
             } else {
-                quote::quote! {
+                quote! {
                     impl HandlePostAction for #action_ident {
                         fn handle_post_action(axum::Json(payload): axum::Json<CreateActionPayload>) -> Result<axum::Json<ActionTransaction>, Error> {
                             let action = #action_ident {};
@@ -58,7 +60,7 @@ pub fn generate(collection_mod: &CollectionMod) -> proc_macro2::TokenStream {
         })
         .collect();
 
-    quote::quote! {
+    quote! {
         #(#impls)*
     }
 }

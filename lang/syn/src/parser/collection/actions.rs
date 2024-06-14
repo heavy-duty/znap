@@ -1,8 +1,8 @@
+use syn::spanned::Spanned;
 use syn::{
     parse::{Error as ParseError, Result as ParseResult},
     Item, ItemFn, ItemMod,
 };
-use syn::spanned::Spanned;
 
 use crate::ActionFn;
 

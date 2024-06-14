@@ -6,9 +6,6 @@ members = [
     "lang/derive/*",
     "lang/syn",
 ]
-exclude = [
-    "examples/api", 
-]
 
 [package]
 name = "action-api"

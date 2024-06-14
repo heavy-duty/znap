@@ -1,10 +1,12 @@
+use proc_macro2::TokenStream;
+
 use crate::{
     codegen::collection::common::{extract_action_ident, extract_action_query},
     CollectionMod,
 };
 
-pub fn generate(collection_mod: &CollectionMod) -> proc_macro2::TokenStream {
-    let impls: Vec<proc_macro2::TokenStream> = collection_mod.action_fns
+pub fn generate(collection_mod: &CollectionMod) -> TokenStream {
+    let impls: Vec<TokenStream> = collection_mod.action_fns
         .iter()
         .map(|action_fn| {
             let action_ident = extract_action_ident(&action_fn.raw_method).unwrap();

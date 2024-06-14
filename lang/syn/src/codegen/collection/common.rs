@@ -1,6 +1,6 @@
-use syn::{FnArg, GenericArgument, Ident, PathArguments, Type};
+use syn::{FnArg, GenericArgument, Ident, ItemFn, PathArguments, Type};
 
-pub fn extract_action_ident(f: &syn::ItemFn) -> Option<&Ident> {
+pub fn extract_action_ident(f: &ItemFn) -> Option<&Ident> {
     if let FnArg::Typed(pt) = f.sig.inputs.first()? {
         if let Type::Path(type_path) = pt.ty.as_ref() {
             if let PathArguments::AngleBracketed(inner_path) =
@@ -17,7 +17,7 @@ pub fn extract_action_ident(f: &syn::ItemFn) -> Option<&Ident> {
     None
 }
 
-pub fn extract_action_query(f: &syn::ItemFn) -> Option<&Ident> {
+pub fn extract_action_query(f: &ItemFn) -> Option<&Ident> {
     if let FnArg::Typed(pt) = f.sig.inputs.first()? {
         if let Type::Path(type_path) = pt.ty.as_ref() {
             if type_path.path.segments.first()?.ident == "ContextWithQuery" {
