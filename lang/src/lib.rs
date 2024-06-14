@@ -1,6 +1,6 @@
 use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
-use axum::{extract::Query, Json};
+use axum::Json;
 pub use base64::prelude::*;
 use serde::{Deserialize, Serialize};
 use solana_sdk::transaction::Transaction;
@@ -50,29 +50,6 @@ pub struct ActionMetadata {
     pub title: &'static str,
     pub description: &'static str,
     pub label: &'static str,
-}
-
-pub trait HandleGetAction {
-    fn handle_get_action() -> Result<Json<ActionMetadata>, ActionError>;
-}
-
-pub trait HandlePostAction {
-    fn handle_post_action(
-        payload: Json<CreateActionPayload>,
-    ) -> Result<Json<ActionTransaction>, ActionError>;
-}
-
-pub trait HandlePostActionWithQuery<T> {
-    fn handle_post_action(
-        payload: Json<CreateActionPayload>,
-        query: Query<T>,
-    ) -> Result<Json<ActionTransaction>, ActionError>;
-}
-
-#[derive(Debug, Serialize)]
-pub enum Error {
-    InvalidAccountPubkey,
-    InvalidInstruction,
 }
 
 #[derive(Debug)]

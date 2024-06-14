@@ -42,7 +42,10 @@ impl ToTokens for CollectionMod {
 #[derive(Debug)]
 pub struct ActionFn {
     pub raw_method: ItemFn,
-    pub ident: Ident,
+    pub name: Ident,
+    pub handle_get_ident: Ident,
+    pub handle_post_ident: Ident,
+    pub action_ident: Ident,
 }
 
 #[derive(Debug)]

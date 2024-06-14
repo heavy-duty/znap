@@ -1,4 +1,4 @@
-use crate::{codegen::collection::common::extract_action_ident, CollectionMod};
+use crate::CollectionMod;
 use proc_macro2::TokenStream;
 
 pub fn generate(collection_mod: &CollectionMod) -> TokenStream {
@@ -6,15 +6,14 @@ pub fn generate(collection_mod: &CollectionMod) -> TokenStream {
         .action_fns
         .iter()
         .map(|action_fn| {
-            let action_ident = extract_action_ident(&action_fn.raw_method).unwrap();
-
+            let action_ident = &action_fn.action_ident;
+            let handler_ident = &action_fn.handle_get_ident;
+            
             quote::quote! {
-                impl HandleGetAction for #action_ident {
-                    fn handle_get_action() -> Result<axum::Json<ActionMetadata>, znap_lang::ActionError> {
-                        let action = #action_ident;
+                pub async fn #handler_ident() -> Result<axum::Json<ActionMetadata>, znap_lang::ActionError> {
+                    let action = #action_ident;
 
-                        Ok(axum::Json(action.to_metadata()))
-                    }
+                    Ok(axum::Json(action.to_metadata()))
                 }
             }
         })

@@ -4,7 +4,6 @@ use std::str::FromStr;
 use znap_lang::*;
 use axum::http::StatusCode;
 
-// START OF ACTUAL CODE
 #[collection]
 pub mod my_actions {
     use super::*;
@@ -100,61 +99,3 @@ pub struct DynamicTransferAction;
 pub struct DynamicTransferQuery {
     pub amount: u64,
 }
-// END OF ACTUAL CODE
-
-// START TESTING
-#[cfg(test)]
-mod tests {
-    use axum::{extract::Query, http::Uri, Json};
-
-    use super::*;
-
-    #[test]
-    fn it_handles_fixed_transfer_action() {
-        let action = FixedTransferAction {};
-        let action_metadata = action.to_metadata();
-
-        assert_eq!(
-            action_metadata,
-            ActionMetadata {
-                icon: "https://google.com",
-                title: "Fixed transfer",
-                description: "Send a fixed transfer to the treasury",
-                label: "Send",
-            }
-        );
-
-        let payload = Json::from(CreateActionPayload {
-            account: "4PYnraBJbdPXeMXdgL5k1m3TCcfNMaEWycvEQu2cteEV".to_string(),
-        });
-        let action_transaction = FixedTransferAction::handle_post_action(payload).unwrap();
-
-        assert_eq!("AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAQEEMlnIyV1k2VNRqM4x48htBRRy5jUZ2umQgMwoQ53uf4q5cX+QxKq3dF2j8lUSI+G9tMrUBw/nxQWe4oaNVv7qhPxCeH+W3dRh/wUfr48nA/12tCHT4rv2+H/cXKS0IZgdBt324ddloZPZy+FGzut5rBy0he1fWzeROoz1hX7/AKkAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEDBAECAAAJAwEAAAAAAAAA", action_transaction.transaction);
-    }
-
-    #[test]
-    fn it_handles_dynamic_transfer_action() {
-        let action = DynamicTransferAction {};
-        let action_metadata = action.to_metadata();
-
-        assert_eq!(
-            action_metadata,
-            ActionMetadata {
-                icon: "https://google.com",
-                title: "Dynamic transfer",
-                description: "Send a dynamic transfer to the treasury",
-                label: "Send",
-            }
-        );
-
-        let payload = Json::from(CreateActionPayload {
-            account: "4PYnraBJbdPXeMXdgL5k1m3TCcfNMaEWycvEQu2cteEV".to_string(),
-        });
-        let uri = Uri::from_str("http://example.com/path?amount=5").unwrap();
-        let query: Query<DynamicTransferQuery> = Query::try_from_uri(&uri).unwrap();
-        let action_transaction = DynamicTransferAction::handle_post_action(payload, query).unwrap();
-
-        assert_eq!("AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAQEEMlnIyV1k2VNRqM4x48htBRRy5jUZ2umQgMwoQ53uf4q5cX+QxKq3dF2j8lUSI+G9tMrUBw/nxQWe4oaNVv7qhPxCeH+W3dRh/wUfr48nA/12tCHT4rv2+H/cXKS0IZgdBt324ddloZPZy+FGzut5rBy0he1fWzeROoz1hX7/AKkAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEDBAECAAAJAwUAAAAAAAAA", action_transaction.transaction);
-    }
-}
-// END TESTING
