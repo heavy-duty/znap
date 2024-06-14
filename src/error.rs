@@ -1,3 +1,6 @@
+/* 
+V1:
+
 use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
 use serde::Serialize;
@@ -65,4 +68,51 @@ pub enum ClientError {
 	INVALID_PARAMS,
 	INVALID_ACCOUNT_PUBKEY,
 	SERVICE_ERROR,
+} */
+
+use axum::http::StatusCode;
+use axum::response::{IntoResponse, Response};
+use axum::Json;
+use serde::{Deserialize, Serialize};
+
+pub type Result<T> = core::result::Result<T, ActionError>;
+
+#[derive(Debug)]
+pub struct ActionError {
+    code: StatusCode,
+    message: String,
 }
+
+impl ActionError {
+    pub fn new(code: StatusCode, message: impl Into<String>) -> Self {
+        Self {
+            code,
+            message: message.into(),
+        }
+    }
+}
+
+impl IntoResponse for ActionError {
+	fn into_response(self) -> Response {
+        (
+            self.code,
+            Json(ErrorResponse {
+                error: self.message.clone(),
+            }),
+        )
+            .into_response()
+    }
+}
+
+#[derive(Serialize, Deserialize)]
+struct ErrorResponse {
+    error: String,
+}
+
+/* 
+
+- Create transaction methods should return a Result with ActionError.
+- There should be API errors.
+- Handler methods should return a Result with an Error ()
+
+*/

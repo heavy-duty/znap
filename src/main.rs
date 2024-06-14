@@ -1,8 +1,8 @@
-use std::str::FromStr;
+use std::{fmt::Display, str::FromStr};
 
-pub use self::error::{Error, Result};
+pub use self::error::{ActionError, Result};
 
-use axum::{extract::Query, routing::get, Json, Router};
+use axum::{extract::Query, http::StatusCode, routing::get, Json, Router};
 use base64::prelude::*;
 use bincode::serialize;
 use serde::{Deserialize, Serialize};
@@ -138,7 +138,7 @@ impl Action<DynamicTransferParams> for DynamicTransferAction {
     fn create_transaction(params: DynamicTransferParams) -> Result<String> {
         let account_pubkey = match Pubkey::from_str(&params.account) {
             Ok(account_pubkey) => account_pubkey,
-            _ => return Err(Error::InvalidAccountPubkey),
+            _ => return Err(ActionError::new(StatusCode::BAD_REQUEST, "Invalid account")),
         };
         let mint_pubkey =
             Pubkey::from_str(&"4PYnraBJbdPXeMXdgL5k1m3TCcfNMaEWycvEQu2cteEV").unwrap();
@@ -161,13 +161,18 @@ impl Action<DynamicTransferParams> for DynamicTransferAction {
             params.amount,
         ) {
             Ok(transfer_instruction) => transfer_instruction,
-            _ => return Err(Error::InvalidInstruction),
+            _ => {
+                return Err(ActionError::new(
+                    StatusCode::BAD_REQUEST,
+                    "Invalid instruction",
+                ))
+            }
         };
         let transaction_message = Message::new(&[transfer_instruction], None);
         let transaction: Transaction = Transaction::new_unsigned(transaction_message);
         let serialized_transaction = match serialize(&transaction) {
             Ok(serialized_transaction) => serialized_transaction,
-            _ => return Err(Error::InvalidInstruction),
+            _ => return Err(ActionError::new(StatusCode::BAD_REQUEST, "Invalid instruction")),
         };
 
         Ok(BASE64_STANDARD.encode(serialized_transaction))
@@ -198,7 +203,7 @@ impl Action<FixedTransferParams> for FixedTransferAction {
     fn create_transaction(params: FixedTransferParams) -> Result<String> {
         let account_pubkey = match Pubkey::from_str(&params.account) {
             Ok(account_pubkey) => account_pubkey,
-            _ => return Err(Error::InvalidAccountPubkey),
+            _ => return Err(ActionError::new(StatusCode::BAD_REQUEST, "Invalid account")),
         };
         let mint_pubkey =
             Pubkey::from_str(&"4PYnraBJbdPXeMXdgL5k1m3TCcfNMaEWycvEQu2cteEV").unwrap();
@@ -221,13 +226,18 @@ impl Action<FixedTransferParams> for FixedTransferAction {
             1,
         ) {
             Ok(transfer_instruction) => transfer_instruction,
-            _ => return Err(Error::InvalidInstruction),
+            _ => {
+                return Err(ActionError::new(
+                    StatusCode::BAD_REQUEST,
+                    "Invalid instruction",
+                ))
+            }
         };
         let transaction_message = Message::new(&[transfer_instruction], None);
         let transaction: Transaction = Transaction::new_unsigned(transaction_message);
         let serialized_transaction = match serialize(&transaction) {
             Ok(serialized_transaction) => serialized_transaction,
-            _ => return Err(Error::InvalidInstruction),
+            _ => return Err(ActionError::new(StatusCode::BAD_REQUEST, "Invalid instruction")),
         };
 
         Ok(BASE64_STANDARD.encode(serialized_transaction))
