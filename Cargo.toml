@@ -1,13 +1,15 @@
-workspace = { members = [ "action","action-derive", "collection-attribute", "my-actions"] }
+[workspace]
+members = [ 
+    "my-actions", 
+    "lang", 
+    "lang/attribute/*",
+    "lang/derive/*"
+]
 
 [package]
 name = "action-api"
 version = "0.1.0"
 edition = "2021"
-
-[lib]
-name = "action_api"
-crate-type = ["cdylib", "lib"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -23,5 +25,3 @@ spl-associated-token-account = "2.3.0"
 url = { version = "2.5.0", features = ["serde"] }
 bincode = "1.3.3"
 base64 = "0.22.1"
-action-derive = { path = "action-derive" }
-collection-attribute = { path = "collection-attribute" }

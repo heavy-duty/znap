@@ -1,10 +1,7 @@
-use action::*;
-use action_derive::Action;
-use base64::prelude::*;
-use collection_attribute::collection;
 use serde::Deserialize;
 use solana_sdk::{message::Message, pubkey::Pubkey, transaction::Transaction};
 use std::{marker::PhantomData, str::FromStr};
+use znap_lang::*;
 
 // START OF ACTUAL CODE
 #[collection]

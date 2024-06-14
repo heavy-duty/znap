@@ -1,4 +1,4 @@
-use std::{fmt::Display, str::FromStr};
+use std::str::FromStr;
 
 pub use self::error::{ActionError, Result};
 
@@ -172,7 +172,12 @@ impl Action<DynamicTransferParams> for DynamicTransferAction {
         let transaction: Transaction = Transaction::new_unsigned(transaction_message);
         let serialized_transaction = match serialize(&transaction) {
             Ok(serialized_transaction) => serialized_transaction,
-            _ => return Err(ActionError::new(StatusCode::BAD_REQUEST, "Invalid instruction")),
+            _ => {
+                return Err(ActionError::new(
+                    StatusCode::BAD_REQUEST,
+                    "Invalid instruction",
+                ))
+            }
         };
 
         Ok(BASE64_STANDARD.encode(serialized_transaction))
@@ -237,7 +242,12 @@ impl Action<FixedTransferParams> for FixedTransferAction {
         let transaction: Transaction = Transaction::new_unsigned(transaction_message);
         let serialized_transaction = match serialize(&transaction) {
             Ok(serialized_transaction) => serialized_transaction,
-            _ => return Err(ActionError::new(StatusCode::BAD_REQUEST, "Invalid instruction")),
+            _ => {
+                return Err(ActionError::new(
+                    StatusCode::BAD_REQUEST,
+                    "Invalid instruction",
+                ))
+            }
         };
 
         Ok(BASE64_STANDARD.encode(serialized_transaction))

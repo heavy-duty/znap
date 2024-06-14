@@ -3,23 +3,12 @@
 version = 3
 
 [[package]]
-name = "action"
-version = "0.1.0"
-dependencies = [
- "axum",
- "serde",
- "solana-sdk",
-]
-
-[[package]]
 name = "action-api"
 version = "0.1.0"
 dependencies = [
- "action-derive",
  "axum",
  "base64 0.22.1",
  "bincode",
- "collection-attribute",
  "envy",
  "serde",
  "solana-sdk",
@@ -28,16 +17,6 @@ dependencies = [
  "strum_macros",
  "tokio",
  "url",
-]
-
-[[package]]
-name = "action-derive"
-version = "0.1.0"
-dependencies = [
- "deluxe",
- "proc-macro2",
- "quote",
- "syn 2.0.66",
 ]
 
 [[package]]
@@ -653,18 +632,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7ee52072ec15386f770805afd189a01c8841be8696bed250fa2f13c4c0d6dfb7"
 dependencies = [
  "generic-array",
-]
-
-[[package]]
-name = "collection-attribute"
-version = "0.1.0"
-dependencies = [
- "bincode",
- "deluxe",
- "proc-macro2",
- "quote",
- "solana-sdk",
- "syn 2.0.66",
 ]
 
 [[package]]
@@ -1466,16 +1433,14 @@ dependencies = [
 name = "my-actions"
 version = "0.1.0"
 dependencies = [
- "action",
- "action-derive",
  "axum",
  "base64 0.22.1",
  "bincode",
- "collection-attribute",
  "serde",
  "solana-sdk",
  "spl-associated-token-account 3.0.2",
  "spl-token",
+ "znap-lang",
 ]
 
 [[package]]
@@ -3330,4 +3295,37 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 2.0.66",
+]
+
+[[package]]
+name = "znap-attribute-collection"
+version = "0.1.0"
+dependencies = [
+ "bincode",
+ "proc-macro2",
+ "quote",
+ "solana-sdk",
+ "syn 2.0.66",
+]
+
+[[package]]
+name = "znap-derive-action"
+version = "0.1.0"
+dependencies = [
+ "deluxe",
+ "proc-macro2",
+ "quote",
+ "syn 2.0.66",
+]
+
+[[package]]
+name = "znap-lang"
+version = "0.1.0"
+dependencies = [
+ "axum",
+ "base64 0.22.1",
+ "serde",
+ "solana-sdk",
+ "znap-attribute-collection",
+ "znap-derive-action",
 ]
