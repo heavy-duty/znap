@@ -1,8 +1,10 @@
 pub mod codegen;
 pub mod parser;
+use codegen::query as query_codegen;
 use codegen::action as action_codegen;
 use codegen::collection as collection_codegen;
 use deluxe::ExtractAttributes;
+use parser::query as query_parser;
 use parser::action as action_parser;
 use parser::collection as collection_parser;
 use proc_macro2::TokenStream;
@@ -82,4 +84,29 @@ pub struct ActionAttributesStruct {
     pub title: String,
     pub description: String,
     pub label: String,
+}
+
+#[derive(Debug)]
+pub struct QueryStruct {
+    pub name: Ident,
+    pub raw_struct: ItemStruct,
+}
+
+impl Parse for QueryStruct {
+    fn parse(input: ParseStream) -> ParseResult<Self> {
+        let query_struct = <ItemStruct as Parse>::parse(input)?;
+        query_parser::parse(&query_struct)
+    }
+}
+
+impl From<&QueryStruct> for TokenStream {
+    fn from(query_struct: &QueryStruct) -> Self {
+        query_codegen::generate(query_struct)
+    }
+}
+
+impl ToTokens for QueryStruct {
+    fn to_tokens(&self, tokens: &mut TokenStream) {
+        tokens.extend::<TokenStream>(self.into());
+    }
 }

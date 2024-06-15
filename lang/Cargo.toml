@@ -10,4 +10,5 @@ bincode = "1.3.3"
 serde = "1.0.203"
 solana-sdk = "1.18.16"
 znap-attribute-collection = { path = "./attribute/collection" }
+znap-attribute-query = { path = "./attribute/query" }
 znap-derive-action = { path = "./derive/action" }

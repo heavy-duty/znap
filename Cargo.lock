@@ -3083,6 +3083,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "znap-attribute-query"
+version = "0.1.0"
+dependencies = [
+ "deluxe",
+ "proc-macro2",
+ "quote",
+ "syn 2.0.66",
+ "znap-syn",
+]
+
+[[package]]
 name = "znap-derive-action"
 version = "0.1.0"
 dependencies = [
@@ -3103,6 +3114,7 @@ dependencies = [
  "serde",
  "solana-sdk",
  "znap-attribute-collection",
+ "znap-attribute-query",
  "znap-derive-action",
 ]
 
