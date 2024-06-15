@@ -5,6 +5,7 @@ members = [
     "lang/attribute/*",
     "lang/derive/*",
     "lang/syn",
+    "cli"
 ]
 
 [package]
