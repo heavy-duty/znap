@@ -1,5 +1,6 @@
 use crate::{ActionAttributesStruct, ActionStruct};
 use proc_macro2::TokenStream;
+use quote::quote;
 
 pub fn generate(action_struct: &ActionStruct) -> TokenStream {
     let ActionStruct {
@@ -12,7 +13,7 @@ pub fn generate(action_struct: &ActionStruct) -> TokenStream {
         icon,
     } = attributes;
 
-    quote::quote! {
+    quote! {
         impl ToMetadata for #name {
             fn to_metadata(&self) -> ActionMetadata {
                 ActionMetadata {

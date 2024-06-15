@@ -12,6 +12,7 @@ use parser::error_code as error_code_parser;
 use proc_macro2::TokenStream;
 use quote::ToTokens;
 use syn::ItemEnum;
+use syn::Variant;
 use syn::{
     parse::{Parse, ParseStream, Result as ParseResult},
     Ident, ItemFn, ItemMod, ItemStruct,
@@ -118,6 +119,7 @@ impl ToTokens for QueryStruct {
 pub struct ErrorEnum {
     pub name: Ident,
     pub raw_enum: ItemEnum,
+    pub error_variants: Vec<ErrorVariant>,
 }
 
 impl Parse for ErrorEnum {
@@ -137,4 +139,17 @@ impl ToTokens for ErrorEnum {
     fn to_tokens(&self, tokens: &mut TokenStream) {
         tokens.extend::<TokenStream>(self.into());
     }
+}
+
+#[derive(Debug, ExtractAttributes)]
+#[deluxe(attributes(error))]
+pub struct ErrorAttributesStruct {
+    pub msg: String,
+}
+
+#[derive(Debug)]
+pub struct ErrorVariant {
+    pub name: Ident,
+    pub raw_variant: Variant,
+    pub msg: String,
 }

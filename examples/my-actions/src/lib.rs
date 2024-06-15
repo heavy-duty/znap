@@ -97,8 +97,8 @@ pub struct DynamicTransferQuery {
 
 #[derive(ErrorCode)]
 enum ActionError {
-    #[msg("Invalid account public key")]
+    #[error(msg = "Invalid account public key")]
     InvalidAccountPublicKey,
-    #[msg("Invalid instruction")]
+    #[error(msg = "Invalid instruction")]
     InvalidInstruction,
 }
