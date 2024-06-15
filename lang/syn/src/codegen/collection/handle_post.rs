@@ -15,7 +15,7 @@ pub fn generate(collection_mod: &CollectionMod) -> TokenStream {
                         pub async fn #handler_ident(
                             axum::extract::Query(query): axum::extract::Query<#action_query_ident>,
                             axum::Json(payload): axum::Json<znap_lang::CreateActionPayload>,
-                        ) -> Result<axum::Json<znap_lang::ActionTransaction>, znap_lang::ActionError> {
+                        ) -> znap_lang::Result<axum::Json<znap_lang::ActionTransaction>> {
                             let action = #action_ident;
                             let context_with_query = znap_lang::ContextWithQuery::<#action_ident, #action_query_ident> {
                                 payload,
@@ -37,7 +37,7 @@ pub fn generate(collection_mod: &CollectionMod) -> TokenStream {
                     quote! {
                         pub async fn #handler_ident(
                             axum::Json(payload): axum::Json<znap_lang::CreateActionPayload>
-                        )  -> Result<axum::Json<znap_lang::ActionTransaction>, znap_lang::ActionError>{
+                        )  -> znap_lang::Result<axum::Json<znap_lang::ActionTransaction>>{
                             let action = #action_ident {};
                             let context = znap_lang::Context::<#action_ident> {
                                 payload,

@@ -9,20 +9,25 @@ use std::marker::PhantomData;
 pub use std::str::FromStr;
 pub use znap_attribute_collection::collection;
 pub use znap_attribute_query::query;
+pub use znap_derive_error_code::ErrorCode;
 pub use znap_derive_action::Action;
 
 pub trait Action {}
+
+pub trait ErrorCode {}
+
+pub type Result<T> = core::result::Result<T, Error>;
 
 pub trait ToMetadata {
     fn to_metadata(&self) -> ActionMetadata;
 }
 
 pub trait CreateTransaction<T> {
-    fn create_transaction(&self, ctx: Context<T>) -> Result<Transaction, ActionError>;
+    fn create_transaction(&self, ctx: Context<T>) -> Result<Transaction>;
 }
 
 pub trait CreateTransactionWithQuery<T, U> {
-    fn create_transaction(&self, ctx: ContextWithQuery<T, U>) -> Result<Transaction, ActionError>;
+    fn create_transaction(&self, ctx: ContextWithQuery<T, U>) -> Result<Transaction>;
 }
 
 pub struct Context<TAction> {
@@ -56,26 +61,29 @@ pub struct ActionMetadata {
 }
 
 #[derive(Debug)]
-pub struct ActionError {
-    code: StatusCode,
-    message: String,
+pub struct Error {
+    pub code: StatusCode,
+    pub name: String,
+    pub message: String,
 }
 
-impl ActionError {
-    pub fn new(code: StatusCode, message: impl Into<String>) -> Self {
+impl Error {
+    pub fn new(code: StatusCode, name: String, message: impl Into<String>) -> Self {
         Self {
             code,
+            name,
             message: message.into(),
         }
     }
 }
 
-impl IntoResponse for ActionError {
+impl IntoResponse for Error {
     fn into_response(self) -> Response {
         (
             self.code,
             Json(ErrorResponse {
-                error: self.message.clone(),
+                name: self.name.clone(),
+                message: self.message.clone(),
             }),
         )
             .into_response()
@@ -84,5 +92,6 @@ impl IntoResponse for ActionError {
 
 #[derive(Serialize, Deserialize)]
 struct ErrorResponse {
-    error: String,
+    name: String,
+    message: String,
 }

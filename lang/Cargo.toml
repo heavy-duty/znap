@@ -11,4 +11,5 @@ serde = "1.0.203"
 solana-sdk = "1.18.16"
 znap-attribute-collection = { path = "./attribute/collection" }
 znap-attribute-query = { path = "./attribute/query" }
+znap-derive-error-code = { path = "./derive/error-code" }
 znap-derive-action = { path = "./derive/action" }

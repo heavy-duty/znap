@@ -3,12 +3,15 @@ pub mod parser;
 use codegen::query as query_codegen;
 use codegen::action as action_codegen;
 use codegen::collection as collection_codegen;
+use codegen::error_code as error_code_codegen;
 use deluxe::ExtractAttributes;
 use parser::query as query_parser;
 use parser::action as action_parser;
 use parser::collection as collection_parser;
+use parser::error_code as error_code_parser;
 use proc_macro2::TokenStream;
 use quote::ToTokens;
+use syn::ItemEnum;
 use syn::{
     parse::{Parse, ParseStream, Result as ParseResult},
     Ident, ItemFn, ItemMod, ItemStruct,
@@ -106,6 +109,31 @@ impl From<&QueryStruct> for TokenStream {
 }
 
 impl ToTokens for QueryStruct {
+    fn to_tokens(&self, tokens: &mut TokenStream) {
+        tokens.extend::<TokenStream>(self.into());
+    }
+}
+
+#[derive(Debug)]
+pub struct ErrorEnum {
+    pub name: Ident,
+    pub raw_enum: ItemEnum,
+}
+
+impl Parse for ErrorEnum {
+    fn parse(input: ParseStream) -> ParseResult<Self> {
+        let error_enum = <ItemEnum as Parse>::parse(input)?;
+        error_code_parser::parse(&error_enum)
+    }
+}
+
+impl From<&ErrorEnum> for TokenStream {
+    fn from(error_enum: &ErrorEnum) -> Self {
+        error_code_codegen::generate(error_enum)
+    }
+}
+
+impl ToTokens for ErrorEnum {
     fn to_tokens(&self, tokens: &mut TokenStream) {
         tokens.extend::<TokenStream>(self.into());
     }

@@ -3101,6 +3101,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "znap-derive-error-code"
+version = "0.1.0"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.66",
+ "znap-syn",
+]
+
+[[package]]
 name = "znap-lang"
 version = "0.1.0"
 dependencies = [
@@ -3112,6 +3122,7 @@ dependencies = [
  "znap-attribute-collection",
  "znap-attribute-query",
  "znap-derive-action",
+ "znap-derive-error-code",
 ]
 
 [[package]]

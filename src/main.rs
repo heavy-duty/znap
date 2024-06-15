@@ -4,7 +4,7 @@ use tokio::net::TcpListener;
 use znap_lang::*;
 
 #[tokio::main]
-async fn main() -> Result<(), ActionError> {
+async fn main() -> Result<()> {
     let listener = TcpListener::bind("127.0.0.1:3000").await.unwrap();
     let router = Router::new().merge(collection_router());
 
