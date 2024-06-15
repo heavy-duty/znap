@@ -1,10 +1,9 @@
 use axum::Router;
 use my_actions::collection_router;
 use tokio::net::TcpListener;
-use znap_lang::*;
 
 #[tokio::main]
-async fn main() -> Result<()> {
+async fn main() -> Result<(), axum::Error> {
     let listener = TcpListener::bind("127.0.0.1:3000").await.unwrap();
     let router = Router::new().merge(collection_router());
 
