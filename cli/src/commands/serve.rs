@@ -1,11 +1,12 @@
 use crate::{
     template::api::template as api_template,
     template::toml::template as toml_template,
-    utils::{get_collections, run_server, write_file},
+    utils::{get_collections, write_file},
 };
 use std::{
     fs::{create_dir, remove_dir_all},
     path::PathBuf,
+    process::Stdio,
 };
 use tempfile::tempdir_in;
 
@@ -36,5 +37,17 @@ pub fn run() {
     .expect("Error setting Ctrl-C handler");
 
     // Run the server
-    run_server(&toml_path)
+    let exit = std::process::Command::new("cargo")
+        .arg("run")
+        .arg("--manifest-path")
+        .arg(toml_path)
+        .stdout(Stdio::inherit())
+        .stderr(Stdio::inherit())
+        .output()
+        .map_err(|e| anyhow::format_err!("{}", e.to_string()))
+        .unwrap();
+
+    if !exit.status.success() {
+        std::process::exit(exit.status.code().unwrap_or(1));
+    }
 }

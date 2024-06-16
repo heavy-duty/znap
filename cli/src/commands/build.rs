@@ -1,11 +1,25 @@
-use crate::utils::{build_collection, get_collections};
+use crate::utils::get_collections;
+use std::process::Stdio;
 
 pub fn run() {
     let collections = get_collections();
 
     for collection in collections.iter() {
-        match build_collection(collection.name.clone()) {
-            Ok(_) => {}
+        let maybe_exit = std::process::Command::new("cargo")
+            .arg("build")
+            .arg("-p")
+            .arg(&collection.name)
+            .stdout(Stdio::inherit())
+            .stderr(Stdio::inherit())
+            .output()
+            .map_err(|e| anyhow::format_err!("{}", e.to_string()));
+
+        match maybe_exit {
+            Ok(exit) => {
+                if !exit.status.success() {
+                    std::process::exit(exit.status.code().unwrap_or(1));
+                }
+            }
             _ => panic!("Failed to build collection: {}", collection.name),
         }
     }

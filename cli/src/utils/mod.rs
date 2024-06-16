@@ -36,22 +36,6 @@ pub fn get_collections() -> Vec<Collection> {
     collections
 }
 
-pub fn run_server(dir_path: &Path) {
-    let exit = std::process::Command::new("cargo")
-        .arg("run")
-        .arg("--manifest-path")
-        .arg(dir_path)
-        .stdout(Stdio::inherit())
-        .stderr(Stdio::inherit())
-        .output()
-        .map_err(|e| anyhow::format_err!("{}", e.to_string()))
-        .unwrap();
-
-    if !exit.status.success() {
-        std::process::exit(exit.status.code().unwrap_or(1));
-    }
-}
-
 pub fn write_file(toml_path: &Path, content: &String) {
     let mut file = File::create(&toml_path).unwrap();
     file.write_all(content.as_bytes()).unwrap();
