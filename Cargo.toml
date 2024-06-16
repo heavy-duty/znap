@@ -1,5 +1,6 @@
 [workspace]
 members = [
+    "examples/*",
     "znap-cli",
     "znap-lang",
     "znap-lang/macros/attribute/*",
@@ -15,7 +16,10 @@ version = "0.1.0"
 [workspace.dependencies]
 axum = "0.7.5"
 serde = "1"
+# solana
 solana-sdk = "1"
+spl-associated-token-account = "3.0"
+spl-token = "4.0"
 # macros
 proc-macro2 = "1.0"
 quote = "1.0"

@@ -4,9 +4,11 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-axum = "0.7.5"
-serde = "1.0.203"
+axum = { workspace = true }
+serde = { workspace = true }
+solana-sdk = { workspace = true }
+spl-associated-token-account = { workspace = true }
+spl-token = { workspace = true }
+tokio = { version = "1", features = ["full"] }
+# local
 znap-lang = { path = "../../znap-lang" }
-solana-sdk = "1.18.16"
-spl-associated-token-account = "3.0.2"
-spl-token = "4.0.1"
