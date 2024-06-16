@@ -24,6 +24,10 @@ enum Commands {
     Init {
         name: String,
     },
+    /// Create a new collection in the workspace
+    New {
+        name: String,
+    },
 }
 
 fn main() {
@@ -35,6 +39,7 @@ fn main() {
         Some(Commands::Test) => commands::test::run(),
         Some(Commands::Clean) => commands::clean::run(),
         Some(Commands::Init { name }) => commands::init::run(&name),
+        Some(Commands::New { name }) => commands::new::run(&name),
         None => {}
     }
 }

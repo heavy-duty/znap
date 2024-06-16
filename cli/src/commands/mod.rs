@@ -1,5 +1,6 @@
 pub mod build;
-pub mod serve;
 pub mod clean;
-pub mod test;
 pub mod init;
+pub mod new;
+pub mod serve;
+pub mod test;

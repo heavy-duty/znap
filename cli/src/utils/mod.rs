@@ -36,8 +36,8 @@ pub fn get_collections() -> Vec<Collection> {
     collections
 }
 
-pub fn write_file(toml_path: &Path, content: &String) {
-    let mut file = File::create(&toml_path).unwrap();
+pub fn write_file(path: &Path, content: &String) {
+    let mut file = File::create(&path).unwrap();
     file.write_all(content.as_bytes()).unwrap();
 }
 

@@ -1,6 +1,7 @@
 use crate::{
-    template::api::template as api_template,
-    template::toml::template as toml_template,
+    template::{
+        server_api::template as server_api_template, server_toml::template as server_toml_template,
+    },
     utils::{get_collections, write_file},
 };
 use std::{
@@ -23,10 +24,10 @@ pub fn run() {
 
     // Generate api file
     create_dir(dir_path.join("src")).unwrap();
-    write_file(&api_path, &api_template(&collections));
+    write_file(&api_path, &server_api_template(&collections));
 
     // Generate cargo file
-    write_file(&toml_path, &toml_template(&collections));
+    write_file(&toml_path, &server_toml_template(&collections));
 
     // Remove tmp files if user hits Ctrl-C
     ctrlc::set_handler(move || {
