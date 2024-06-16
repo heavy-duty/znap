@@ -1,7 +1,11 @@
 [package]
 name = "znap-lang"
 version = "0.1.0"
+authors = ["Heavy Duty Builders <team@heavyduty.builders>"]
+repository = "https://github.com/heavy-duty/znap"
 edition = "2021"
+license = "Apache-2.0"
+description = "Coming soon"
 
 [dependencies]
 axum = "0.7.5"
@@ -9,7 +13,7 @@ base64 = "0.22.1"
 bincode = "1.3.3"
 serde = "1.0.203"
 solana-sdk = "1.18.16"
-znap-attribute-collection = { path = "./attribute/collection" }
-znap-attribute-query = { path = "./attribute/query" }
-znap-derive-error-code = { path = "./derive/error-code" }
-znap-derive-action = { path = "./derive/action" }
+znap-attribute-collection = { path = "./attribute/collection", version = "0.1.0" }
+znap-attribute-query = { path = "./attribute/query", version = "0.1.0" }
+znap-derive-error-code = { path = "./derive/error-code", version = "0.1.0" }
+znap-derive-action = { path = "./derive/action", version = "0.1.0" }
