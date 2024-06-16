@@ -9,8 +9,8 @@ use std::marker::PhantomData;
 pub use std::str::FromStr;
 pub use znap_attribute_collection::collection;
 pub use znap_attribute_query::query;
-pub use znap_derive_error_code::ErrorCode;
 pub use znap_derive_action::Action;
+pub use znap_derive_error_code::ErrorCode;
 
 pub trait Action {}
 

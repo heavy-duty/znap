@@ -1,0 +1,17 @@
+[package]
+name = "znap-lang"
+version.workspace = true
+edition = "2021"
+
+[dependencies]
+axum = { workspace = true }
+serde = { workspace = true }
+solana-sdk = { workspace = true }
+base64 = "0.22.1"
+bincode = "1.3.3"
+
+# local dependencies
+znap-attribute-collection = { path = "./macros/attribute/collection" }
+znap-attribute-query = { path = "./macros/attribute/query" }
+znap-derive-error-code = { path = "./macros/derive/error-code" }
+znap-derive-action = { path = "./macros/derive/action" }
