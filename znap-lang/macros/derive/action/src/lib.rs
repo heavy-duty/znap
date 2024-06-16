@@ -1,6 +1,5 @@
 use proc_macro::TokenStream;
-use quote::ToTokens;
-use syn::parse_macro_input;
+use znap_syn::prelude::*;
 use znap_syn::ActionStruct;
 
 #[proc_macro_derive(Action, attributes(action))]

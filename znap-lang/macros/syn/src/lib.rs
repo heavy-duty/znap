@@ -1,21 +1,23 @@
 pub mod codegen;
 pub mod parser;
-use codegen::query as query_codegen;
+
+pub mod prelude;
+
+use prelude::*;
+
 use codegen::action as action_codegen;
 use codegen::collection as collection_codegen;
 use codegen::error_code as error_code_codegen;
+use codegen::query as query_codegen;
 use deluxe::ExtractAttributes;
-use parser::query as query_parser;
 use parser::action as action_parser;
 use parser::collection as collection_parser;
 use parser::error_code as error_code_parser;
+use parser::query as query_parser;
 use proc_macro2::TokenStream;
-use quote::ToTokens;
-use syn::ItemEnum;
-use syn::Variant;
 use syn::{
     parse::{Parse, ParseStream, Result as ParseResult},
-    Ident, ItemFn, ItemMod, ItemStruct,
+    Ident, ItemEnum, ItemFn, ItemMod, ItemStruct, Variant,
 };
 
 #[derive(Debug)]

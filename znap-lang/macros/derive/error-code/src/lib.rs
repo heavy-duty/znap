@@ -1,6 +1,5 @@
 use proc_macro::TokenStream;
-use quote::ToTokens;
-use syn::parse_macro_input;
+use znap_syn::prelude::*;
 use znap_syn::ErrorEnum;
 
 #[proc_macro_derive(ErrorCode, attributes(error))]
