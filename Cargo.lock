@@ -3,15 +3,6 @@
 version = 3
 
 [[package]]
-name = "action-api"
-version = "0.1.0"
-dependencies = [
- "axum",
- "my-actions",
- "tokio",
-]
-
-[[package]]
 name = "addr2line"
 version = "0.22.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3304,8 +3295,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "znap"
+version = "0.1.1"
+dependencies = [
+ "axum",
+ "my-actions",
+ "tokio",
+]
+
+[[package]]
 name = "znap-attribute-collection"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -3315,7 +3315,7 @@ dependencies = [
 
 [[package]]
 name = "znap-attribute-query"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -3325,7 +3325,7 @@ dependencies = [
 
 [[package]]
 name = "znap-cli"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "anyhow",
  "clap",
@@ -3338,7 +3338,7 @@ dependencies = [
 
 [[package]]
 name = "znap-derive-action"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -3348,7 +3348,7 @@ dependencies = [
 
 [[package]]
 name = "znap-derive-error-code"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -3358,7 +3358,7 @@ dependencies = [
 
 [[package]]
 name = "znap-lang"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "axum",
  "base64 0.22.1",
@@ -3373,7 +3373,7 @@ dependencies = [
 
 [[package]]
 name = "znap-syn"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "convert_case",
  "deluxe",

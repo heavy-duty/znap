@@ -41,8 +41,6 @@ pub fn parse(collection_mod: &ItemMod) -> ParseResult<Vec<ActionFn>> {
                 action_name_without_suffix(action_name).to_snek_case()
             );
 
-            println!("{}", route_path);
-
             Ok(ActionFn {
                 raw_method: method.clone(),
                 name: method.sig.ident.clone(),

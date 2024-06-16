@@ -1,6 +1,6 @@
 [package]
 name = "znap-cli"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 description = "Manage your znap workspaces"
 authors = ["Heavy Duty Builders <team@heavyduty.builders>"]
