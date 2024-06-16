@@ -1,10 +1,11 @@
 use anyhow::Result;
 use clap::{Parser, Subcommand};
-use tempfile::tempdir;
 use std::fs::{create_dir, File};
+use std::path::PathBuf;
 use std::process::Stdio;
-use template::toml::template as toml_template;
+use tempfile::tempdir_in;
 use template::api::template as api_template;
+use template::toml::template as toml_template;
 use utils::get_collections;
 mod template;
 mod utils;
@@ -70,22 +71,26 @@ fn build_all() {
 }
 
 fn serve_all() {
-    // TODO: We need some sort of caching, at least re-using the target when possible.
-
+    // Get all the collections in the workspace
     let collections = get_collections();
 
+    // Create a temporal directory and store the code there.
+    let cwd: PathBuf = std::env::current_dir().unwrap();
+    let dir = tempdir_in(cwd.join(".znap")).unwrap();
+    let dir_name = String::from(
+        String::from(dir.path().to_str().unwrap())
+            .split("/")
+            .last()
+            .unwrap(),
+    );
+    let dir_name_without_dot = String::from(dir_name.split(".").last().unwrap());
+    create_dir(dir.path().join("src")).unwrap();
+
     // Generate Cargo.toml content
-    let cargo_content = toml_template(&collections);
-    println!("Cargo: \n{}\n", cargo_content);
+    let cargo_content = toml_template(&dir_name_without_dot, &collections);
 
     // Generate server file content.
     let api_content = api_template(&collections);
-    println!("API: \n{}\n", api_content);
-
-    // Create a temporal directory and store the code there.
-    let dir = tempdir().unwrap();
-
-    create_dir(dir.path().join("src")).unwrap();
 
     let api_path = dir.path().join("src/main.rs");
     let mut api_file = File::create(api_path).unwrap();
@@ -103,7 +108,8 @@ fn serve_all() {
         .stdout(Stdio::inherit())
         .stderr(Stdio::inherit())
         .output()
-        .map_err(|e| anyhow::format_err!("{}", e.to_string())).unwrap();
+        .map_err(|e| anyhow::format_err!("{}", e.to_string()))
+        .unwrap();
 
     if !exit.status.success() {
         std::process::exit(exit.status.code().unwrap_or(1));
