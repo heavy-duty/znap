@@ -1,12 +1,11 @@
 use anyhow::Result;
 use clap::{Parser, Subcommand};
-use serde::{Deserialize, Serialize};
-use std::{fs::read_to_string, path::PathBuf, process::Stdio};
-
-#[derive(Serialize, Deserialize, Debug)]
-struct Config {
-    collections: Vec<String>,
-}
+use std::process::Stdio;
+use template::toml::template as toml_template;
+use template::api::template as api_template;
+use utils::get_collections;
+mod template;
+mod utils;
 
 #[derive(Parser)]
 #[command(version, about, long_about = None)]
@@ -21,6 +20,8 @@ enum Commands {
     Build,
     /// Serves all collections from the workspace
     Serve,
+    /// Runs the test suite for the workspace
+    Test,
 }
 
 fn main() {
@@ -28,42 +29,12 @@ fn main() {
 
     match &cli.command {
         Some(Commands::Build) => build_all(),
-        Some(Commands::Serve) => {
-            /*
-
-            Now I should build each collection, then create a router that
-            merges them all together and starts a TCP server that serves
-            the requests.
-
-
-            Dynamic imports are a problem and are not really what we're looking for,
-            instead it seems like we need something different.
-
-            Something like:
-
-            - Build all the collections.
-            - Creating a temp server file.
-            - Using a macro generate the appropiate router
-
-            Having like a declarative macro that's used to create a temp
-            server file, then we run that.
-
-             */
-
-            println!("Serving your workspace");
+        Some(Commands::Serve) => serve_all(),
+        Some(Commands::Test) => {
+            println!("Testing your workspace");
         }
         None => {}
     }
-}
-
-pub fn get_collections() -> Vec<String> {
-    let cwd: PathBuf = std::env::current_dir().unwrap();
-    let cwd_string = cwd.to_str().unwrap();
-    let znap_file_path = format!("{}/Znap.toml", cwd_string);
-    let znap_file = read_to_string(znap_file_path).expect("Should have been able to read the file");
-    let Config { collections } = toml::from_str(&znap_file).unwrap();
-
-    collections
 }
 
 // Runs the build command outside of a workspace.
@@ -93,4 +64,40 @@ fn build_all() {
             _ => panic!("Failed to build collection: {}", collection),
         }
     }
+}
+
+fn serve_all() {
+    /*
+
+    What happens if there's a server already? Should it be updated?
+    Generated entirely again?
+
+    What happens if we are running the server and another instance
+    starts? Should updates be allowed? Would those changes even
+    affect our current thing?
+
+    There is no way to have a duplicate collection, but duplicate actions
+    can occur. Each action can be prefixed with the collection and since
+    there can't be duplicate actions within a collection, the problem
+    is solved.
+
+    */
+
+    let collections = get_collections();
+
+    // Generate Cargo.toml content
+    let cargo_content = toml_template(&collections);
+    println!("Cargo: \n{}\n", cargo_content);
+
+    // Generate server file content.
+    let api_content = api_template(&collections);
+    println!("API: \n{}\n", api_content);
+
+    // Check .znap and .znap/server exist
+    
+    // Create/Update cargo.toml and main.rs
+
+    // Run the server using cargo run --manifest-path
+
+    println!("Serving your workspace");
 }
