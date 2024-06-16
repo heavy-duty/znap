@@ -2,6 +2,10 @@
 name = "znap-syn"
 version = "0.1.0"
 edition = "2021"
+authors = ["Heavy Duty Builders <team@heavyduty.builders>"]
+repository = "https://github.com/heavy-duty/znap"
+license = "Apache-2.0"
+description = "Coming soon"
 
 [dependencies]
 convert_case = "0.6.0"

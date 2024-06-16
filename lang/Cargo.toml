@@ -1,9 +1,9 @@
 [package]
 name = "znap-lang"
 version = "0.1.0"
+edition = "2021"
 authors = ["Heavy Duty Builders <team@heavyduty.builders>"]
 repository = "https://github.com/heavy-duty/znap"
-edition = "2021"
 license = "Apache-2.0"
 description = "Coming soon"
 
