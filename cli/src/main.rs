@@ -1,8 +1,4 @@
 use clap::{Parser, Subcommand};
-use commands::build::run as build_command;
-use commands::clean::run as clean_command;
-use commands::serve::run as serve_command;
-use commands::test::run as test_command;
 mod commands;
 pub mod template;
 pub mod utils;
@@ -24,16 +20,21 @@ enum Commands {
     Test,
     /// Cleans all the temp files
     Clean,
+    /// Initializes a new workspace
+    Init {
+        name: String,
+    },
 }
 
 fn main() {
     let cli = Cli::parse();
 
     match &cli.command {
-        Some(Commands::Build) => build_command(),
-        Some(Commands::Serve) => serve_command(),
-        Some(Commands::Test) => test_command(),
-        Some(Commands::Clean) => clean_command(),
+        Some(Commands::Build) => commands::build::run(),
+        Some(Commands::Serve) => commands::serve::run(),
+        Some(Commands::Test) => commands::test::run(),
+        Some(Commands::Clean) => commands::clean::run(),
+        Some(Commands::Init { name }) => commands::init::run(&name),
         None => {}
     }
 }
