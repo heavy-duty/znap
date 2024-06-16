@@ -42,5 +42,5 @@ pub fn action_name_without_suffix(action_name: String) -> String {
         .collect();
     let (_, action_name_without_suffix) = action_name_splitted.split_last().unwrap();
     
-    format!("/actions/{}", action_name_without_suffix.join("_"))
+    action_name_without_suffix.join("_")
 }

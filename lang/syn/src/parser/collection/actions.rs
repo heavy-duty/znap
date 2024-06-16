@@ -1,6 +1,8 @@
+use super::common::action_name_without_suffix;
 use crate::parser::collection::common::{extract_action_ident, extract_action_query};
 use crate::ActionFn;
 use convert_case::{Case, Casing};
+use heck::ToSnekCase;
 use proc_macro2::Span;
 use syn::spanned::Spanned;
 use syn::Ident;
@@ -8,8 +10,6 @@ use syn::{
     parse::{Error as ParseError, Result as ParseResult},
     Item, ItemFn, ItemMod,
 };
-
-use super::common::action_name_without_suffix;
 
 pub fn parse(collection_mod: &ItemMod) -> ParseResult<Vec<ActionFn>> {
     let mod_content = &collection_mod
@@ -35,7 +35,13 @@ pub fn parse(collection_mod: &ItemMod) -> ParseResult<Vec<ActionFn>> {
                 Some(ident) => Some(ident.clone()),
                 _ => None,
             };
-            let route_path = action_name_without_suffix(action_name);
+            let route_path = format!(
+                "/actions/{}_{}",
+                collection_mod.ident.to_string().to_snek_case(),
+                action_name_without_suffix(action_name).to_snek_case()
+            );
+
+            println!("{}", route_path);
 
             Ok(ActionFn {
                 raw_method: method.clone(),
