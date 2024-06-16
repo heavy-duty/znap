@@ -1,13 +1,17 @@
 [package]
 name = "znap-derive-error-code"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
+authors = ["Heavy Duty Builders <team@heavyduty.builders>"]
+repository = "https://github.com/heavy-duty/znap"
+license = "Apache-2.0"
+description = "Coming soon"
 
 [dependencies]
 proc-macro2 = "1.0.85"
 quote = "1.0.36"
 syn = "2.0.66"
-znap-syn = { path = "../../syn" }
+znap-syn = { path = "../../syn", version = "0.1.1" }
 
 [lib]
 proc-macro = true
