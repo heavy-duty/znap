@@ -1,19 +1,21 @@
 use heck::ToSnekCase;
 
-pub fn template(collections: &Vec<String>) -> String {
+use crate::utils::Collection;
+
+pub fn template(collections: &Vec<Collection>) -> String {
     let collection_imports: Vec<String> = collections
         .iter()
         .map(|collection| {
             format!(
                 "use {}::collection_router as {}_collection_router;",
-                collection.to_snek_case(), collection.to_snek_case()
+                collection.name.to_snek_case(), collection.name.to_snek_case()
             )
         })
         .collect();
 
     let collection_routes: Vec<String> = collections
         .iter()
-        .map(|collection| format!(".merge({}_collection_router())", collection.to_snek_case()))
+        .map(|collection| format!(".merge({}_collection_router())", collection.name.to_snek_case()))
         .collect();
 
     let collection_router = format!("let router = Router::new(){};", collection_routes.join(""));

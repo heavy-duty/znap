@@ -1,11 +1,14 @@
 use anyhow::Result;
 use clap::{Parser, Subcommand};
+use tempfile::tempdir;
+use std::fs::{create_dir, File};
 use std::process::Stdio;
 use template::toml::template as toml_template;
 use template::api::template as api_template;
 use utils::get_collections;
 mod template;
 mod utils;
+use std::io::Write;
 
 #[derive(Parser)]
 #[command(version, about, long_about = None)]
@@ -59,29 +62,15 @@ fn build_all() {
     let collections = get_collections();
 
     for collection in collections.iter() {
-        match build_collection(collection.clone()) {
+        match build_collection(collection.name.clone()) {
             Ok(_) => {}
-            _ => panic!("Failed to build collection: {}", collection),
+            _ => panic!("Failed to build collection: {}", collection.name),
         }
     }
 }
 
 fn serve_all() {
-    /*
-
-    What happens if there's a server already? Should it be updated?
-    Generated entirely again?
-
-    What happens if we are running the server and another instance
-    starts? Should updates be allowed? Would those changes even
-    affect our current thing?
-
-    There is no way to have a duplicate collection, but duplicate actions
-    can occur. Each action can be prefixed with the collection and since
-    there can't be duplicate actions within a collection, the problem
-    is solved.
-
-    */
+    // TODO: We need some sort of caching, at least re-using the target when possible.
 
     let collections = get_collections();
 
@@ -93,11 +82,30 @@ fn serve_all() {
     let api_content = api_template(&collections);
     println!("API: \n{}\n", api_content);
 
-    // Check .znap and .znap/server exist
-    
-    // Create/Update cargo.toml and main.rs
+    // Create a temporal directory and store the code there.
+    let dir = tempdir().unwrap();
+
+    create_dir(dir.path().join("src")).unwrap();
+
+    let api_path = dir.path().join("src/main.rs");
+    let mut api_file = File::create(api_path).unwrap();
+    api_file.write_all(api_content.as_bytes()).unwrap();
+
+    let toml_path = dir.path().join("Cargo.toml");
+    let mut toml_file = File::create(toml_path).unwrap();
+    toml_file.write_all(cargo_content.as_bytes()).unwrap();
 
     // Run the server using cargo run --manifest-path
+    let exit = std::process::Command::new("cargo")
+        .arg("run")
+        .arg("--manifest-path")
+        .arg(dir.path().join("Cargo.toml"))
+        .stdout(Stdio::inherit())
+        .stderr(Stdio::inherit())
+        .output()
+        .map_err(|e| anyhow::format_err!("{}", e.to_string())).unwrap();
 
-    println!("Serving your workspace");
+    if !exit.status.success() {
+        std::process::exit(exit.status.code().unwrap_or(1));
+    }
 }

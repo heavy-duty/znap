@@ -1,4 +1,6 @@
-pub fn template(collections: &Vec<String>) -> String {
+use crate::utils::Collection;
+
+pub fn template(collections: &Vec<Collection>) -> String {
     let cargo_content_without_collections = "[package]\n\
         name = \"znap-server\"\n\
         version = \"0.1.0\"\n\
@@ -11,8 +13,8 @@ pub fn template(collections: &Vec<String>) -> String {
         .iter()
         .map(|collection| {
             format!(
-                "{} = {{ path = \"../../collections/{}\" }}",
-                collection, collection
+                "{} = {{ path = \"{}\" }}",
+                collection.name, collection.path.to_str().unwrap()
             )
         })
         .collect();
