@@ -26,6 +26,8 @@ enum Commands {
     Serve,
     /// Runs the test suite for the workspace
     Test,
+    /// Cleans all the temp files
+    Clean,
 }
 
 fn main() {
@@ -35,8 +37,9 @@ fn main() {
         Some(Commands::Build) => build_all(),
         Some(Commands::Serve) => serve_all(),
         Some(Commands::Test) => {
-            println!("Testing your workspace");
+            println!("TODO: Testing your workspace");
         }
+        Some(Commands::Clean) => clean(),
         None => {}
     }
 }
@@ -77,28 +80,27 @@ fn serve_all() {
     // Create a temporal directory and store the code there.
     let cwd: PathBuf = std::env::current_dir().unwrap();
     let dir = tempdir_in(cwd.join(".znap")).unwrap();
+
+    // Generate api file
     create_dir(dir.path().join("src")).unwrap();
-
-    // Generate Cargo.toml content
-    let cargo_content = toml_template(&collections);
-
-    // Generate server file content.
-    let api_content = api_template(&collections);
-
     let api_path = dir.path().join("src/main.rs");
     let mut api_file = File::create(api_path).unwrap();
-    api_file.write_all(api_content.as_bytes()).unwrap();
+    api_file
+        .write_all(api_template(&collections).as_bytes())
+        .unwrap();
 
+    // Generate cargo file
     let toml_path = dir.path().join("Cargo.toml");
     let mut toml_file = File::create(&toml_path).unwrap();
-    toml_file.write_all(cargo_content.as_bytes()).unwrap();
+    toml_file
+        .write_all(toml_template(&collections).as_bytes())
+        .unwrap();
 
     // Remove tmp files if user hits Ctrl-C
     ctrlc::set_handler(move || {
         println!("Removing temp files");
         remove_dir_all(dir.path()).unwrap()
     })
-    
     .expect("Error setting Ctrl-C handler");
 
     // Run the server using cargo run --manifest-path
@@ -115,4 +117,11 @@ fn serve_all() {
     if !exit.status.success() {
         std::process::exit(exit.status.code().unwrap_or(1));
     }
+}
+
+fn clean() {
+    let cwd: PathBuf = std::env::current_dir().unwrap();
+    remove_dir_all(cwd.join(".znap")).unwrap();
+    create_dir(cwd.join(".znap")).unwrap();
+    File::create(cwd.join(".znap/.gitkeep")).unwrap();
 }
