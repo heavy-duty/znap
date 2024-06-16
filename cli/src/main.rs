@@ -1,6 +1,6 @@
 use anyhow::Result;
 use clap::{Parser, Subcommand};
-use std::fs::{create_dir, File};
+use std::fs::{create_dir, remove_dir_all, File};
 use std::path::PathBuf;
 use std::process::Stdio;
 use tempfile::tempdir_in;
@@ -77,17 +77,10 @@ fn serve_all() {
     // Create a temporal directory and store the code there.
     let cwd: PathBuf = std::env::current_dir().unwrap();
     let dir = tempdir_in(cwd.join(".znap")).unwrap();
-    let dir_name = String::from(
-        String::from(dir.path().to_str().unwrap())
-            .split("/")
-            .last()
-            .unwrap(),
-    );
-    let dir_name_without_dot = String::from(dir_name.split(".").last().unwrap());
     create_dir(dir.path().join("src")).unwrap();
 
     // Generate Cargo.toml content
-    let cargo_content = toml_template(&dir_name_without_dot, &collections);
+    let cargo_content = toml_template(&collections);
 
     // Generate server file content.
     let api_content = api_template(&collections);
@@ -97,14 +90,22 @@ fn serve_all() {
     api_file.write_all(api_content.as_bytes()).unwrap();
 
     let toml_path = dir.path().join("Cargo.toml");
-    let mut toml_file = File::create(toml_path).unwrap();
+    let mut toml_file = File::create(&toml_path).unwrap();
     toml_file.write_all(cargo_content.as_bytes()).unwrap();
+
+    // Remove tmp files if user hits Ctrl-C
+    ctrlc::set_handler(move || {
+        println!("Removing temp files");
+        remove_dir_all(dir.path()).unwrap()
+    })
+    
+    .expect("Error setting Ctrl-C handler");
 
     // Run the server using cargo run --manifest-path
     let exit = std::process::Command::new("cargo")
         .arg("run")
         .arg("--manifest-path")
-        .arg(dir.path().join("Cargo.toml"))
+        .arg(&toml_path)
         .stdout(Stdio::inherit())
         .stderr(Stdio::inherit())
         .output()

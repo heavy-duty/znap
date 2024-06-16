@@ -7,6 +7,7 @@ description = "Manage your znap workspaces"
 [dependencies]
 anyhow = "1.0.86"
 clap = { version = "4.5.7", features = ["derive"] }
+ctrlc = "3.4.4"
 heck = "0.5.0"
 serde = { version = "1.0.203", features = ["derive"] }
 tempfile = "3.10.1"
