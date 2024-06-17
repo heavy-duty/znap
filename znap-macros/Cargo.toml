@@ -14,7 +14,7 @@ syn = { workspace = true }
 quote = { workspace = true }
 
 # local
-znap-syn = { path = "../znap-syn", version = "0.1.1" }
+znap-syn = { path = "../znap-syn", version = "0.1.2" }
 
 [lib]
 proc-macro = true
