@@ -14,10 +14,10 @@ pub fn generate(collection_mod: &CollectionMod) -> TokenStream {
                     quote! {
                         pub async fn #handler_ident(
                             axum::extract::Query(query): axum::extract::Query<#action_query_ident>,
-                            axum::Json(payload): axum::Json<znap_lang::CreateActionPayload>,
-                        ) -> znap_lang::Result<axum::Json<znap_lang::ActionTransaction>> {
+                            axum::Json(payload): axum::Json<znap::CreateActionPayload>,
+                        ) -> znap::Result<axum::Json<znap::ActionTransaction>> {
                             let action = #action_ident;
-                            let context_with_query = znap_lang::ContextWithQuery::<#action_ident, #action_query_ident> {
+                            let context_with_query = znap::ContextWithQuery::<#action_ident, #action_query_ident> {
                                 payload,
                                 action: std::marker::PhantomData,
                                 query
@@ -26,7 +26,7 @@ pub fn generate(collection_mod: &CollectionMod) -> TokenStream {
                             let serialized_transaction = bincode::serialize(&transaction).unwrap();
                             let encoded_transaction = BASE64_STANDARD.encode(serialized_transaction);
         
-                            Ok(axum::Json(znap_lang::ActionTransaction {
+                            Ok(axum::Json(znap::ActionTransaction {
                                 transaction: encoded_transaction,
                                 message: None
                             }))
@@ -36,10 +36,10 @@ pub fn generate(collection_mod: &CollectionMod) -> TokenStream {
                 _ => {
                     quote! {
                         pub async fn #handler_ident(
-                            axum::Json(payload): axum::Json<znap_lang::CreateActionPayload>
-                        )  -> znap_lang::Result<axum::Json<znap_lang::ActionTransaction>>{
+                            axum::Json(payload): axum::Json<znap::CreateActionPayload>
+                        )  -> znap::Result<axum::Json<znap::ActionTransaction>>{
                             let action = #action_ident {};
-                            let context = znap_lang::Context::<#action_ident> {
+                            let context = znap::Context::<#action_ident> {
                                 payload,
                                 action: std::marker::PhantomData,
                             };
@@ -47,7 +47,7 @@ pub fn generate(collection_mod: &CollectionMod) -> TokenStream {
                             let serialized_transaction = bincode::serialize(&transaction).unwrap();
                             let encoded_transaction = BASE64_STANDARD.encode(serialized_transaction);
         
-                            Ok(axum::Json(znap_lang::ActionTransaction {
+                            Ok(axum::Json(znap::ActionTransaction {
                                 transaction: encoded_transaction,
                                 message: None
                             }))

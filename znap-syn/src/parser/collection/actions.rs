@@ -1,7 +1,6 @@
 use super::common::action_name_without_suffix;
 use crate::parser::collection::common::{extract_action_ident, extract_action_query};
 use crate::ActionFn;
-use convert_case::{Case, Casing};
 use heck::ToSnekCase;
 use proc_macro2::Span;
 use syn::spanned::Spanned;
@@ -26,7 +25,7 @@ pub fn parse(collection_mod: &ItemMod) -> ParseResult<Vec<ActionFn>> {
         })
         .map(|method: &ItemFn| {
             let action_ident = extract_action_ident(&method).unwrap();
-            let action_name = action_ident.to_string().to_case(Case::Snake);
+            let action_name = action_ident.to_string().to_snek_case();
             let handle_get_ident =
                 Ident::new(&format!("handle_get_{}", action_name), Span::call_site());
             let handle_post_ident =

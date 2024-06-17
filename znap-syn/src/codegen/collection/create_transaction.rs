@@ -13,7 +13,7 @@ pub fn generate(collection_mod: &CollectionMod) -> TokenStream {
                 Some(action_query_ident) => {
                     quote! {
                         impl CreateTransactionWithQuery<#action_ident, #action_query_ident> for #action_ident {
-                            fn create_transaction(&self, ctx: ContextWithQuery<#action_ident, #action_query_ident>) -> znap_lang::Result<solana_sdk::transaction::Transaction> {
+                            fn create_transaction(&self, ctx: ContextWithQuery<#action_ident, #action_query_ident>) -> znap::Result<solana_sdk::transaction::Transaction> {
                                 #fn_block
                             }
                         }
@@ -22,7 +22,7 @@ pub fn generate(collection_mod: &CollectionMod) -> TokenStream {
                 _ => {
                     quote! {
                         impl CreateTransaction<#action_ident> for #action_ident {
-                            fn create_transaction(&self, ctx: Context<#action_ident>) -> znap_lang::Result<solana_sdk::transaction::Transaction> {
+                            fn create_transaction(&self, ctx: Context<#action_ident>) -> znap::Result<solana_sdk::transaction::Transaction> {
                                 #fn_block
                             }
                         }

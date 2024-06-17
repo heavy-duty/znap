@@ -1,6 +1,6 @@
 [package]
 name = "znap-cli"
-version = "0.1.1"
+version.workspace = true
 edition = "2021"
 description = "Manage your znap workspaces"
 authors = ["Heavy Duty Builders <team@heavyduty.builders>"]
@@ -12,10 +12,13 @@ name = "znap"
 path = "src/bin/main.rs"
 
 [dependencies]
+# workspace deps
+heck = { workspace = true }
+serde = { workspace = true }
+
+# crate specific
 anyhow = "1.0.86"
 clap = { version = "4.5.7", features = ["derive"] }
 ctrlc = "3.4.4"
-heck = "0.5.0"
-serde = { version = "1.0.203", features = ["derive"] }
 tempfile = "3.10.1"
 toml = "0.8.14"

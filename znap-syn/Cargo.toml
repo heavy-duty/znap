@@ -1,6 +1,6 @@
 [package]
 name = "znap-syn"
-version = "0.1.1"
+version.workspace = true
 edition = "2021"
 authors = ["Heavy Duty Builders <team@heavyduty.builders>"]
 repository = "https://github.com/heavy-duty/znap"
@@ -8,9 +8,12 @@ license = "Apache-2.0"
 description = "Coming soon"
 
 [dependencies]
-convert_case = "0.6.0"
+# workspace deps
+proc-macro2 = { workspace = true }
+syn = { workspace = true }
+quote = { workspace = true }
+heck = { workspace = true }
+
+# crate specific
 deluxe = { version = "0.5.0", features = ["full"] }
-heck = "0.5.0"
-proc-macro2 = "1.0.85"
-quote = "1.0.36"
-syn = "2.0.66"
+

@@ -1,21 +1,28 @@
 [workspace]
 members = [ 
-    "examples/my-actions", 
-    "lang", 
-    "lang/attribute/*",
-    "lang/derive/*",
-    "lang/syn",
-    "cli"
+    "znap-syn",
+    "znap-macros",
+    "znap", 
+    "znap-cli",
+    "examples/*",
 ]
+resolver = "2"
 
-[package]
-name = "znap"
+[workspace.package]
 version = "0.1.1"
-edition = "2021"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[workspace.dependencies]
+# znap specific
+axum = "0.7.5"
+serde = "1.0.203"
 
-[dependencies]
-tokio = { version = "1", features = ["full"] }
-axum = "0.7"
-my-actions = { path = "./examples/my-actions"}
+# solana
+solana-sdk = "1.18.16"
+
+# macros
+proc-macro2 = "1.0"
+quote = "1.0"
+syn = "2.0"
+
+# utilities
+heck = "0.5.0"
