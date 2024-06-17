@@ -14,7 +14,7 @@ version = "0.1.2"
 [workspace.dependencies]
 # znap specific
 axum = "0.7.5"
-serde = "1.0.203"
+serde = { version = "1.0.203", features = ["derive"] }
 
 # solana
 solana-sdk = "1.18.16"
