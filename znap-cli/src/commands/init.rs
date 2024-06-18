@@ -1,5 +1,6 @@
 use crate::utils::write_file;
 use colored::Colorize;
+use console::Emoji;
 use heck::ToKebabCase;
 use std::fs::create_dir;
 
@@ -21,7 +22,15 @@ pub fn run(name: &String, dry_run: &bool) {
     println!("{}", message.bold().yellow());
     println!("");
     println!("Someone is about to get some action...");
-    println!("No worries, we got you. {}", "BLINK BLINK".bold().italic());
+    println!(
+        "No worries, we got you. {}",
+        format!(
+            "{}{}{}",
+            Emoji("✨", ""),
+            "BLINK BLINK".bold().italic(),
+            Emoji("✨", "")
+        )
+    );
     println!("");
     println!(
         "You are about to create a {} named: {}\n",
