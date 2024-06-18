@@ -1,0 +1,19 @@
+[package]
+name = "znap-syn"
+version.workspace = true
+edition = "2021"
+authors = ["Heavy Duty Builders <team@heavyduty.builders>"]
+repository = "https://github.com/heavy-duty/znap"
+license = "Apache-2.0"
+description = "Coming soon"
+
+[dependencies]
+# workspace deps
+proc-macro2 = { workspace = true }
+syn = { workspace = true }
+quote = { workspace = true }
+heck = { workspace = true }
+
+# crate specific
+deluxe = { version = "0.5.0", features = ["full"] }
+
