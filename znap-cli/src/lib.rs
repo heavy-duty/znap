@@ -32,6 +32,9 @@ pub enum Command {
     /// Create a new collection in the workspace
     New {
         name: String,
+         /// Skip writing the files.
+         #[clap(short, long)]
+         dry_run: bool,
     },
 }
 
@@ -42,7 +45,7 @@ fn process_command(opts: Opts) -> Result<()> {
         Command::Test => Ok(commands::test::run()),
         Command::Clean => Ok(commands::clean::run()),
         Command::Init { name, dry_run } => Ok(commands::init::run(&name, &dry_run)),
-        Command::New { name } => Ok(commands::new::run(&name)),
+        Command::New { name, dry_run } => Ok(commands::new::run(&name, &dry_run)),
     }
 }
 
