@@ -28,7 +28,7 @@ pub fn run(name: &String, dry_run: &bool) {
     println!("No worries, we got you. {}", "BLINK BLINK".bold().italic());
     println!("");
     println!(
-        "We are about to create a {} named: {}\n",
+        "You are about to create a {} named: {}\n",
         "Znap workspace".bold(),
         &name.cyan()
     );
@@ -73,15 +73,16 @@ pub fn run(name: &String, dry_run: &bool) {
         write_file(znap_dir.join(".gitkeep").as_path(), &String::from(""));
     }
 
-    println!("  {}", format!("+ {}/Cargo.toml", &name).on_bright_green());
-    println!("  {}", format!("+ {}/Znap.toml", &name).on_bright_green());
-    println!("  {}", format!("+ {}/.gitignore", &name).on_bright_green());
+    println!("  Added:\n");
+    println!("      {}", format!("+ {}/Cargo.toml", &name).on_bright_green());
+    println!("      {}", format!("+ {}/Znap.toml", &name).on_bright_green());
+    println!("      {}", format!("+ {}/.gitignore", &name).on_bright_green());
     println!(
-        "  {}",
+        "      {}",
         format!("+ {}/.znap/.gitkeep", &name).on_bright_green()
     );
     println!(
-        "  {}",
+        "      {}",
         format!("+ {}/collections/.gitkeep", &name).on_bright_green()
     );
 
