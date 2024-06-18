@@ -23,13 +23,10 @@ pub fn run(name: &String, dry_run: &bool) {
     println!("");
     println!("Someone is about to get some action...");
     println!(
-        "No worries, we got you. {}",
-        format!(
-            "{}{}{}",
-            Emoji("✨", ""),
-            "BLINK BLINK".bold().italic(),
-            Emoji("✨", "")
-        )
+        "No worries, we got you. {}{}{}",
+        Emoji("✨", ""),
+        "BLINK BLINK".bold().italic(),
+        Emoji("✨", "")
     );
     println!("");
     println!(
