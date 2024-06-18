@@ -12,6 +12,9 @@ pub fn generate(collection_mod: &CollectionMod) -> proc_macro2::TokenStream {
     let router = router::generate(collection_mod);
 
     quote! {
+        use znap::base64::prelude::BASE64_STANDARD;
+        use znap::base64::Engine;
+
         #create_transaction
         #handle_post
         #handle_get

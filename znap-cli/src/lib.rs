@@ -1,8 +1,8 @@
 use anyhow::Result;
 use clap::Parser;
 mod commands;
-pub mod template;
-pub mod utils;
+mod template;
+mod utils;
 
 #[derive(Debug, Parser)]
 #[clap(version)]
