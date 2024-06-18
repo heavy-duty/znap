@@ -1,6 +1,7 @@
-use solana_sdk::{message::Message, pubkey::Pubkey, transaction::Transaction};
+use solana_sdk::{message::Message, pubkey, pubkey::Pubkey, transaction::Transaction};
 use spl_associated_token_account::get_associated_token_address;
 use spl_token::{instruction::transfer, ID as TOKEN_PROGRAM_ID};
+use std::str::FromStr;
 use znap::*;
 
 #[collection]
@@ -10,14 +11,10 @@ pub mod my_actions {
     pub fn fixed_transfer(ctx: Context<FixedTransferAction>) -> Result<Transaction> {
         let account_pubkey = match Pubkey::from_str(&ctx.payload.account) {
             Ok(account_pubkey) => account_pubkey,
-            _ => {
-                return Err(Error::from(ActionError::InvalidAccountPublicKey))
-            }
+            _ => return Err(Error::from(ActionError::InvalidAccountPublicKey)),
         };
-        let mint_pubkey =
-            Pubkey::from_str(&"FtaDaiPPAy52vKtzdrpMLS3bXvG9LVUYJt6TeG6XxMUi").unwrap();
-        let receiver_pubkey =
-            Pubkey::from_str(&"6GBLiSwAPhDMttmdjo3wvEsssEnCiW3yZwVyVZnhFm3G").unwrap();
+        let mint_pubkey = pubkey!("FtaDaiPPAy52vKtzdrpMLS3bXvG9LVUYJt6TeG6XxMUi");
+        let receiver_pubkey = pubkey!("6GBLiSwAPhDMttmdjo3wvEsssEnCiW3yZwVyVZnhFm3G");
         let source_pubkey = get_associated_token_address(&account_pubkey, &mint_pubkey);
         let destination_pubkey = get_associated_token_address(&receiver_pubkey, &mint_pubkey);
         let transfer_instruction = match transfer(
@@ -29,9 +26,7 @@ pub mod my_actions {
             1,
         ) {
             Ok(transfer_instruction) => transfer_instruction,
-            _ => {
-                return Err(Error::from(ActionError::InvalidInstruction))
-            }
+            _ => return Err(Error::from(ActionError::InvalidInstruction)),
         };
         let transaction_message = Message::new(&[transfer_instruction], None);
 
@@ -43,14 +38,10 @@ pub mod my_actions {
     ) -> Result<Transaction> {
         let account_pubkey = match Pubkey::from_str(&ctx.payload.account) {
             Ok(account_pubkey) => account_pubkey,
-            _ => {
-                return Err(Error::from(ActionError::InvalidAccountPublicKey))
-            }
+            _ => return Err(Error::from(ActionError::InvalidAccountPublicKey)),
         };
-        let mint_pubkey =
-            Pubkey::from_str(&"FtaDaiPPAy52vKtzdrpMLS3bXvG9LVUYJt6TeG6XxMUi").unwrap();
-        let receiver_pubkey =
-            Pubkey::from_str(&"6GBLiSwAPhDMttmdjo3wvEsssEnCiW3yZwVyVZnhFm3G").unwrap();
+        let mint_pubkey = pubkey!("FtaDaiPPAy52vKtzdrpMLS3bXvG9LVUYJt6TeG6XxMUi");
+        let receiver_pubkey = pubkey!("6GBLiSwAPhDMttmdjo3wvEsssEnCiW3yZwVyVZnhFm3G");
         let source_pubkey = get_associated_token_address(&account_pubkey, &mint_pubkey);
         let destination_pubkey = get_associated_token_address(&receiver_pubkey, &mint_pubkey);
         let transfer_instruction = match transfer(
@@ -62,9 +53,7 @@ pub mod my_actions {
             ctx.query.amount,
         ) {
             Ok(transfer_instruction) => transfer_instruction,
-            _ => {
-                return Err(Error::from(ActionError::InvalidInstruction))
-            }
+            _ => return Err(Error::from(ActionError::InvalidInstruction)),
         };
         let transaction_message = Message::new(&[transfer_instruction], None);
 

@@ -1,10 +1,8 @@
-use anyhow::Result;
 use serde::{Deserialize, Serialize};
 use std::io::Write;
 use std::{
     fs::{read_to_string, File},
-    path::{Path, PathBuf},
-    process::Stdio,
+    path::{Path, PathBuf}
 };
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -39,21 +37,4 @@ pub fn get_collections() -> Vec<Collection> {
 pub fn write_file(path: &Path, content: &String) {
     let mut file = File::create(&path).unwrap();
     file.write_all(content.as_bytes()).unwrap();
-}
-
-pub fn build_collection(collection_name: String) -> Result<()> {
-    let exit = std::process::Command::new("cargo")
-        .arg("build")
-        .arg("-p")
-        .arg(collection_name)
-        .stdout(Stdio::inherit())
-        .stderr(Stdio::inherit())
-        .output()
-        .map_err(|e| anyhow::format_err!("{}", e.to_string()))?;
-
-    if !exit.status.success() {
-        std::process::exit(exit.status.code().unwrap_or(1));
-    }
-
-    Ok(())
 }

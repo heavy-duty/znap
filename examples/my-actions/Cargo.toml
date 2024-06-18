@@ -15,5 +15,5 @@ spl-token = "4.0.1"
 tokio = { version = "1", features = ["full"] }
 
 # local
-znap = { path = "../../znap", version = "0.1.2" }
+znap = { path = "../../znap" }
 
