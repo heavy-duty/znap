@@ -5,12 +5,8 @@ use std::fs::create_dir;
 
 pub fn run(name: &String, dry_run: &bool) {
     std::process::Command::new("clear").status().unwrap();
-    let cwd = std::env::current_dir().unwrap();
-    let workspace_dir = cwd.join(name.to_kebab_case());
-
     println!("\n");
-
-    let message =  r#"
+    let message = r#"
     ____ 
    |\   \      ________  ________   ________  ________   
    \ \   \    |\_____  \|\   ___  \|\   __  \|\   __  \  
@@ -32,6 +28,11 @@ pub fn run(name: &String, dry_run: &bool) {
         "Znap workspace".bold(),
         &name.cyan()
     );
+
+    let cwd = std::env::current_dir().unwrap();
+    let workspace_dir = cwd.join(name.to_kebab_case());
+    let collections_dir = &workspace_dir.join("collections");
+    let znap_dir = &workspace_dir.join(".znap");
 
     if !dry_run {
         // Create a folder with the provided name.
@@ -56,7 +57,6 @@ pub fn run(name: &String, dry_run: &bool) {
         );
 
         // Create a collections folder.
-        let collections_dir = &workspace_dir.join("collections");
         create_dir(&collections_dir).unwrap();
 
         // Create a .gitkeep in the collections folder.
@@ -66,7 +66,6 @@ pub fn run(name: &String, dry_run: &bool) {
         );
 
         // Create a .znap folder.
-        let znap_dir = &workspace_dir.join(".znap2");
         create_dir(&znap_dir).unwrap();
 
         // Create a .gitkeep in the .znap folder.
@@ -74,9 +73,18 @@ pub fn run(name: &String, dry_run: &bool) {
     }
 
     println!("  Added:\n");
-    println!("      {}", format!("+ {}/Cargo.toml", &name).on_bright_green());
-    println!("      {}", format!("+ {}/Znap.toml", &name).on_bright_green());
-    println!("      {}", format!("+ {}/.gitignore", &name).on_bright_green());
+    println!(
+        "      {}",
+        format!("+ {}/Cargo.toml", &name).on_bright_green()
+    );
+    println!(
+        "      {}",
+        format!("+ {}/Znap.toml", &name).on_bright_green()
+    );
+    println!(
+        "      {}",
+        format!("+ {}/.gitignore", &name).on_bright_green()
+    );
     println!(
         "      {}",
         format!("+ {}/.znap/.gitkeep", &name).on_bright_green()
