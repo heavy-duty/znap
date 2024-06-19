@@ -69,20 +69,6 @@ pub mod my_actions {
 )]
 pub struct FixedTransferAction;
 
-#[derive(Action)]
-#[action(
-    icon = "https://google.com",
-    title = "Dynamic transfer",
-    description = "Send a dynamic transfer to the treasury",
-    label = "Send"
-)]
-pub struct DynamicTransferAction;
-
-#[query]
-pub struct DynamicTransferQuery {
-    pub amount: u64,
-}
-
 #[derive(ErrorCode)]
 enum ActionError {
     #[error(msg = "Invalid account public key")]
