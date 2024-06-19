@@ -79,25 +79,13 @@ pub fn run(name: &String, dry_run: &bool) {
     }
 
     println!("  Added:\n");
+    println!("      {}", format!("+ {}/Cargo.toml", &name).green());
+    println!("      {}", format!("+ {}/Znap.toml", &name).green());
+    println!("      {}", format!("+ {}/.gitignore", &name).green());
+    println!("      {}", format!("+ {}/.znap/.gitkeep", &name).green());
     println!(
         "      {}",
-        format!("+ {}/Cargo.toml", &name).on_bright_green()
-    );
-    println!(
-        "      {}",
-        format!("+ {}/Znap.toml", &name).on_bright_green()
-    );
-    println!(
-        "      {}",
-        format!("+ {}/.gitignore", &name).on_bright_green()
-    );
-    println!(
-        "      {}",
-        format!("+ {}/.znap/.gitkeep", &name).on_bright_green()
-    );
-    println!(
-        "      {}",
-        format!("+ {}/collections/.gitkeep", &name).on_bright_green()
+        format!("+ {}/collections/.gitkeep", &name).green()
     );
 
     println!(
