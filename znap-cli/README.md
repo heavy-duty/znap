@@ -12,15 +12,7 @@
 
 1. `cargo install znap-cli`
 
-## Package
-
-| Package                 | Description                                              | Version                                                                                                                          | Docs                                                                                                            |
-| :---------------------- | :------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------- | :-------------------------------------------------------------------------------------------------------------- |
-| `znap-cli`           | Znap CLI for writing Solana actions           | [![Crates.io](https://img.shields.io/crates/v/anchor-lang?color=blue)](https://crates.io/crates/znap-cli)                     | [![Docs.rs](https://docs.rs/anchor-lang/badge.svg)](https://docs.rs/znap-cli/latest/znap_cli/)                                |
-
 ## Command list
-
-
 
 | Command                 | Description                                              |
 | :---------------------- | :------------------------------------------------------- |
@@ -31,3 +23,9 @@
 | `znap init`           | Initializes a new workspace           |
 | `znap new`           | Create a new collection in the workspace           |
 | `znap help`           | Print this message or the help of the given subcommand(s)           |
+
+## Package
+
+| Package                 | Description                                              | Version                                                                                                                          | Docs                                                                                                            |
+| :---------------------- | :------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------- | :-------------------------------------------------------------------------------------------------------------- |
+| `znap-cli`           | Znap CLI to interact with a znap workspace.           | [![Crates.io](https://img.shields.io/crates/v/anchor-lang?color=blue)](https://crates.io/crates/znap-cli)                     | [![Docs.rs](https://docs.rs/anchor-lang/badge.svg)](https://docs.rs/znap-cli/latest/znap_cli/)                                |

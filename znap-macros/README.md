@@ -2,7 +2,7 @@
   <h1>znap-macros</h1>
 
   <p>
-    <strong>Macros for creating Solana actions</strong>
+    <strong>Macro collection for creating Solana actions</strong>
   </p>
 </div>
 
@@ -18,4 +18,4 @@ Macros in `znap-macros` allow you to transform Rust code snippets into `znap-syn
 
 | Package                 | Description                                              | Version                                                                                                                          | Docs                                                                                                            |
 | :---------------------- | :------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------- | :-------------------------------------------------------------------------------------------------------------- |
-| `znap-macros`           | Macros for creating Solana actions           | [![Crates.io](https://img.shields.io/crates/v/anchor-lang?color=blue)](https://crates.io/crates/znap-macros)                     | [![Docs.rs](https://docs.rs/anchor-lang/badge.svg)](https://docs.rs/znap-macros/latest/znap_macros/)                                |
+| `znap-macros`           | Macro collection for creating Solana actions           | [![Crates.io](https://img.shields.io/crates/v/anchor-lang?color=blue)](https://crates.io/crates/znap-macros)                     | [![Docs.rs](https://docs.rs/anchor-lang/badge.svg)](https://docs.rs/znap-macros/latest/znap_macros/)                                |
