@@ -2,7 +2,7 @@ use solana_sdk::{message::Message, pubkey, pubkey::Pubkey, transaction::Transact
 use spl_associated_token_account::get_associated_token_address;
 use spl_token::{instruction::transfer, ID as TOKEN_PROGRAM_ID};
 use std::str::FromStr;
-use znap::*;
+use znap::prelude::*;
 
 #[collection]
 pub mod my_actions {
