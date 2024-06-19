@@ -11,7 +11,7 @@ pub fn template(name: &String) -> String {
         solana-sdk = \"1.18.16\"\n\
         spl-associated-token-account = \"3.0.2\"\n\
         spl-token = \"4.0.1\"\n\
-        znap = \"0.1.4\"\n\
+        znap = \"0.1.6\"\n\
     ", name.to_kebab_case())
 }
 
