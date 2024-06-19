@@ -3322,6 +3322,7 @@ dependencies = [
  "axum",
  "base64 0.22.1",
  "bincode",
+ "colored",
  "serde",
  "solana-sdk",
  "znap-macros",
@@ -3356,6 +3357,7 @@ dependencies = [
 name = "znap-syn"
 version = "0.1.4"
 dependencies = [
+ "colored",
  "deluxe",
  "heck 0.5.0",
  "proc-macro2",

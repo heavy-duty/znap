@@ -12,6 +12,7 @@ description = "Coming soon"
 axum = { workspace = true }
 serde = { workspace = true }
 solana-sdk = { workspace = true }
+colored = { workspace = true }
 
 # crate specific
 base64 = "0.22.1"
