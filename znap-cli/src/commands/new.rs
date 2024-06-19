@@ -53,15 +53,15 @@ pub fn run(name: &String, dry_run: &bool) {
     println!("  Added:\n");
     println!(
         "      {}",
-        format!("+ collections/{}/Cargo.toml", &name).on_bright_green()
+        format!("+ collections/{}/Cargo.toml", &name).green()
     );
     println!(
         "      {}",
-        format!("+ collections/{}/src/lib.rs", &name).on_bright_green()
+        format!("+ collections/{}/src/lib.rs", &name).green()
     );
     println!("");
     println!("  Modified:\n");
-    println!("      {}", "* ./Znap.toml".on_bright_green());
+    println!("      {}", "* ./Znap.toml".green());
 
     println!(
         "\nCollection created at {}\n",

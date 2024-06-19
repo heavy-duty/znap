@@ -2,7 +2,7 @@ use heck::ToSnekCase;
 
 pub fn template(name: &String) -> String {
     format!(
-        r#"use znap::*;
+        r#"use znap::prelude::*;
 
 #[collection]
 pub mod {} {{
