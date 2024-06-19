@@ -1569,7 +1569,7 @@ dependencies = [
 
 [[package]]
 name = "my-actions"
-version = "0.1.6"
+version = "0.1.7"
 dependencies = [
  "axum",
  "serde",
@@ -3317,7 +3317,7 @@ dependencies = [
 
 [[package]]
 name = "znap"
-version = "0.1.6"
+version = "0.1.7"
 dependencies = [
  "axum",
  "base64 0.22.1",
@@ -3330,7 +3330,7 @@ dependencies = [
 
 [[package]]
 name = "znap-cli"
-version = "0.1.6"
+version = "0.1.7"
 dependencies = [
  "anyhow",
  "clap",
@@ -3345,7 +3345,7 @@ dependencies = [
 
 [[package]]
 name = "znap-macros"
-version = "0.1.6"
+version = "0.1.7"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -3355,7 +3355,7 @@ dependencies = [
 
 [[package]]
 name = "znap-syn"
-version = "0.1.6"
+version = "0.1.7"
 dependencies = [
  "colored",
  "deluxe",
