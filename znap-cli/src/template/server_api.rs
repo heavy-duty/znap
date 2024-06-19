@@ -7,7 +7,8 @@ pub fn template(collections: &Vec<Collection>) -> String {
         .iter()
         .map(|collection| {
             format!(
-                "use {}::collection_router as {}_collection_router;",
+                "use {}::{{collection_router as {}_collection_router, display_collection_routes as {}_display_collection_routes}};",
+                collection.name.to_snek_case(),
                 collection.name.to_snek_case(),
                 collection.name.to_snek_case()
             )
@@ -23,6 +24,17 @@ pub fn template(collections: &Vec<Collection>) -> String {
             )
         })
         .collect();
+
+    let collection_prints: Vec<String> = collections
+        .iter()
+        .map(|collection| {
+            format!(
+                "{}_display_collection_routes();",
+                collection.name.to_snek_case()
+            )
+        })
+        .collect();
+
     let collection_router = format!("let router = Router::new(){};", collection_routes.join(""));
 
     format!(
@@ -36,18 +48,23 @@ use console::Emoji;
 async fn main() -> Result<(), axum::Error> {{
     println!("");
     println!(
-        "{{}} Znap Server {{}} \n\n Service is running at {{}}\n{{}} {{}}\n",
+        "{{}} Znap Server {{}} \n\n Service is running at {{}}",
         Emoji("✨", ""),
         Emoji("✨", ""),
-        "http://localhost:3000".cyan(),
-        Emoji("💡", ""),
-        "Press Ctrl+C to stop the server".bright_red().italic(),
-        
+        "http://localhost:3000".cyan()
     );
 
-    let listener = TcpListener::bind("127.0.0.1:3000").await.unwrap();
     {}
 
+    {}
+
+    println!(
+        "\n{{}} {{}}\n",
+        Emoji("💡", ""),
+        "Press Ctrl+C to stop the server".bright_red().italic(), 
+    );
+    
+    let listener = TcpListener::bind("127.0.0.1:3000").await.unwrap();
     axum::serve(listener, router.into_make_service())
         .await
         .unwrap();
@@ -56,6 +73,7 @@ async fn main() -> Result<(), axum::Error> {{
 }}
 "#,
         collection_imports.join("\n"),
+        collection_prints.join("\n"),
         collection_router
     )
 }

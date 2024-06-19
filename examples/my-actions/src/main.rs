@@ -1,5 +1,5 @@
 use axum::Router;
-use my_actions::collection_router;
+use my_actions::{collection_router, display_collection_routes};
 use tokio::net::TcpListener;
 
 #[tokio::main]
@@ -8,6 +8,9 @@ async fn main() -> Result<(), axum::Error> {
     let router = Router::new().merge(collection_router());
 
     println!("->> LISTENING on {:?}\n", listener.local_addr());
+
+    display_collection_routes();
+
     axum::serve(listener, router.into_make_service())
         .await
         .unwrap();

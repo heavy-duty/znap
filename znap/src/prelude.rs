@@ -5,3 +5,4 @@ pub use crate::{
 };
 pub use crate::bincode;
 pub use crate::base64;
+pub use crate::colored;
