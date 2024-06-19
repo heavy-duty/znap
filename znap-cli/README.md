@@ -6,7 +6,7 @@
   </p>
 </div>
 
-`znap-cli` is a command line tool designed to simplify and speed up the creation of Solana Actions and Blinks on different operating systems.
+`znap-cli` is a command line tool designed to simplify and speed up the creation of Solana Actions on different operating systems.
 
 ## How to install
 

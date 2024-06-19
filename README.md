@@ -10,7 +10,7 @@
   </p>
 </div>
 
-Znap is an innovative Rust-based framework designed to simplify the creation of [Solana Actions and Blinks](#) on the Solana blockchain.
+Znap is an innovative Rust-based framework designed to simplify the creation of [Solana Actions](#) on the Solana blockchain.
 
 - Rust eDSL for writing Solana actions
 - Macro collection
