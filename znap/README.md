@@ -15,6 +15,12 @@
 1. `cargo add znap`
 2. In your lib.rs file import: `use znap::prelude::*`
 
+## Package
+
+| Package                 | Description                                              | Version                                                                                                                          | Docs                                                                                                            |
+| :---------------------- | :------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------- | :-------------------------------------------------------------------------------------------------------------- |
+| `znap`           | Znap framework's core library to create Solana actions           | [![Crates.io](https://img.shields.io/crates/v/znap?color=blue)](https://crates.io/crates/znap)                     | [![Docs.rs](https://docs.rs/anchor-lang/badge.svg)](https://docs.rs/znap/latest/znap/)                                |
+
 ## How to use
 
 ```rust
@@ -85,9 +91,3 @@ enum ActionError {
     InvalidInstruction,
 }
 ```
-
-## Package
-
-| Package                 | Description                                              | Version                                                                                                                          | Docs                                                                                                            |
-| :---------------------- | :------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------- | :-------------------------------------------------------------------------------------------------------------- |
-| `znap`           | Znap framework's core library to create Solana actions           | [![Crates.io](https://img.shields.io/crates/v/znap?color=blue)](https://crates.io/crates/znap)                     | [![Docs.rs](https://docs.rs/anchor-lang/badge.svg)](https://docs.rs/znap/latest/znap/)                                |
