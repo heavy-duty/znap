@@ -1,6 +1,9 @@
 <div align="center">
+  
+  [![Watch the demo](https://res.cloudinary.com/andresmgsl/image/upload/q_auto/f_auto/w_450/v1718845551/ZNAP_cuckvf.png)](https://youtu.be/pmuwP9fWa3M)
   <h1>Znap</h1>
-
+  
+  [Watch the demo](https://youtu.be/pmuwP9fWa3M)
   <p>
     <strong>Performance-first Rust Framework to build APIs compatible with the Solana Actions Spec.</strong>
   </p>
