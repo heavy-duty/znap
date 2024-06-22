@@ -8,11 +8,13 @@ fn generate_parameter(parameters: &[ActionLinkParameterStruct]) -> TokenStream {
         .map(|p| {
             let label = &p.label;
             let name = &p.name;
+            let required = p.required;
 
             quote! {
                 ActionLinkParameterMetadata {
                     label: #label,
                     name: #name,
+                    required: #required,
                 }
             }
         })

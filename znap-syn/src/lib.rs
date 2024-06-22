@@ -105,6 +105,8 @@ pub struct ActionLinkStruct {
 pub struct ActionLinkParameterStruct {
     label: String,
     name: String,
+    #[deluxe(default = false)]
+    required: bool,
 }
 
 #[derive(Debug)]

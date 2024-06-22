@@ -71,6 +71,7 @@ pub struct ActionLinkMetadata {
 pub struct ActionLinkParameterMetadata {
     pub label: &'static str,
     pub name: &'static str,
+    pub required: bool,
 }
 
 #[derive(Debug)]
