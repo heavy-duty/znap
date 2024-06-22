@@ -67,8 +67,8 @@ pub mod my_actions {
     title = "Fixed transfer",
     description = "Send a fixed transfer to the treasury",
     label = "Send",
-    link = { label = "label", href = "https://google.com" },
-    link = { label = "label", href = "https://google.com" }
+    link = { label = "Text to show", href = "https://google.com?q={param}", parameter = { label = "Input Placeholder Text", name = "param" } },
+    link = { label = "Text to show", href = "https://google.com" }
 )]
 pub struct FixedTransferAction;
 
@@ -78,6 +78,8 @@ pub struct FixedTransferAction;
     title = "Dynamic transfer",
     description = "Send a dynamic transfer to the treasury",
     label = "Send",
+    link = { label = "Text to Show", href = "https://google.com" },
+    link = { label = "Text to Show", href = "https://google.com" }
 )]
 pub struct DynamicTransferAction;
 
