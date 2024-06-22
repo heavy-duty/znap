@@ -18,7 +18,7 @@ fn generate_parameter(parameters: &[ActionLinkParameterStruct]) -> TokenStream {
         })
         .collect();
     quote! {
-        vec![ #(#parameters),* ]
+        &[ #(#parameters),* ]
     }
 }
 
@@ -27,7 +27,7 @@ fn generate_links(links: &[ActionLinkStruct]) -> TokenStream {
         .iter()
         .map(|l| {
             let label = &l.label;
-            let href = &l.label;
+            let href = &l.href;
             let params = generate_parameter(&l.parameters);
 
             quote! {
@@ -41,7 +41,7 @@ fn generate_links(links: &[ActionLinkStruct]) -> TokenStream {
         .collect();
 
     quote! {
-        vec![ #(#links),* ]
+        &[ #(#links),* ]
     }
 }
 

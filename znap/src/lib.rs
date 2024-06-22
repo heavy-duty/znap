@@ -57,14 +57,14 @@ pub struct ActionMetadata {
     pub title: &'static str,
     pub description: &'static str,
     pub label: &'static str,
-    pub links: Vec<ActionLinkMetadata>,
+    pub links: &'static [ActionLinkMetadata],
 }
 
 #[derive(Debug, Serialize, PartialEq)]
 pub struct ActionLinkMetadata {
     pub label: &'static str,
     pub href: &'static str,
-    pub parameters: Vec<ActionLinkParameterMetadata>,
+    pub parameters: &'static [ActionLinkParameterMetadata],
 }
 
 #[derive(Debug, Serialize, PartialEq)]
