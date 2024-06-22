@@ -11,6 +11,8 @@ pub fn generate(action_struct: &ActionStruct) -> TokenStream {
         description,
         label,
         icon,
+        // TODO: put on quote
+        links,
     } = attributes;
 
     quote! {
@@ -21,6 +23,7 @@ pub fn generate(action_struct: &ActionStruct) -> TokenStream {
                     title: #title,
                     description: #description,
                     label: #label,
+                    links: Vec::new(),
                 }
             }
         }

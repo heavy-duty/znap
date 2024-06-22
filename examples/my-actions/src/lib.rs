@@ -66,7 +66,9 @@ pub mod my_actions {
     icon = "https://google.com",
     title = "Fixed transfer",
     description = "Send a fixed transfer to the treasury",
-    label = "Send"
+    label = "Send",
+    link = { label = "label", href = "https://google.com" },
+    link = { label = "label", href = "https://google.com" }
 )]
 pub struct FixedTransferAction;
 
@@ -75,7 +77,7 @@ pub struct FixedTransferAction;
     icon = "https://google.com",
     title = "Dynamic transfer",
     description = "Send a dynamic transfer to the treasury",
-    label = "Send"
+    label = "Send",
 )]
 pub struct DynamicTransferAction;
 
