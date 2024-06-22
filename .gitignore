@@ -1,3 +1,4 @@
 /target
 TODO.md
 .vscode
+examples/**/.znap/.tmp**
