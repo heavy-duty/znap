@@ -11,7 +11,7 @@ use std::{
 };
 use tempfile::tempdir_in;
 
-pub fn run() {
+pub fn run(address: &str, port: u16) {
     // Get all the collections in the workspace
     let collections = get_collections();
 
@@ -24,7 +24,7 @@ pub fn run() {
 
     // Generate api file
     create_dir(dir_path.join("src")).unwrap();
-    write_file(&api_path, &server_api_template(&collections));
+    write_file(&api_path, &server_api_template(&collections, address, port));
 
     // Generate cargo file
     write_file(&toml_path, &server_toml_template(&collections));
