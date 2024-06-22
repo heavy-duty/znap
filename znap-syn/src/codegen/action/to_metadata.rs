@@ -1,6 +1,49 @@
-use crate::{ActionAttributesStruct, ActionStruct};
+use crate::{ActionAttributesStruct, ActionLinkParameterStruct, ActionLinkStruct, ActionStruct};
 use proc_macro2::TokenStream;
 use quote::quote;
+
+fn generate_parameter(parameters: &[ActionLinkParameterStruct]) -> TokenStream {
+    let parameters: Vec<_> = parameters
+        .iter()
+        .map(|p| {
+            let label = &p.label;
+            let name = &p.name;
+
+            quote! {
+                ActionLinkParameterMetadata {
+                    label: #label,
+                    name: #name,
+                }
+            }
+        })
+        .collect();
+    quote! {
+        vec![ #(#parameters),* ]
+    }
+}
+
+fn generate_links(links: &[ActionLinkStruct]) -> TokenStream {
+    let links: Vec<_> = links
+        .iter()
+        .map(|l| {
+            let label = &l.label;
+            let href = &l.label;
+            let params = generate_parameter(&l.parameters);
+
+            quote! {
+                ActionLinkMetadata {
+                    label: #label,
+                    href: #href,
+                    parameters: #params,
+                }
+            }
+        })
+        .collect();
+
+    quote! {
+        vec![ #(#links),* ]
+    }
+}
 
 pub fn generate(action_struct: &ActionStruct) -> TokenStream {
     let ActionStruct {
@@ -11,9 +54,10 @@ pub fn generate(action_struct: &ActionStruct) -> TokenStream {
         description,
         label,
         icon,
-        // TODO: put on quote
         links,
     } = attributes;
+
+    let links = generate_links(links);
 
     quote! {
         impl ToMetadata for #name {
@@ -23,7 +67,7 @@ pub fn generate(action_struct: &ActionStruct) -> TokenStream {
                     title: #title,
                     description: #description,
                     label: #label,
-                    links: Vec::new(),
+                    links: #links,
                 }
             }
         }
