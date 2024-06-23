@@ -139,6 +139,20 @@ pub struct ActionTransaction {
     pub message: Option<String>,
 }
 
+impl Default for ActionMetadata {
+    fn default() -> ActionMetadata {
+        ActionMetadata {
+            title: "",
+            description: "",
+            icon: "",
+            label: "",
+            links: &None,
+            disabled: false,
+            error: None
+        }
+    }
+}
+
 /// Represents the data structure returned by a GET request to an endpoint of the Solana Actions API.
 #[derive(Debug, Serialize, PartialEq)]
 pub struct ActionMetadata {
@@ -147,6 +161,13 @@ pub struct ActionMetadata {
     pub description: &'static str,
     pub label: &'static str,
     pub links: &'static Option<ActionLinks>,
+    pub disabled: bool,
+    pub error: Option<ActionError>,
+}
+
+#[derive(Debug, Serialize, PartialEq)]
+pub struct ActionError {
+    pub message: String,
 }
 
 #[derive(Debug, Serialize, PartialEq)]
