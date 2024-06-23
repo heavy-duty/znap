@@ -1,14 +1,15 @@
 pub mod codegen;
 pub mod parser;
-use codegen::query as query_codegen;
 use codegen::action as action_codegen;
 use codegen::collection as collection_codegen;
 use codegen::error_code as error_code_codegen;
+use codegen::query as query_codegen;
 use deluxe::ExtractAttributes;
-use parser::query as query_parser;
+use deluxe::ParseMetaItem;
 use parser::action as action_parser;
 use parser::collection as collection_parser;
 use parser::error_code as error_code_parser;
+use parser::query as query_parser;
 use proc_macro2::TokenStream;
 use quote::ToTokens;
 use syn::ItemEnum;
@@ -88,6 +89,24 @@ pub struct ActionAttributesStruct {
     pub title: String,
     pub description: String,
     pub label: String,
+    #[deluxe(append, rename = link, default = Vec::new())]
+    pub links: Vec<ActionLinkStruct>,
+}
+
+#[derive(Debug, ParseMetaItem)]
+pub struct ActionLinkStruct {
+    label: String,
+    href: String,
+    #[deluxe(append, rename = parameter, default = Vec::new())]
+    parameters: Vec<ActionLinkParameterStruct>,
+}
+
+#[derive(Debug, ParseMetaItem)]
+pub struct ActionLinkParameterStruct {
+    label: String,
+    name: String,
+    #[deluxe(default = false)]
+    required: bool,
 }
 
 #[derive(Debug)]
@@ -153,3 +172,4 @@ pub struct ErrorVariant {
     pub raw_variant: Variant,
     pub msg: String,
 }
+

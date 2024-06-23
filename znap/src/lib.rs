@@ -145,6 +145,21 @@ pub struct ActionMetadata {
     pub title: &'static str,
     pub description: &'static str,
     pub label: &'static str,
+    pub links: &'static [ActionLinkMetadata],
+}
+
+#[derive(Debug, Serialize, PartialEq)]
+pub struct ActionLinkMetadata {
+    pub label: &'static str,
+    pub href: &'static str,
+    pub parameters: &'static [ActionLinkParameterMetadata],
+}
+
+#[derive(Debug, Serialize, PartialEq)]
+pub struct ActionLinkParameterMetadata {
+    pub label: &'static str,
+    pub name: &'static str,
+    pub required: bool,
 }
 
 /// Error occurred during the processing of the request.
