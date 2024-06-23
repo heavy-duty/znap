@@ -2,7 +2,7 @@ use heck::ToSnekCase;
 
 use crate::utils::Collection;
 
-pub fn template(collections: &Vec<Collection>) -> String {
+pub fn template(collections: &[Collection], address: &str, port: u16) -> String {
     let collection_imports: Vec<String> = collections
         .iter()
         .map(|collection| {
@@ -51,7 +51,7 @@ async fn main() -> Result<(), axum::Error> {{
         "{{}} Znap Server {{}} \n\n Service is running at {{}}",
         Emoji("✨", ""),
         Emoji("✨", ""),
-        "http://localhost:3000".cyan()
+        "http://{address}:{port}".cyan()
     );
 
     {}
@@ -64,7 +64,7 @@ async fn main() -> Result<(), axum::Error> {{
         "Press Ctrl+C to stop the server".bright_red().italic(), 
     );
     
-    let listener = TcpListener::bind("127.0.0.1:3000").await.unwrap();
+    let listener = TcpListener::bind("{address}:{port}").await.unwrap();
     axum::serve(listener, router.into_make_service())
         .await
         .unwrap();
