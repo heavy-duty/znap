@@ -80,6 +80,8 @@ pub fn generate(action_struct: &ActionStruct) -> TokenStream {
                     description: #description,
                     label: #label,
                     links: #links,
+                    disabled: false,
+                    error: None,
                 }
             }
         }

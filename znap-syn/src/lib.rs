@@ -21,7 +21,10 @@ use syn::{
 
 #[derive(Debug)]
 pub struct CollectionMod {
+    pub action_idents: Vec<Ident>,
     pub action_fns: Vec<ActionFn>,
+    pub get_action_fns: Vec<GetActionFn>,
+    pub post_action_fns: Vec<PostActionFn>,
     pub name: Ident,
     pub collection_mod: ItemMod,
 }
@@ -43,6 +46,23 @@ impl ToTokens for CollectionMod {
     fn to_tokens(&self, tokens: &mut TokenStream) {
         tokens.extend::<TokenStream>(self.into());
     }
+}
+
+#[derive(Debug)]
+pub struct GetActionFn {
+    pub raw_method: ItemFn,
+    pub name: Ident,
+    pub handle_ident: Ident,
+    pub action_ident: Ident,
+}
+
+#[derive(Debug)]
+pub struct PostActionFn {
+    pub raw_method: ItemFn,
+    pub name: Ident,
+    pub handle_ident: Ident,
+    pub action_ident: Ident,
+    pub action_query_ident: Option<Ident>,
 }
 
 #[derive(Debug)]
