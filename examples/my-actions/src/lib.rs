@@ -7,6 +7,7 @@ use znap::prelude::*;
 
 #[collection]
 pub mod my_actions {
+
     use super::*;
 
     pub fn send_donation(
@@ -25,6 +26,21 @@ pub mod my_actions {
         let transaction_message = Message::new(&[transfer_instruction], None);
 
         Ok(Transaction::new_unsigned(transaction_message))
+    }
+
+    pub fn get_fixed_transfer(ctx: GetContext<FixedTransferAction>) -> Result<ActionMetadata> {
+        let action = FixedTransferAction;
+        let metadata = action.to_metadata();
+
+        Ok(ActionMetadata {
+            title: metadata.title,
+            description: metadata.description,
+            label: metadata.label,
+            icon: metadata.icon,
+            links: metadata.links,
+            disabled: true,
+            error: None
+        })
     }
 }
 

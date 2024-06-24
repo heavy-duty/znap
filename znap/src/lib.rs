@@ -31,7 +31,7 @@
 //! pub mod my_actions {
 //!     use super::*;
 //!
-//!     pub fn fixed_transfer(ctx: Context<FixedTransferAction>) -> Result<Transaction> {
+//!     pub fn fixed_transfer(ctx: PostContext<FixedTransferAction>) -> Result<Transaction> {
 //!         let account_pubkey = match Pubkey::from_str(&ctx.payload.account) {
 //!             Ok(account_pubkey) => account_pubkey,
 //!             _ => return Err(Error::from(ActionError::InvalidAccountPublicKey)),
@@ -105,26 +105,49 @@ pub trait ToMetadata {
 
 /// Allows a struct to create a transaction.
 pub trait CreateTransaction<T> {
-    fn create_transaction(&self, ctx: Context<T>) -> Result<Transaction>;
+    fn create_transaction(&self, ctx: PostContext<T>) -> Result<Transaction>;
 }
 
 /// Allows a struct to create a transaction that includes query parameters.
 pub trait CreateTransactionWithQuery<T, U> {
-    fn create_transaction(&self, ctx: ContextWithQuery<T, U>) -> Result<Transaction>;
+    fn create_transaction(&self, ctx: PostContextWithQuery<T, U>) -> Result<Transaction>;
+}
+
+/// Allows a struct to create a metadata.
+pub trait CreateMetadata<T> {
+    fn create_metadata(&self, ctx: GetContext<T>) -> Result<ActionMetadata>;
+}
+
+/// Allows a struct to create a metadata that includes query parameters.
+pub trait CreateMetadataWithQuery<T, U> {
+    fn create_metadata(&self, ctx: GetContextWithQuery<T, U>) -> Result<ActionMetadata>;
 }
 
 /// Allows access to the methods and other values defined within the Action.
-pub struct Context<TAction> {
+pub struct PostContext<TAction> {
     pub payload: CreateActionPayload,
     pub action: PhantomData<TAction>,
 }
 
 /// Allows access to the methods and other values defined within the Action for requests that include query parameters.
-pub struct ContextWithQuery<TAction, TQuery> {
+pub struct PostContextWithQuery<TAction, TQuery> {
     pub payload: CreateActionPayload,
     pub action: PhantomData<TAction>,
     pub query: TQuery,
 }
+
+
+/// Allows access to the methods and other values defined within the Action.
+pub struct GetContext<TAction> {
+    pub action: PhantomData<TAction>,
+}
+
+/// Allows access to the methods and other values defined within the Action for requests that include query parameters.
+pub struct GetContextWithQuery<TAction, TQuery> {
+    pub action: PhantomData<TAction>,
+    pub query: TQuery,
+}
+
 
 /// Data structure required to make a POST request to an endpoint of the Solana Actions API.
 #[derive(Debug, Deserialize)]

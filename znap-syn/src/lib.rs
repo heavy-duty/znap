@@ -54,6 +54,7 @@ pub struct GetActionFn {
     pub name: Ident,
     pub handle_ident: Ident,
     pub action_ident: Ident,
+    pub action_query_ident: Option<Ident>,
 }
 
 #[derive(Debug)]

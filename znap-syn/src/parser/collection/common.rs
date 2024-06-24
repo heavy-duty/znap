@@ -20,7 +20,7 @@ pub fn extract_action_ident(f: &ItemFn) -> Option<&Ident> {
 pub fn extract_action_query(f: &ItemFn) -> Option<&Ident> {
     if let FnArg::Typed(pt) = f.sig.inputs.first()? {
         if let Type::Path(type_path) = pt.ty.as_ref() {
-            if type_path.path.segments.first()?.ident == "ContextWithQuery" {
+            if type_path.path.segments.first()?.ident.to_string().contains("ContextWithQuery") {
                 if let PathArguments::AngleBracketed(inner_path) =
                     &type_path.path.segments.first()?.arguments
                 {
@@ -36,7 +36,7 @@ pub fn extract_action_query(f: &ItemFn) -> Option<&Ident> {
     None
 }
 
-pub fn action_name_without_suffix(action_name: String) -> String {
+pub fn action_name_without_suffix(action_name: &String) -> String {
     let action_name_splitted: Vec<&str> = action_name.split("_").collect();
     let (_, action_name_without_suffix) = action_name_splitted.split_last().unwrap();
 

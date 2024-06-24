@@ -13,7 +13,7 @@ pub fn parse(collection_mod: &ItemMod) -> ParseResult<Vec<Ident>> {
         .ok_or_else(|| ParseError::new(collection_mod.span(), "collection content not provided"))?
         .1;
 
-    let post_actions_fns = mod_content
+    let post_action_idents = mod_content
         .iter()
         .filter_map(|item| match item {
             Item::Fn(item_fn) => {
@@ -32,5 +32,5 @@ pub fn parse(collection_mod: &ItemMod) -> ParseResult<Vec<Ident>> {
         })
         .collect::<ParseResult<Vec<Ident>>>()?;
 
-    Ok(post_actions_fns)
+    Ok(post_action_idents)
 }

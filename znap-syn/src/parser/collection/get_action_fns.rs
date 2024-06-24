@@ -1,4 +1,4 @@
-use super::common::extract_fn_result_type;
+use super::common::{extract_action_query, extract_fn_result_type};
 use crate::parser::collection::common::extract_action_ident;
 use crate::GetActionFn;
 use heck::ToSnekCase;
@@ -33,12 +33,17 @@ pub fn parse(collection_mod: &ItemMod) -> ParseResult<Vec<GetActionFn>> {
             let action_name = action_ident.to_string().to_snek_case();
             let handle_ident =
                 Ident::new(&format!("handle_get_{}", action_name), Span::call_site());
+            let action_query_ident = match extract_action_query(&method) {
+                Some(ident) => Some(ident.clone()),
+                _ => None,
+            };
 
             Ok(GetActionFn {
                 raw_method: method.clone(),
                 name: method.sig.ident.clone(),
                 handle_ident,
                 action_ident: action_ident.clone(),
+                action_query_ident: action_query_ident.clone(),
             })
         })
         .collect::<ParseResult<Vec<GetActionFn>>>()?;
