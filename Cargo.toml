@@ -4,7 +4,8 @@ members = [
     "znap-macros",
     "znap", 
     "znap-cli",
-    "examples/*",
+    "examples/my-actions",
+    "examples/my-actions/.znap/*",
 ]
 resolver = "2"
 
