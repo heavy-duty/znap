@@ -35,6 +35,7 @@ pub fn generate(collection_mod: &CollectionMod) -> TokenStream {
             axum::Router::new()
                 #(#routes)*
                 .layer(cors)
+                .route_service("/actions.json", tower_http::services::ServeFile::new("actions.json"))
         }
     }
 }

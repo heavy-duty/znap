@@ -35,8 +35,7 @@ pub fn parse(collection_mod: &ItemMod) -> ParseResult<Vec<ActionFn>> {
                 _ => None,
             };
             let route_path = format!(
-                "/actions/{}_{}",
-                collection_mod.ident.to_string().to_snek_case(),
+                "/api/{}",
                 action_name_without_suffix(action_name).to_snek_case()
             );
 
