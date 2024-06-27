@@ -11,7 +11,7 @@ fn generate_parameter(parameters: &[ActionLinkParameterStruct]) -> TokenStream {
             let required = p.required;
 
             quote! {
-                ActionLinkParameterMetadata {
+                LinkedActionParameter {
                     label: #label,
                     name: #name,
                     required: #required,
@@ -33,7 +33,7 @@ fn generate_links(links: &[ActionLinkStruct]) -> TokenStream {
             let params = generate_parameter(&l.parameters);
 
             quote! {
-                ActionLinkMetadata {
+                LinkedAction {
                     label: #label,
                     href: #href,
                     parameters: #params,
@@ -44,11 +44,11 @@ fn generate_links(links: &[ActionLinkStruct]) -> TokenStream {
 
     if links.len() == 0 {
         quote! {
-            None
+            &None
         }
     } else {
         quote! {
-            Some(
+            &Some(
                 ActionLinks {
                     actions: &[ #(#links),* ]
                 }

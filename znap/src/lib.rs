@@ -145,7 +145,7 @@ pub struct ActionMetadata {
     pub title: &'static str,
     pub description: &'static str,
     pub label: &'static str,
-    pub links: Option<&'static ActionLinks>,
+    pub links: &'static Option<ActionLinks>,
 }
 
 #[derive(Debug, Serialize, PartialEq)]
