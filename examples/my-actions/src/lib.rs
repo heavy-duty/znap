@@ -36,15 +36,15 @@ pub mod my_actions {
     label = "Stake boost",
     link = {
         label = "Send 1 SOL",
-        href = "/actions/my_actions_send_donation?amount=1",
+        href = "/api/send_donation?amount=1",
     },
     link = {
         label = "Send 5 SOL",
-        href = "/actions/my_actions_send_donation?amount=5",
+        href = "/api/send_donation?amount=5",
     },
     link = {
         label = "Custom Donation",
-        href = "/actions/my_actions_send_donation?amount={amount}",
+        href = "/api/send_donation?amount={amount}",
         parameter = { label = "Amount in SOL", name = "amount" }
     },
 )]
