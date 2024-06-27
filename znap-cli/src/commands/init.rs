@@ -47,13 +47,19 @@ pub fn run(name: &String, dry_run: &bool) {
         // Create a Cargo.toml file.
         write_file(
             workspace_dir.join("Cargo.toml").as_path(),
-            &String::from("[workspace]\nmembers = [\"collections/*\", \".znap/*\"]"),
+            &String::from("[workspace]\nmembers = [\"collections/*\", \".znap/*\"]\nresolver = \"2\""),
         );
 
         // Create a Znap.toml file.
         write_file(
             workspace_dir.join("Znap.toml").as_path(),
             &String::from("collections = []"),
+        );
+
+        // Create a default actions.json file
+        write_file(
+            workspace_dir.join("actions.json").as_path(),
+            &String::from("{\"rules\":[{\"pathPattern\":\"/**\",\"apiPath\":\"/api/**\"}]}"),
         );
 
         // Create a .gitignore file.
@@ -81,6 +87,7 @@ pub fn run(name: &String, dry_run: &bool) {
     println!("  Added:\n");
     println!("      {}", format!("+ {}/Cargo.toml", &name).green());
     println!("      {}", format!("+ {}/Znap.toml", &name).green());
+    println!("      {}", format!("+ {}/actions.json", &name).green());
     println!("      {}", format!("+ {}/.gitignore", &name).green());
     println!("      {}", format!("+ {}/.znap/.gitkeep", &name).green());
     println!(
