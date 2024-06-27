@@ -42,8 +42,18 @@ fn generate_links(links: &[ActionLinkStruct]) -> TokenStream {
         })
         .collect();
 
-    quote! {
-        &[ #(#links),* ]
+    if links.len() == 0 {
+        quote! {
+            None
+        }
+    } else {
+        quote! {
+            Some(
+                ActionLinks {
+                    actions: &[ #(#links),* ]
+                }
+            )        
+        }
     }
 }
 
