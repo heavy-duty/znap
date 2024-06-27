@@ -30,10 +30,23 @@ pub mod my_actions {
 
 #[derive(Action)]
 #[action(
-    icon = "https://arweave.net/uidd6qXKV9Msx8LavjhNdCis_UmFm_RhcmeQxi1fZJE",
-    title = "Liquid stake SOL",
-    description = "Stake with SolanaHub! Support public good and gain access to stake boost through our Loyalty League. 🚀",
+    icon = "https://media.discordapp.net/attachments/1205590693041541181/1212566609202520065/icon.png?ex=667eb568&is=667d63e8&hm=0f247078545828c0a5cf8300a5601c56bbc9b59d3d87a0c74b082df0f3a6d6bd&=&format=webp&quality=lossless&width=660&height=660",
+    title = "Alice's website",
+    description = "Website to make a donation to Alice",
     label = "Stake boost",
+    link = {
+        label = "Send 1 SOL",
+        href = "/actions/my_actions_send_donation?amount=1",
+    },
+    link = {
+        label = "Send 5 SOL",
+        href = "/actions/my_actions_send_donation?amount=5",
+    },
+    link = {
+        label = "Custom Donation",
+        href = "/actions/my_actions_send_donation?amount={amount}",
+        parameter = { label = "Amount in SOL", name = "amount" }
+    },
 )]
 pub struct SendDonationAction;
 
