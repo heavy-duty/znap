@@ -85,6 +85,7 @@ pub extern crate bincode;
 pub extern crate base64;
 pub extern crate znap_macros;
 pub extern crate colored;
+pub extern crate tower_http;
 
 pub mod prelude;
 
