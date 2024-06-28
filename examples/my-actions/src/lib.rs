@@ -10,7 +10,7 @@ pub mod my_actions {
     use super::*;
 
     pub fn post_send_donation(
-        ctx: PostContextWithQuery<SendDonationAction, SendDonationQuery>,
+        ctx: Context<SendDonationAction, SendDonationPostQuery>,
     ) -> Result<Transaction> {
         let account_pubkey = match Pubkey::from_str(&ctx.payload.account) {
             Ok(account_pubkey) => account_pubkey,
@@ -27,7 +27,7 @@ pub mod my_actions {
         Ok(Transaction::new_unsigned(transaction_message))
     }
 
-    pub fn get_send_donation(ctx: GetContext<SendDonationAction>) -> Result<ActionMetadata> {
+    pub fn get_send_donation(ctx: Context<SendDonationAction, SendDonationGetQuery>) -> Result<ActionMetadata> {
         let metadata = SendDonationAction::to_metadata();
 
         Ok(ActionMetadata {
@@ -67,8 +67,13 @@ pub struct SendDonationAction {
 }
 
 #[query]
-pub struct SendDonationQuery {
+pub struct SendDonationPostQuery {
     pub amount: u64,
+}
+
+#[query]
+pub struct SendDonationGetQuery {
+    pub disabled: bool,
 }
 
 #[derive(ErrorCode)]
