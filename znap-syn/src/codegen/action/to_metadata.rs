@@ -73,7 +73,7 @@ pub fn generate(action_struct: &ActionStruct) -> TokenStream {
 
     quote! {
         impl ToMetadata for #name {
-            fn to_metadata(&self) -> ActionMetadata {
+            fn to_metadata() -> ActionMetadata {
                 ActionMetadata {
                     icon: #icon,
                     title: #title,

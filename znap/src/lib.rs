@@ -100,27 +100,27 @@ pub type Result<T> = core::result::Result<T, Error>;
 
 /// Allows a struct to capture its internal values and return them as an ActionMetadata interface.
 pub trait ToMetadata {
-    fn to_metadata(&self) -> ActionMetadata;
+    fn to_metadata() -> ActionMetadata;
 }
 
 /// Allows a struct to create a transaction.
 pub trait CreateTransaction<T> {
-    fn create_transaction(&self, ctx: PostContext<T>) -> Result<Transaction>;
+    fn create_transaction(ctx: PostContext<T>) -> Result<Transaction>;
 }
 
 /// Allows a struct to create a transaction that includes query parameters.
 pub trait CreateTransactionWithQuery<T, U> {
-    fn create_transaction(&self, ctx: PostContextWithQuery<T, U>) -> Result<Transaction>;
+    fn create_transaction(ctx: PostContextWithQuery<T, U>) -> Result<Transaction>;
 }
 
 /// Allows a struct to create a metadata.
 pub trait CreateMetadata<T> {
-    fn create_metadata(&self, ctx: GetContext<T>) -> Result<ActionMetadata>;
+    fn create_metadata(ctx: GetContext<T>) -> Result<ActionMetadata>;
 }
 
 /// Allows a struct to create a metadata that includes query parameters.
 pub trait CreateMetadataWithQuery<T, U> {
-    fn create_metadata(&self, ctx: GetContextWithQuery<T, U>) -> Result<ActionMetadata>;
+    fn create_metadata(ctx: GetContextWithQuery<T, U>) -> Result<ActionMetadata>;
 }
 
 /// Allows access to the methods and other values defined within the Action.

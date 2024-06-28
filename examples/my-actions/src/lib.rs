@@ -7,7 +7,6 @@ use znap::prelude::*;
 
 #[collection]
 pub mod my_actions {
-
     use super::*;
 
     pub fn post_send_donation(
@@ -29,8 +28,7 @@ pub mod my_actions {
     }
 
     pub fn get_send_donation(ctx: GetContext<SendDonationAction>) -> Result<ActionMetadata> {
-        let action = SendDonationAction;
-        let metadata = action.to_metadata();
+        let metadata = SendDonationAction::to_metadata();
 
         Ok(ActionMetadata {
             title: metadata.title,
@@ -64,7 +62,9 @@ pub mod my_actions {
         parameter = { label = "Amount in SOL", name = "amount" }
     },
 )]
-pub struct SendDonationAction;
+pub struct SendDonationAction {
+    pub amount: u64,
+}
 
 #[query]
 pub struct SendDonationQuery {

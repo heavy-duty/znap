@@ -13,7 +13,7 @@ pub fn generate(collection_mod: &CollectionMod) -> TokenStream {
                 Some(query) => {
                     quote! {
                         impl CreateTransactionWithQuery<#action, #query> for #action {
-                            fn create_transaction(&self, ctx: znap::PostContextWithQuery<#action, #query>) -> znap::Result<solana_sdk::transaction::Transaction> {
+                            fn create_transaction(ctx: znap::PostContextWithQuery<#action, #query>) -> znap::Result<solana_sdk::transaction::Transaction> {
                                 #fn_block
                             }
                         }
@@ -22,7 +22,7 @@ pub fn generate(collection_mod: &CollectionMod) -> TokenStream {
                 _ => {
                     quote! {
                         impl CreateTransaction<#action> for #action {
-                            fn create_transaction(&self, ctx: znap::PostContext<#action>) -> znap::Result<solana_sdk::transaction::Transaction> {
+                            fn create_transaction(ctx: znap::PostContext<#action>) -> znap::Result<solana_sdk::transaction::Transaction> {
                                 #fn_block
                             }
                         }

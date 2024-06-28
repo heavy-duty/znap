@@ -16,12 +16,11 @@ pub fn generate(collection_mod: &CollectionMod) -> TokenStream {
                                 pub async fn #handler(
                                     axum::extract::Query(query): axum::extract::Query<#query>,
                                 ) -> znap::Result<axum::Json<znap::ActionMetadata>> {
-                                    let action = #action {};
                                     let context_with_query = znap::GetContextWithQuery::<#action, #query> {
                                         action: std::marker::PhantomData,
                                         query
                                     };
-                                    let metadata = action.create_metadata(context_with_query)?;
+                                    let metadata = #action::create_metadata(context_with_query)?;
                 
                                     Ok(axum::Json(metadata))
                                 }
@@ -30,11 +29,10 @@ pub fn generate(collection_mod: &CollectionMod) -> TokenStream {
                         _ => {
                             quote! {
                                 pub async fn #handler() -> znap::Result<axum::Json<znap::ActionMetadata>> {
-                                    let action = #action {};
                                     let context = znap::GetContext::<#action> {
                                         action: std::marker::PhantomData,
                                     };
-                                    let metadata = action.create_metadata(context)?;
+                                    let metadata = #action::create_metadata(context)?;
                 
                                     Ok(axum::Json(metadata))
                                 }
@@ -45,11 +43,10 @@ pub fn generate(collection_mod: &CollectionMod) -> TokenStream {
                 _ => {
                     quote! {
                         pub async fn #handler() -> znap::Result<axum::Json<znap::ActionMetadata>> {
-                            let action = #action {};
                             let context = znap::GetContext::<#action> {
                                 action: std::marker::PhantomData,
                             };
-                            let metadata = action.create_metadata(context)?;
+                            let metadata = #action::create_metadata(context)?;
         
                             Ok(axum::Json(metadata))
                         }

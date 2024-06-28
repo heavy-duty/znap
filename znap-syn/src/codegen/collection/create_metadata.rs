@@ -14,7 +14,7 @@ pub fn generate(collection_mod: &CollectionMod) -> TokenStream {
                         Some(query) => {
                             quote! {
                                 impl CreateMetadataWithQuery<#action, #query> for #action {
-                                    fn create_metadata(&self, ctx: znap::GetContextWithQuery<#action, #query>) -> znap::Result<znap::ActionMetadata> {
+                                    fn create_metadata(ctx: znap::GetContextWithQuery<#action, #query>) -> znap::Result<znap::ActionMetadata> {
                                         #fn_block
                                     }
                                 }
@@ -23,7 +23,7 @@ pub fn generate(collection_mod: &CollectionMod) -> TokenStream {
                         _ => {
                             quote! {
                                 impl CreateMetadata<#action> for #action {
-                                    fn create_metadata(&self, ctx: znap::GetContext<#action>) -> znap::Result<znap::ActionMetadata> {
+                                    fn create_metadata(ctx: znap::GetContext<#action>) -> znap::Result<znap::ActionMetadata> {
                                         #fn_block
                                     }
                                 }
@@ -34,9 +34,8 @@ pub fn generate(collection_mod: &CollectionMod) -> TokenStream {
                 _ => {
                     quote! {
                         impl CreateMetadata<#action> for #action {
-                            fn create_metadata(&self, ctx: znap::GetContext<#action>) -> znap::Result<znap::ActionMetadata> {
-                                let action = #action {};
-                                let metadata = action.to_metadata();
+                            fn create_metadata(ctx: znap::GetContext<#action>) -> znap::Result<znap::ActionMetadata> {
+                                let metadata = #action::to_metadata();
 
                                 Ok(metadata)
                             }
