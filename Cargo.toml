@@ -9,12 +9,13 @@ members = [
 resolver = "2"
 
 [workspace.package]
-version = "0.1.11"
+version = "0.1.16"
 
 [workspace.dependencies]
 # znap specific
 axum = "0.7.5"
 serde = { version = "1.0.203", features = ["derive"] }
+tower-http = { version = "0.5.2", features = ["cors", "fs"] }
 
 # solana
 solana-sdk = "1.18.16"
@@ -27,3 +28,4 @@ syn = "2.0"
 # utilities
 heck = "0.5.0"
 colored = "2.1.0"
+console = "0.15.8"

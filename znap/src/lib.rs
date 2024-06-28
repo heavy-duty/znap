@@ -85,6 +85,7 @@ pub extern crate bincode;
 pub extern crate base64;
 pub extern crate znap_macros;
 pub extern crate colored;
+pub extern crate tower_http;
 
 pub mod prelude;
 
@@ -145,18 +146,23 @@ pub struct ActionMetadata {
     pub title: &'static str,
     pub description: &'static str,
     pub label: &'static str,
-    pub links: &'static [ActionLinkMetadata],
+    pub links: &'static Option<ActionLinks>,
 }
 
 #[derive(Debug, Serialize, PartialEq)]
-pub struct ActionLinkMetadata {
+pub struct ActionLinks {
+    pub actions: &'static [LinkedAction],
+}
+
+#[derive(Debug, Serialize, PartialEq)]
+pub struct LinkedAction {
     pub label: &'static str,
     pub href: &'static str,
-    pub parameters: &'static [ActionLinkParameterMetadata],
+    pub parameters: &'static [LinkedActionParameter],
 }
 
 #[derive(Debug, Serialize, PartialEq)]
-pub struct ActionLinkParameterMetadata {
+pub struct LinkedActionParameter {
     pub label: &'static str,
     pub name: &'static str,
     pub required: bool,

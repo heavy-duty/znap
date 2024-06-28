@@ -8,6 +8,8 @@ edition = "2021"
 axum = { workspace = true }
 serde = { workspace = true }
 solana-sdk = { workspace = true }
+colored = { workspace = true }
+console = { workspace = true }
 
 # crate specific
 spl-associated-token-account = "3.0.2"
