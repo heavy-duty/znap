@@ -212,24 +212,24 @@ In this step, we will create our function `send_donation`, which will generate a
 First, we declare our function with the parameter it will use, which we defined in the previous step.
 
 ```rust
-    pub fn send_donation(
-        ctx: Context<SendDonationAction, SendDonationQuery>
-    ) -> Result<Transaction> {
+pub fn send_donation(
+    ctx: Context<SendDonationAction, SendDonationQuery>
+) -> Result<Transaction> {
 
-    }
+}
 ```
 
 Next, we obtain and validate the applicant's public key. If it is not valid, we return an error.
 
 ```rust
-    pub fn send_donation(
-        ctx: Context<SendDonationAction, SendDonationQuery>
-    ) -> Result<Transaction> {
-        let account_pubkey = match Pubkey::from_str(&ctx.payload.account) {
-            Ok(account_pubkey) => account_pubkey,
-            _ => return Err(Error::from(ActionError::InvalidAccountPublicKey)),
-        };
-    }
+pub fn send_donation(
+    ctx: Context<SendDonationAction, SendDonationQuery>
+) -> Result<Transaction> {
+    let account_pubkey = match Pubkey::from_str(&ctx.payload.account) {
+        Ok(account_pubkey) => account_pubkey,
+        _ => return Err(Error::from(ActionError::InvalidAccountPublicKey)),
+    };
+}
 ```
 
 If the public key is valid, we set the public key of the receiver (Alice) and create the instructions for our transfer transaction.
@@ -237,20 +237,20 @@ If the public key is valid, we set the public key of the receiver (Alice) and cr
 To create the instructions, we use `ctx.query.amount` to get the amount specified by the requester (client).
 
 ```rust
-    pub fn send_donation(
-        ctx: Context<SendDonationAction, SendDonationQuery>
-    ) -> Result<Transaction> {
-        let account_pubkey = match Pubkey::from_str(&ctx.payload.account) {
-            Ok(account_pubkey) => account_pubkey,
-            _ => return Err(Error::from(ActionError::InvalidAccountPublicKey)),
-        };
-        let receiver_pubkey = pubkey!("6GBLiSwAPhDMttmdjo3wvEsssEnCiW3yZwVyVZnhFm3G");
-        let transfer_instruction = transfer(
-            &account_pubkey,
-            &receiver_pubkey,
-            ctx.query.amount * LAMPORTS_PER_SOL,
-        );
-    }
+pub fn send_donation(
+    ctx: Context<SendDonationAction, SendDonationQuery>
+) -> Result<Transaction> {
+    let account_pubkey = match Pubkey::from_str(&ctx.payload.account) {
+        Ok(account_pubkey) => account_pubkey,
+        _ => return Err(Error::from(ActionError::InvalidAccountPublicKey)),
+    };
+    let receiver_pubkey = pubkey!("6GBLiSwAPhDMttmdjo3wvEsssEnCiW3yZwVyVZnhFm3G");
+    let transfer_instruction = transfer(
+        &account_pubkey,
+        &receiver_pubkey,
+        ctx.query.amount * LAMPORTS_PER_SOL,
+    );
+}
 ```
 
 Finally, we create a message with our instructions to indicate that everything went well.
@@ -258,24 +258,24 @@ Finally, we create a message with our instructions to indicate that everything w
 Then, we create and return an unsigned transaction with the instructions we generated.
 
 ```rust
-    pub fn send_donation(
-        ctx: Context<SendDonationAction, SendDonationQuery>
-    ) -> Result<Transaction> {
-        let account_pubkey = match Pubkey::from_str(&ctx.payload.account) {
-            Ok(account_pubkey) => account_pubkey,
-            _ => return Err(Error::from(ActionError::InvalidAccountPublicKey)),
-        };
-        let receiver_pubkey = pubkey!("6GBLiSwAPhDMttmdjo3wvEsssEnCiW3yZwVyVZnhFm3G");
-        let transfer_instruction = transfer(
-            &account_pubkey,
-            &receiver_pubkey,
-            ctx.query.amount * LAMPORTS_PER_SOL,
-        );
+pub fn send_donation(
+    ctx: Context<SendDonationAction, SendDonationQuery>
+) -> Result<Transaction> {
+    let account_pubkey = match Pubkey::from_str(&ctx.payload.account) {
+        Ok(account_pubkey) => account_pubkey,
+        _ => return Err(Error::from(ActionError::InvalidAccountPublicKey)),
+    };
+    let receiver_pubkey = pubkey!("6GBLiSwAPhDMttmdjo3wvEsssEnCiW3yZwVyVZnhFm3G");
+    let transfer_instruction = transfer(
+        &account_pubkey,
+        &receiver_pubkey,
+        ctx.query.amount * LAMPORTS_PER_SOL,
+    );
 
-        let transaction_message = Message::new(&[transfer_instruction], None);
+    let transaction_message = Message::new(&[transfer_instruction], None);
 
-        Ok(Transaction::new_unsigned(transaction_message))
-    }
+    Ok(Transaction::new_unsigned(transaction_message))
+}
 ```
 
 And that’s it! We did it.
