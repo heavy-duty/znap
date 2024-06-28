@@ -1,3 +1,6 @@
 /target
 TODO.md
 .vscode
+examples/**/target
+examples/**/.znap/.tmp*
+examples/**/Cargo.lock
