@@ -1,23 +1,26 @@
-# ZNAP Tutorials
+# ZNAP Tutorial - **Donate/Pay a user**
 
-This document provides a collection of step-by-step tutorials to guide you through ZNAP's functionalities, enabling you to create customized Solana actions and develop groundbreaking solutions.
-
-Solana Actions are APIs compatible with the Solana Actions Specification. Our Solana Actios must be able to return:
-
-1. Actions Metadata
-2. One o more transactions to be signed in a client
-
-Firstly, we will create our workspace using `znap-cli`. If you do not have `znap-cli` installed, follow our guide [here](https://github.com/heavy-duty/znap/blob/master/INSTALLATION.md).
-
-Then, let's create a new project with `znap init <project-name>`
-
-## 1. **Donate/Pay a user**
+## Description
 
 Alice is a well-known influencer on Twitter. She usually shares research and valuable insights with her audience free of charge. She decides she wants to start a donation campaign for herself. She spins up a “Donate to me” Blink using the Actions Stack and shares the link to Sphere on Twitter.The link unfurls into an actionable Blink containing the following information:
 
 1. Her image, name, description
 2. 3 buttons: 1 SOL, 5 SOL, 10 SOL
 3. 4th button with an input field: “Enter a custom SOL amount”
+
+## Brief review
+
+Solana Actions are APIs compatible with the Solana Actions Specification. Our Solana Actios must be able to return:
+
+1. Action Metadata
+2. A transaction which will be sent to the Solana blockchain.
+
+## Let's start!
+
+Firstly, we will create our workspace using `znap-cli`. If you do not have `znap-cli` installed, follow our guide [here](https://github.com/heavy-duty/znap/blob/master/INSTALLATION.md).
+
+Then, let's create a new project with `znap init <project-name>`
+
 
 ### 1. Let's create our action collection for Alice's campaign
 
@@ -38,7 +41,7 @@ You are about to create a collection named: alice_campaign
       * ./Znap.toml
 ```
 
-Now, let's open our lib.rs file where will create our blinks. The file will look like this:
+Now, let's open our lib.rs file where will create our actions. The file will look like this:
 
 ```rust
 use znap::prelude::*;
@@ -79,9 +82,9 @@ We must setup all necessary information to comply with the Solana Actions Specef
 - **Icon:** Action's Icon
 - **Description:** Description about the purpose of the Action
 - **Label:** Text for the main button shown to the user
-- **Link/s:** Buttons or inputs where the user will be able to get a transaction to be signed (POST Request).
+- **Link/s:** Buttons or inputs where the user will be able to get a transaction to be sent to the blockchain (POST Request).
 
-We will use the macro `Action` from the library `znap` to create our Solana Action's metadata.
+We will use the macros `#[derive]`, `#[action]` ant the trait `Action` to create our Solana Action's metadata.
 
 ```rust
 use solana_sdk::{
@@ -111,27 +114,33 @@ pub mod alice_campaign {
         href = "/api/send_donation?amount=5",
     },
     link = {
+        label = "Send 10 SOL",
+        href = "/api/send_donation?amount=10",
+    },
+    link = {
         label = "Send SOL",
         href = "/api/send_donation?amount={amount}",
-        parameter = { label = "Amount in SOL", name = "amount" }
+        parameter = { label = "Enter a custom SOL amount", name = "amount" }
     },
 )]
+
+pub struct SendDonationAction;
 ```
 
-### 4. Create contexts and Action custom error
+### 4. Define Query and Custom Errors
 
-Now, in this step we will create our contexts for our function, which we will create in the next step. Like Anchor, our context allows our function to be able to know what information to work with to complete our purpose.
+Now, in this step we will define our query param for our function, which we will create in the next step. Like Anchor contexts, our query param allows our function to be able to know what information to work with to complete our purpose.
+
+we use the macro `#[query]` to define query param structs and their expected data.
 
 ```rust
-pub struct SendDonationAction;
-
 #[query]
 pub struct SendDonationQuery {
     pub amount: u64,
 }
 ```
 
-The above structs are our contexts for our function, these contexts will allow us to access information such as the requester's public key and the amount they wish to donate.
+The above struct is our query param for our function, this query param will allow us to access the amount they wish to donate.
 
 Added, we will create a custom error message for our function in case the requester's public key is wrong.
 
@@ -173,9 +182,13 @@ pub mod alice_campaign {
         href = "/api/send_donation?amount=5",
     },
     link = {
+        label = "Send 10 SOL",
+        href = "/api/send_donation?amount=10",
+    },
+    link = {
         label = "Send SOL",
         href = "/api/send_donation?amount={amount}",
-        parameter = { label = "Amount in SOL", name = "amount" }
+        parameter = { label = "Enter a custom SOL amount", name = "amount" }
     },
 )]
 
@@ -193,27 +206,25 @@ enum ActionError {
 }
 ```
 
-### 5. Create transaction to be signed
+### 5. Create a transaction to be sent
 
-In this step, we will create our function `send_donation` which will create a transaction to be signed in a client.
+In this step, we will create our function `send_donation` which will create a transaction which will be sent to the blockchain.
 
 Firstly, we declare our function with the contexts it will use, which we created in the previous step.
 
 ```rust
     pub fn send_donation(
-        ctx: ContextWithQuery<SendDonationAction, SendDonationQuery>
+        ctx: Context<SendDonationAction, SendDonationQuery>
     ) -> Result<Transaction> {
 
     }
 ```
 
-`ContextWithQuery` (from znap): Allows access to the methods and other values defined within the Action for requests that include query parameters.
-
 Now, we obtain and validate if the applicant's public key is valid, if not we return an error.
 
 ```rust
     pub fn send_donation(
-        ctx: ContextWithQuery<SendDonationAction, SendDonationQuery>
+        ctx: Context<SendDonationAction, SendDonationQuery>
     ) -> Result<Transaction> {
         let account_pubkey = match Pubkey::from_str(&ctx.payload.account) {
             Ok(account_pubkey) => account_pubkey,
@@ -228,7 +239,7 @@ To create the instructions we use the `ctx.query.amount` to get the amount sent 
 
 ```rust
     pub fn send_donation(
-        ctx: ContextWithQuery<SendDonationAction, SendDonationQuery>
+        ctx: Context<SendDonationAction, SendDonationQuery>
     ) -> Result<Transaction> {
         let account_pubkey = match Pubkey::from_str(&ctx.payload.account) {
             Ok(account_pubkey) => account_pubkey,
@@ -249,7 +260,7 @@ And we create and return an unsigned transaction with the instructions we create
 
 ```rust
     pub fn send_donation(
-        ctx: ContextWithQuery<SendDonationAction, SendDonationQuery>
+        ctx: Context<SendDonationAction, SendDonationQuery>
     ) -> Result<Transaction> {
         let account_pubkey = match Pubkey::from_str(&ctx.payload.account) {
             Ok(account_pubkey) => account_pubkey,
@@ -318,9 +329,13 @@ pub mod my_actions {
         href = "/api/send_donation?amount=5",
     },
     link = {
+        label = "Send 10 SOL",
+        href = "/api/send_donation?amount=10",
+    },
+    link = {
         label = "Send SOL",
         href = "/api/send_donation?amount={amount}",
-        parameter = { label = "Amount in SOL", name = "amount" }
+        parameter = { label = "Enter a custom SOL amount", name = "amount" }
     },
 )]
 pub struct SendDonationAction;
@@ -336,6 +351,8 @@ enum ActionError {
     InvalidAccountPublicKey,
 }
 ```
+
+🎉 CONGRATULATIONS, YOU HAVE CREATED YOUR FIRST SOLANA ACTION WITH ZNAP 🎉
 
 ### 6. ¡Let's test our action!
 
@@ -357,3 +374,12 @@ If everything went well, you should see something like this:
 
 💡 Press Ctrl+C to stop the server
 ```
+
+Now if you consume your endpoint with a GET method you will get the metadata of your Solana Action.
+
+![GET response](image.png)
+
+And if you consume your endpoint with a POST method you will get a Solana unsigned transaction to be sent to the blockchain.
+
+![POST response](image-1.png)
+
