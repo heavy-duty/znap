@@ -3,17 +3,17 @@ use quote::quote;
 use crate::CollectionMod;
 
 pub fn generate(collection_mod: &CollectionMod) -> TokenStream {
-    let impls: Vec<TokenStream> = collection_mod.action_fns
+    let impls: Vec<TokenStream> = collection_mod.post_action_fns
         .iter()
         .map(|action_fn| {
-            let action_ident = &action_fn.action_ident;
+            let action = &action_fn.action;
             let fn_block = &action_fn.raw_method.block;
             
-            match &action_fn.action_query_ident {
-                Some(action_query_ident) => {
+            match &action_fn.query {
+                Some(query) => {
                     quote! {
-                        impl CreateTransactionWithQuery<#action_ident, #action_query_ident> for #action_ident {
-                            fn create_transaction(&self, ctx: ContextWithQuery<#action_ident, #action_query_ident>) -> znap::Result<solana_sdk::transaction::Transaction> {
+                        impl CreateTransactionWithQuery<#action, #query> for #action {
+                            fn create_transaction(ctx: znap::PostContextWithQuery<#action, #query>) -> znap::Result<solana_sdk::transaction::Transaction> {
                                 #fn_block
                             }
                         }
@@ -21,8 +21,8 @@ pub fn generate(collection_mod: &CollectionMod) -> TokenStream {
                 },
                 _ => {
                     quote! {
-                        impl CreateTransaction<#action_ident> for #action_ident {
-                            fn create_transaction(&self, ctx: Context<#action_ident>) -> znap::Result<solana_sdk::transaction::Transaction> {
+                        impl CreateTransaction<#action> for #action {
+                            fn create_transaction(ctx: znap::PostContext<#action>) -> znap::Result<solana_sdk::transaction::Transaction> {
                                 #fn_block
                             }
                         }

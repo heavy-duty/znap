@@ -1,14 +1,19 @@
+use crate::{parser::collection::common::action_name_without_suffix, CollectionMod};
+use heck::ToSnekCase;
 use proc_macro2::TokenStream;
 use quote::quote;
-use crate::CollectionMod;
 
 pub fn generate(collection_mod: &CollectionMod) -> TokenStream {
     let collection_ident = &collection_mod.name.to_string();
-    let routes: Vec<TokenStream> = collection_mod.action_fns
+    let routes: Vec<TokenStream> = collection_mod
+        .actions
         .iter()
-        .map(|action_fn| {
-            let route_path = &action_fn.route_path;
-            
+        .map(|action| {
+            let route_path = format!(
+                "/api/{}",
+                action_name_without_suffix(&action.to_string().to_snek_case()).to_snek_case()
+            );
+
             quote! {
                 println!("  {}     {}", "GET ".bold(), #route_path.italic());
                 println!("  {}     {}", "POST".bold(), #route_path.italic());
@@ -24,4 +29,3 @@ pub fn generate(collection_mod: &CollectionMod) -> TokenStream {
         }
     }
 }
-

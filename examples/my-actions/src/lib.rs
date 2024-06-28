@@ -9,8 +9,8 @@ use znap::prelude::*;
 pub mod my_actions {
     use super::*;
 
-    pub fn send_donation(
-        ctx: ContextWithQuery<SendDonationAction, SendDonationQuery>,
+    pub fn post_send_donation(
+        ctx: Context<SendDonationAction, SendDonationPostQuery>,
     ) -> Result<Transaction> {
         let account_pubkey = match Pubkey::from_str(&ctx.payload.account) {
             Ok(account_pubkey) => account_pubkey,
@@ -25,6 +25,20 @@ pub mod my_actions {
         let transaction_message = Message::new(&[transfer_instruction], None);
 
         Ok(Transaction::new_unsigned(transaction_message))
+    }
+
+    pub fn get_send_donation(ctx: Context<SendDonationAction, SendDonationGetQuery>) -> Result<ActionMetadata> {
+        let metadata = SendDonationAction::to_metadata();
+        
+        Ok(ActionMetadata {
+            title: metadata.title,
+            description: metadata.description,
+            label: metadata.label,
+            icon: metadata.icon,
+            links: metadata.links,
+            disabled: ctx.query.disabled,
+            error: None
+        })
     }
 }
 
@@ -48,11 +62,18 @@ pub mod my_actions {
         parameter = { label = "Amount in SOL", name = "amount" }
     },
 )]
-pub struct SendDonationAction;
+pub struct SendDonationAction {
+    pub amount: u64,
+}
 
 #[query]
-pub struct SendDonationQuery {
+pub struct SendDonationPostQuery {
     pub amount: u64,
+}
+
+#[query]
+pub struct SendDonationGetQuery {
+    pub disabled: bool,
 }
 
 #[derive(ErrorCode)]
