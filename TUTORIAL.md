@@ -210,7 +210,7 @@ enum ActionError {
 
 In this step, we will create our function `send_donation` which will create a transaction which will be sent to the blockchain.
 
-Firstly, we declare our function with the contexts it will use, which we created in the previous step.
+Firstly, we declare our function with the param it will use, which we created in the previous step.
 
 ```rust
     pub fn send_donation(
