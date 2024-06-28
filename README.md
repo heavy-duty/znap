@@ -52,7 +52,7 @@ pub mod my_actions {
     use super::*;
 
     pub fn send_donation(
-        ctx: ContextWithQuery<SendDonationAction, SendDonationQuery>,
+        ctx: Context<SendDonationAction, SendDonationPostQuery>,
     ) -> Result<Transaction> {
         let account_pubkey = match Pubkey::from_str(&ctx.payload.account) {
             Ok(account_pubkey) => account_pubkey,
