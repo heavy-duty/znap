@@ -20,14 +20,7 @@ pub fn extract_action_ident(f: &ItemFn) -> Option<&Ident> {
 pub fn extract_action_query(f: &ItemFn) -> Option<&Ident> {
     if let FnArg::Typed(pt) = f.sig.inputs.first()? {
         if let Type::Path(type_path) = pt.ty.as_ref() {
-            if type_path
-                .path
-                .segments
-                .first()?
-                .ident
-                .to_string()
-                .contains("Context")
-            {
+            if type_path.path.segments.first()?.ident.to_string() == "Context" {
                 if let PathArguments::AngleBracketed(inner_path) =
                     &type_path.path.segments.first()?.arguments
                 {
