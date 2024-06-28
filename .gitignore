@@ -4,3 +4,5 @@ TODO.md
 examples/**/target
 examples/**/.znap/.tmp*
 examples/**/Cargo.lock
+examples/**/node_modules
+examples/**/package-lock.json
