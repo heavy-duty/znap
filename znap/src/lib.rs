@@ -31,7 +31,7 @@
 //! pub mod my_actions {
 //!     use super::*;
 //!
-//!     pub fn fixed_transfer(ctx: PostContext<FixedTransferAction>) -> Result<Transaction> {
+//!     pub fn fixed_transfer(ctx: Context<FixedTransferAction>) -> Result<Transaction> {
 //!         let account_pubkey = match Pubkey::from_str(&ctx.payload.account) {
 //!             Ok(account_pubkey) => account_pubkey,
 //!             _ => return Err(Error::from(ActionError::InvalidAccountPublicKey)),
@@ -41,7 +41,7 @@
 //!         let source_pubkey = get_associated_token_address(&account_pubkey, &mint_pubkey);
 //!         let destination_pubkey = get_associated_token_address(&receiver_pubkey, &mint_pubkey);
 //!         let transfer_instruction = match transfer(
-//!             &spl_token::ID,
+//!             &TOKEN_PROGRAM_ID,
 //!             &source_pubkey,
 //!             &destination_pubkey,
 //!             &account_pubkey,
