@@ -1,13 +1,13 @@
 use super::common::{extract_action_query, extract_fn_result_type};
 use crate::parser::collection::common::extract_action_ident;
-use crate::GetActionFn;
+use crate::ActionFn;
 use syn::{
     parse::{Error as ParseError, Result as ParseResult},
     spanned::Spanned,
     Item, ItemFn, ItemMod,
 };
 
-pub fn parse(collection_mod: &ItemMod) -> ParseResult<Vec<GetActionFn>> {
+pub fn parse(collection_mod: &ItemMod) -> ParseResult<Vec<ActionFn>> {
     let mod_content = &collection_mod
         .content
         .as_ref()
@@ -33,14 +33,14 @@ pub fn parse(collection_mod: &ItemMod) -> ParseResult<Vec<GetActionFn>> {
                 _ => None,
             };
 
-            Ok(GetActionFn {
+            Ok(ActionFn {
                 raw_method: method.clone(),
                 name: method.sig.ident.clone(),
                 action: action_ident.clone(),
                 query: query_ident,
             })
         })
-        .collect::<ParseResult<Vec<GetActionFn>>>()?;
+        .collect::<ParseResult<Vec<ActionFn>>>()?;
 
     Ok(get_actions_fns)
 }

@@ -22,8 +22,8 @@ use syn::{
 #[derive(Debug)]
 pub struct CollectionMod {
     pub actions: Vec<Ident>,
-    pub get_action_fns: Vec<GetActionFn>,
-    pub post_action_fns: Vec<PostActionFn>,
+    pub get_action_fns: Vec<ActionFn>,
+    pub post_action_fns: Vec<ActionFn>,
     pub name: Ident,
     pub collection_mod: ItemMod,
 }
@@ -48,15 +48,7 @@ impl ToTokens for CollectionMod {
 }
 
 #[derive(Debug)]
-pub struct GetActionFn {
-    pub raw_method: ItemFn,
-    pub name: Ident,
-    pub action: Ident,
-    pub query: Option<Ident>,
-}
-
-#[derive(Debug)]
-pub struct PostActionFn {
+pub struct ActionFn {
     pub raw_method: ItemFn,
     pub name: Ident,
     pub action: Ident,
