@@ -21,24 +21,59 @@ First, we will create our workspace using `znap-cli`. If you do not have `znap-c
 
 Next, let's create a new project with `znap init <project-name>`.
 
+You will then see a message like:
+
+```bash
+Someone is about to get some action...
+No worries, we got you. ✨BLINK BLINK✨
+
+You are about to create a Znap workspace named: example
+
+  Added:
+
+      + example/Cargo.toml
+      + example/Znap.toml
+      + example/.gitignore
+      + example/.znap/.gitkeep
+      + example/collections/.gitkeep
+
+Znap workspace created at /example
+```
+
+The command `znap init` will create the following files and folder structure:
+
+- `.gitignore`: Specifies which files or directories should be ignored by Git.
+- `.znap`: This folder is used to store files specific to the znap-cli. For example, when you run the serve command, certain files are generated in this folder.
+- `Cargo.toml`: Configuration file used by Cargo, the package management and build system for the Rust programming language.
+- `Znap.toml`: Indicates that you are in a "znap workspace". In this file, there is an array of the collections that belong to that workspace.
+- `/collections`: All your created actions are stored here.
+- `.gitkeep`: Is used because Git does not push empty folders. 
+
 ### 1. Let's create our action collection for Alice's campaign
 
-In the root directory of your project, run the following command to create a collection: `znap new alice_campaign`. This command will create a new action collection called 'alice_campaign' inside the `/collections` folder, where we will place our actions for Alice.
+In the root directory of your project, run the following command to create a collection: `znap new alice-campaign`. This command will create a new action collection called 'alice-campaign' inside the `/collections` folder, where we will place our actions for Alice.
 
 You will then see a message like:
 
 ```bash
-You are about to create a collection named: alice_campaign
+You are about to create a collection named: alice-campaign
 
   Added:
 
-      + collections/alice_campaign/Cargo.toml
-      + collections/alice_campaign/src/lib.rs
+      + collections/alice-campaign/Cargo.toml
+      + collections/alice-campaign/src/lib.rs
 
   Modified:
 
       * ./Znap.toml
 ```
+
+The command `znap new` will create a folder with the previously specified name, containing two files:
+
+- `/alice-campaign`
+    - `Cargo.toml`: Configuration file used by Cargo, the package management and build system for the Rust programming language.
+    - `/src`
+        - `lib.rs`: main entry point for libraries in Rust.
 
 Now, let's open our `lib.rs` file where we will create our actions. The file will look like this:
 
