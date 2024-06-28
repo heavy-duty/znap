@@ -20,10 +20,21 @@ pub fn extract_action_ident(f: &ItemFn) -> Option<&Ident> {
 pub fn extract_action_query(f: &ItemFn) -> Option<&Ident> {
     if let FnArg::Typed(pt) = f.sig.inputs.first()? {
         if let Type::Path(type_path) = pt.ty.as_ref() {
-            if type_path.path.segments.first()?.ident.to_string().contains("Context") {
+            if type_path
+                .path
+                .segments
+                .first()?
+                .ident
+                .to_string()
+                .contains("Context")
+            {
                 if let PathArguments::AngleBracketed(inner_path) =
                     &type_path.path.segments.first()?.arguments
                 {
+                    if inner_path.args.len() != 2 {
+                        return None;
+                    }
+
                     if let GenericArgument::Type(inner_type) = inner_path.args.last()? {
                         if let Type::Path(inner_type_path) = inner_type {
                             return inner_type_path.path.segments.first().map(|seg| &seg.ident);
@@ -51,7 +62,7 @@ pub fn extract_fn_result_type(f: &ItemFn) -> Option<&Ident> {
             {
                 if let GenericArgument::Type(inner_type) = inner_path.args.first().unwrap() {
                     if let Type::Path(inner_type_path) = inner_type {
-                        return Some(&inner_type_path.path.segments.first().unwrap().ident)
+                        return Some(&inner_type_path.path.segments.first().unwrap().ident);
                     }
                 }
             }

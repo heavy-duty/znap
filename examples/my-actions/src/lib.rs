@@ -29,14 +29,14 @@ pub mod my_actions {
 
     pub fn get_send_donation(ctx: Context<SendDonationAction, SendDonationGetQuery>) -> Result<ActionMetadata> {
         let metadata = SendDonationAction::to_metadata();
-
+        
         Ok(ActionMetadata {
             title: metadata.title,
             description: metadata.description,
             label: metadata.label,
             icon: metadata.icon,
             links: metadata.links,
-            disabled: true,
+            disabled: ctx.query.disabled,
             error: None
         })
     }
