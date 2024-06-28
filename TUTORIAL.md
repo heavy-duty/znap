@@ -296,7 +296,7 @@ pub mod my_actions {
     use super::*;
 
     pub fn send_donation(
-        ctx: ContextWithQuery<SendDonationAction, SendDonationQuery>
+        ctx: Context<SendDonationAction, SendDonationQuery>
     ) -> Result<Transaction> {
         let account_pubkey = match Pubkey::from_str(&ctx.payload.account) {
             Ok(account_pubkey) => account_pubkey,
@@ -379,7 +379,7 @@ Now if you consume your endpoint with a GET method you will get the metadata of 
 
 ![GET response](image.png)
 
-And if you consume your endpoint with a POST method you will get a Solana unsigned transaction to be sent to the blockchain.
+And if you consume your endpoint with a POST method, setting the query param `amount` to 1 or another number, you will get a Solana unsigned transaction to be sent to the blockchain.
 
 ![POST response](image-1.png)
 
