@@ -6,6 +6,7 @@ mod handle_get;
 mod handle_post;
 mod router;
 mod display_routes;
+mod common;
 
 pub fn generate(collection_mod: &CollectionMod) -> proc_macro2::TokenStream {
     let create_transaction = create_transaction::generate(collection_mod);

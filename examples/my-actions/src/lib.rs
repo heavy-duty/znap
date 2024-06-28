@@ -10,8 +10,8 @@ pub mod my_actions {
 
     use super::*;
 
-    pub fn send_donation(
-        ctx: ContextWithQuery<SendDonationAction, SendDonationQuery>,
+    pub fn post_send_donation(
+        ctx: PostContextWithQuery<SendDonationAction, SendDonationQuery>,
     ) -> Result<Transaction> {
         let account_pubkey = match Pubkey::from_str(&ctx.payload.account) {
             Ok(account_pubkey) => account_pubkey,
@@ -28,8 +28,8 @@ pub mod my_actions {
         Ok(Transaction::new_unsigned(transaction_message))
     }
 
-    pub fn get_fixed_transfer(ctx: GetContext<FixedTransferAction>) -> Result<ActionMetadata> {
-        let action = FixedTransferAction;
+    pub fn get_send_donation(ctx: GetContext<SendDonationAction>) -> Result<ActionMetadata> {
+        let action = SendDonationAction;
         let metadata = action.to_metadata();
 
         Ok(ActionMetadata {

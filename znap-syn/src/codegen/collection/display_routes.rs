@@ -6,14 +6,12 @@ use quote::quote;
 pub fn generate(collection_mod: &CollectionMod) -> TokenStream {
     let collection_ident = &collection_mod.name.to_string();
     let routes: Vec<TokenStream> = collection_mod
-        .action_idents
+        .actions
         .iter()
-        .map(|action_ident| {
-            let action_name = action_ident.to_string().to_snek_case();
+        .map(|action| {
             let route_path = format!(
-                "/actions/{}_{}",
-                collection_mod.name.to_string().to_snek_case(),
-                action_name_without_suffix(&action_name).to_snek_case()
+                "/api/{}",
+                action_name_without_suffix(&action.to_string().to_snek_case()).to_snek_case()
             );
 
             quote! {

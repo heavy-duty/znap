@@ -1,20 +1,23 @@
-use crate::CollectionMod;
+use crate::{
+    codegen::collection::common::{create_get_handler, create_post_handler, create_route_path},
+    CollectionMod,
+};
 use proc_macro2::TokenStream;
 use quote::quote;
 
 pub fn generate(collection_mod: &CollectionMod) -> TokenStream {
     let routes: Vec<TokenStream> = collection_mod
-        .action_fns
+        .actions
         .iter()
-        .map(|action_fn| {
-            let handle_get_ident = &action_fn.handle_get_ident;
-            let handle_post_ident = &action_fn.handle_post_ident;
-            let route_path = &action_fn.route_path;
+        .map(|action| {
+            let get_handler = create_get_handler(&action.to_string());
+            let post_handler = create_post_handler(&action.to_string());
+            let route_path = create_route_path(&action.to_string());
 
             quote! {
                 .route(
                     #route_path,
-                    axum::routing::get(#handle_get_ident).post(#handle_post_ident)
+                    axum::routing::get(#get_handler).post(#post_handler)
                 )
             }
         })

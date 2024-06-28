@@ -1,12 +1,10 @@
 use super::common::extract_fn_result_type;
 use crate::parser::collection::common::{extract_action_ident, extract_action_query};
 use crate::PostActionFn;
-use heck::ToSnekCase;
-use proc_macro2::Span;
 use syn::{
     parse::{Error as ParseError, Result as ParseResult},
     spanned::Spanned,
-    Ident, Item, ItemFn, ItemMod,
+    Item, ItemFn, ItemMod,
 };
 
 pub fn parse(collection_mod: &ItemMod) -> ParseResult<Vec<PostActionFn>> {
@@ -30,10 +28,7 @@ pub fn parse(collection_mod: &ItemMod) -> ParseResult<Vec<PostActionFn>> {
         })
         .map(|method: &ItemFn| {
             let action_ident = extract_action_ident(&method).unwrap();
-            let action_name = action_ident.to_string().to_snek_case();
-            let handle_ident =
-                Ident::new(&format!("handle_post_{}", action_name), Span::call_site());
-            let action_query_ident = match extract_action_query(&method) {
+            let query_ident = match extract_action_query(&method) {
                 Some(ident) => Some(ident.clone()),
                 _ => None,
             };
@@ -41,9 +36,8 @@ pub fn parse(collection_mod: &ItemMod) -> ParseResult<Vec<PostActionFn>> {
             Ok(PostActionFn {
                 raw_method: method.clone(),
                 name: method.sig.ident.clone(),
-                handle_ident,
-                action_ident: action_ident.clone(),
-                action_query_ident,
+                action: action_ident.clone(),
+                query: query_ident,
             })
         })
         .collect::<ParseResult<Vec<PostActionFn>>>()?;
