@@ -38,6 +38,7 @@ pub fn run(name: &String, dry_run: &bool) {
     let cwd = std::env::current_dir().unwrap();
     let workspace_dir = cwd.join(name.to_kebab_case());
     let collections_dir = &workspace_dir.join("collections");
+    let tests_dir = &workspace_dir.join("tests");
     let znap_dir = &workspace_dir.join(".znap");
 
     if !dry_run {
@@ -47,7 +48,9 @@ pub fn run(name: &String, dry_run: &bool) {
         // Create a Cargo.toml file.
         write_file(
             workspace_dir.join("Cargo.toml").as_path(),
-            &String::from("[workspace]\nmembers = [\"collections/*\", \".znap/*\"]\nresolver = \"2\""),
+            &String::from(
+                "[workspace]\nmembers = [\"collections/*\", \".znap/*\"]\nresolver = \"2\"",
+            ),
         );
 
         // Create a Znap.toml file.
@@ -65,7 +68,55 @@ pub fn run(name: &String, dry_run: &bool) {
         // Create a .gitignore file.
         write_file(
             workspace_dir.join(".gitignore").as_path(),
-            &String::from("/target\n.znap/.tmp*"),
+            &String::from("/target\n.znap/.tmp*\nnode_modules"),
+        );
+
+        // Create a package.json file.
+        write_file(
+            workspace_dir.join("package.json").as_path(),
+            &String::from(
+                r#"
+{
+    "scripts": {
+        "lint:fix": "prettier */*.js \"*/**/*{.js,.ts}\" -w",
+        "lint": "prettier */*.js \"*/**/*{.js,.ts}\" --check",
+        "test": "ts-mocha -p ./tsconfig.json -t 1000000 tests/**/*.ts"
+    },
+    "dependencies": {
+        "@solana/web3.js": "^1.93.4"
+    },
+    "devDependencies": {
+        "@types/chai": "^4.3.0",
+        "@types/mocha": "^9.0.0",
+        "@types/node": "^20.14.9",
+        "chai": "^4.3.4",
+        "mocha": "^9.0.3",
+        "prettier": "^2.6.2",
+        "ts-mocha": "^10.0.0",
+        "typescript": "^4.3.5"
+    }
+}
+"#,
+            ),
+        );
+
+        // Create a tsconfig.json file.
+        write_file(
+            workspace_dir.join("tsconfig.json").as_path(),
+            &String::from(
+                r#"
+{
+  "compilerOptions": {
+    "types": ["mocha", "chai", "node"],
+    "typeRoots": ["./node_modules/@types"],
+    "lib": ["es2015"],
+    "module": "commonjs",
+    "target": "es6",
+    "esModuleInterop": true
+  }
+}
+"#,
+            ),
         );
 
         // Create a collections folder.
@@ -75,6 +126,99 @@ pub fn run(name: &String, dry_run: &bool) {
         write_file(
             collections_dir.join(".gitkeep").as_path(),
             &String::from(""),
+        );
+
+        // Create a tests folder.
+        create_dir(&tests_dir).unwrap();
+
+        // Create a tests/utils.ts file.
+        write_file(
+            tests_dir.join("utils.ts").as_path(),
+            &String::from(
+                r#"
+export interface Action {
+  label: string;
+  href: string;
+  parameters: {
+    label: string;
+    name: string;
+  }[];
+}
+
+export interface Metadata {
+  icon: string;
+  title: string;
+  description: string;
+  label: string;
+  disabled: boolean;
+  error: null;
+  links: { actions: Action[] };
+}
+
+export function createClient(baseUrl: string) {
+  return {
+    async getMetadata(actionName: string) {
+      const url = new URL(`${baseUrl}/api/${actionName}`);
+      const response = await fetch(url.toString(), {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const responseJson = (await response.json()) as Metadata;
+
+      return responseJson;
+    },
+    async getTransaction<T extends {}>(
+      actionName: string,
+      account: string,
+      params: T
+    ) {
+      const url = new URL(`${baseUrl}/api/${actionName}`);
+
+      Object.keys(params).forEach((paramName) =>
+        url.searchParams.set(paramName, params[paramName])
+      );
+
+      const response = await fetch(url.toString(), {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ account }),
+      });
+      const responseJson = (await response.json()) as {
+        transaction: string;
+        message: string;
+      };
+
+      return responseJson;
+    },
+  };
+}
+"#,
+            ),
+        );
+
+        // Create a tests/e2e.ts file.
+        write_file(
+            tests_dir.join("e2e.ts").as_path(),
+            &String::from(
+                r#"
+import { assert } from "chai";
+import { Metadata, createClient } from "./utils";
+
+describe("My tests", () => {
+  const znapClient = createClient("http://localhost:3000");
+
+  it("should hello world", async () => {
+    const hello = "world";
+
+    assert.equal(hello, "world");
+  });
+});
+"#,
+            ),
         );
 
         // Create a .znap folder.
@@ -87,6 +231,8 @@ pub fn run(name: &String, dry_run: &bool) {
     println!("  Added:\n");
     println!("      {}", format!("+ {}/Cargo.toml", &name).green());
     println!("      {}", format!("+ {}/Znap.toml", &name).green());
+    println!("      {}", format!("+ {}/package.json", &name).green());
+    println!("      {}", format!("+ {}/tsconfig.json", &name).green());
     println!("      {}", format!("+ {}/actions.json", &name).green());
     println!("      {}", format!("+ {}/.gitignore", &name).green());
     println!("      {}", format!("+ {}/.znap/.gitkeep", &name).green());
@@ -94,6 +240,8 @@ pub fn run(name: &String, dry_run: &bool) {
         "      {}",
         format!("+ {}/collections/.gitkeep", &name).green()
     );
+    println!("      {}", format!("+ {}/tests/utils.ts", &name).green());
+    println!("      {}", format!("+ {}/tests/e2e.ts", &name).green());
 
     println!(
         "\nZnap workspace created at {}\n",
