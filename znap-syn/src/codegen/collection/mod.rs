@@ -1,6 +1,5 @@
 use crate::CollectionMod;
 use quote::quote;
-mod common;
 mod display_routes;
 mod handle_get;
 mod handle_post;

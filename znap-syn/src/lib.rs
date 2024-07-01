@@ -1,5 +1,6 @@
 pub mod codegen;
 pub mod parser;
+pub mod common;
 use codegen::action as action_codegen;
 use codegen::collection as collection_codegen;
 use codegen::error_code as error_code_codegen;
@@ -68,6 +69,7 @@ pub struct ActionStruct {
     pub name: Ident,
     pub raw_struct: ItemStruct,
     pub attributes: ActionAttributesStruct,
+    pub query: Option<Ident>,
 }
 
 impl Parse for ActionStruct {

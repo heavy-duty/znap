@@ -1,6 +1,6 @@
-use crate::{codegen::collection::common::{create_get_context, create_get_handler, create_metadata}, CollectionMod};
 use proc_macro2::TokenStream;
 use quote::quote;
+use crate::{common::{create_get_context, create_get_handler, create_metadata}, CollectionMod};
 
 pub fn generate(collection_mod: &CollectionMod) -> TokenStream {
     let impls: Vec<TokenStream> = collection_mod.actions

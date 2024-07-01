@@ -1,7 +1,8 @@
-use crate::{parser::collection::common::action_name_without_suffix, CollectionMod};
 use heck::ToSnekCase;
 use proc_macro2::TokenStream;
 use quote::quote;
+
+use crate::{common::action_name_without_suffix, CollectionMod};
 
 pub fn generate(collection_mod: &CollectionMod) -> TokenStream {
     let collection_ident = &collection_mod.name.to_string();

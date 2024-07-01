@@ -1,5 +1,5 @@
 use crate::{
-    codegen::collection::common::{create_get_handler, create_post_handler, create_route_path},
+    common::{create_get_handler, create_post_handler, create_route_path},
     CollectionMod,
 };
 use proc_macro2::TokenStream;

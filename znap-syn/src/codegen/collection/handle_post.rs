@@ -1,6 +1,6 @@
 use proc_macro2::TokenStream;
 use quote::quote;
-use crate::{codegen::collection::common::{create_post_context, create_post_handler, create_transaction}, CollectionMod};
+use crate::{common::{create_post_context, create_post_handler, create_transaction}, CollectionMod};
 
 pub fn generate(collection_mod: &CollectionMod) -> TokenStream {
     let impls: Vec<TokenStream> = collection_mod.post_action_fns
