@@ -9,9 +9,7 @@ use znap::prelude::*;
 pub mod my_actions {
     pub use super::*;
 
-    pub fn send_donation(
-        ctx: Context<SendDonationAction>,
-    ) -> Result<Transaction> {
+    pub fn send_donation(ctx: Context<SendDonationAction>) -> Result<Transaction> {
         let account_pubkey = match Pubkey::from_str(&ctx.payload.account) {
             Ok(account_pubkey) => account_pubkey,
             _ => return Err(Error::from(ActionError::InvalidAccountPublicKey)),
@@ -27,6 +25,7 @@ pub mod my_actions {
         Ok(Transaction::new_unsigned(transaction_message))
     }
 }
+
 #[derive(Action)]
 #[action(
     icon = "https://media.discordapp.net/attachments/1205590693041541181/1212566609202520065/icon.png?ex=667eb568&is=667d63e8&hm=0f247078545828c0a5cf8300a5601c56bbc9b59d3d87a0c74b082df0f3a6d6bd&=&format=webp&quality=lossless&width=660&height=660",
@@ -55,5 +54,3 @@ enum ActionError {
     #[error(msg = "Invalid account public key")]
     InvalidAccountPublicKey,
 }
-
-fn asd() {}
