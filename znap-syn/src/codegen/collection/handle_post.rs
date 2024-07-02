@@ -1,6 +1,6 @@
 use proc_macro2::TokenStream;
 use quote::quote;
-use crate::{common::{create_post_context, create_post_handler, create_query, create_transaction}, CollectionMod};
+use crate::{common::{create_params, create_post_context, create_post_handler, create_query, create_transaction}, CollectionMod};
 
 pub fn generate(collection_mod: &CollectionMod) -> TokenStream {
     let impls: Vec<TokenStream> = collection_mod.post_action_fns
@@ -12,10 +12,12 @@ pub fn generate(collection_mod: &CollectionMod) -> TokenStream {
             let create_transaction_fn = create_transaction(&action.to_string());
             let fn_block = &action_fn.raw_method.block;
             let query = create_query(&action.to_string());
+            let params = create_params(&action.to_string());
 
             quote! {
                 pub struct #context {
                     query: #query,
+                    params: #params,
                     payload: znap::CreateActionPayload
                 }
 
@@ -25,11 +27,13 @@ pub fn generate(collection_mod: &CollectionMod) -> TokenStream {
 
                 pub async fn #handler(
                     axum::extract::Query(query): axum::extract::Query<#query>,
+                    axum::extract::Path(params): axum::extract::Path<#params>,
                     axum::Json(payload): axum::Json<znap::CreateActionPayload>,
                 ) -> znap::Result<axum::Json<znap::ActionTransaction>> {
                     let context = #context {
                         payload,
                         query,
+                        params,
                     };
                     let transaction = #create_transaction_fn(context)?;
                     let serialized_transaction = bincode::serialize(&transaction).unwrap();

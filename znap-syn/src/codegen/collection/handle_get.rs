@@ -1,6 +1,6 @@
 use proc_macro2::TokenStream;
 use quote::quote;
-use crate::{common::{create_get_context, create_get_handler, create_metadata, create_query}, CollectionMod};
+use crate::{common::{create_get_context, create_get_handler, create_metadata, create_params, create_query}, CollectionMod};
 
 pub fn generate(collection_mod: &CollectionMod) -> TokenStream {
     let impls: Vec<TokenStream> = collection_mod.actions
@@ -14,10 +14,12 @@ pub fn generate(collection_mod: &CollectionMod) -> TokenStream {
                 Some(get_action_fn) => {
                     let fn_block = &get_action_fn.raw_method.block;
                     let query = create_query(&action.to_string());
+                    let params = create_params(&action.to_string());
 
                     quote! {
                         pub struct #context {
                             query: #query,
+                            params: #params,
                         }
         
                         pub fn #create_metadata_fn(ctx: #context) -> znap::Result<znap::ActionMetadata> {
@@ -26,9 +28,11 @@ pub fn generate(collection_mod: &CollectionMod) -> TokenStream {
         
                         pub async fn #handler(
                             axum::extract::Query(query): axum::extract::Query<#query>,
+                            axum::extract::Path(params): axum::extract::Path<#params>,
                         ) -> znap::Result<axum::Json<znap::ActionMetadata>> {
                             let context = #context {
                                 query,
+                                params,
                             };
                             let metadata = #create_metadata_fn(context)?;
         

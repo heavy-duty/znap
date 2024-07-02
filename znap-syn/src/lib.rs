@@ -67,7 +67,8 @@ pub struct ActionStruct {
     pub name: Ident,
     pub raw_struct: ItemStruct,
     pub attributes: ActionAttributesStruct,
-    pub query_attrs: Option<Vec<(Ident, Ident)>>
+    pub query_attrs: Option<Vec<(Ident, Ident)>>,
+    pub params_attrs: Option<Vec<(Ident, Ident)>>,
 }
 
 impl Parse for ActionStruct {

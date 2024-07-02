@@ -1,6 +1,6 @@
 use solana_sdk::{
-    message::Message, native_token::LAMPORTS_PER_SOL, pubkey, pubkey::Pubkey,
-    system_instruction::transfer, transaction::Transaction,
+    message::Message, native_token::LAMPORTS_PER_SOL, pubkey::Pubkey, system_instruction::transfer,
+    transaction::Transaction,
 };
 use std::str::FromStr;
 use znap::prelude::*;
@@ -14,7 +14,10 @@ pub mod my_actions {
             Ok(account_pubkey) => account_pubkey,
             _ => return Err(Error::from(ActionError::InvalidAccountPublicKey)),
         };
-        let receiver_pubkey = pubkey!("6GBLiSwAPhDMttmdjo3wvEsssEnCiW3yZwVyVZnhFm3G");
+        let receiver_pubkey = match Pubkey::from_str(&ctx.params.receiver_address) {
+            Ok(receiver_pubkey) => receiver_pubkey,
+            _ => return Err(Error::from(ActionError::InvalidReceiverPublicKey)),
+        };
         let transfer_instruction = transfer(
             &account_pubkey,
             &receiver_pubkey,
@@ -47,10 +50,13 @@ pub mod my_actions {
     },
 )]
 #[query(amount: u64)]
+#[params(receiver_address: String)]
 pub struct SendDonationAction;
 
 #[derive(ErrorCode)]
 enum ActionError {
     #[error(msg = "Invalid account public key")]
     InvalidAccountPublicKey,
+    #[error(msg = "Invalid receiver public key")]
+    InvalidReceiverPublicKey,
 }

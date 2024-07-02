@@ -4,11 +4,11 @@ use proc_macro2::Span;
 use quote::ToTokens;
 use syn::{FnArg, GenericArgument, Ident, ItemFn, ItemStruct, PathArguments, ReturnType, Type};
 
-pub fn extract_query_attrs(action_struct: &ItemStruct) -> Option<Vec<(Ident, Ident)>> {
+pub fn extract_attrs_by_name(name: &str, action_struct: &ItemStruct) -> Option<Vec<(Ident, Ident)>> {
     action_struct.attrs.iter().find_map(|attr| {
         if let Ok(meta) = attr.meta.require_list() {
             if let Some(first_segment) = meta.path.segments.first() {
-                if first_segment.ident.to_string() == "query" {
+                if first_segment.ident.to_string() == name {
                     let idents: &Vec<Ident> = &meta
                         .tokens
                         .clone()
@@ -43,6 +43,8 @@ pub fn extract_query_attrs(action_struct: &ItemStruct) -> Option<Vec<(Ident, Ide
         return None;
     })
 }
+
+
 
 pub fn extract_action_ident(f: &ItemFn) -> Option<&Ident> {
     if let FnArg::Typed(pt) = f.sig.inputs.first()? {
@@ -112,6 +114,16 @@ pub fn create_query(action: &String) -> Ident {
     Ident::new(
         &format!(
             "{}Query",
+            action_name_without_suffix(&action.to_snek_case()).to_upper_camel_case()
+        ),
+        Span::call_site(),
+    )
+}
+
+pub fn create_params(action: &String) -> Ident {
+    Ident::new(
+        &format!(
+            "{}Params",
             action_name_without_suffix(&action.to_snek_case()).to_upper_camel_case()
         ),
         Span::call_site(),
