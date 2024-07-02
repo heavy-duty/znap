@@ -4,7 +4,10 @@ use proc_macro2::Span;
 use quote::ToTokens;
 use syn::{FnArg, GenericArgument, Ident, ItemFn, ItemStruct, PathArguments, ReturnType, Type};
 
-pub fn extract_attrs_by_name(name: &str, action_struct: &ItemStruct) -> Option<Vec<(Ident, Ident)>> {
+pub fn extract_attrs_by_name(
+    name: &str,
+    action_struct: &ItemStruct,
+) -> Option<Vec<(Ident, Ident)>> {
     action_struct.attrs.iter().find_map(|attr| {
         if let Ok(meta) = attr.meta.require_list() {
             if let Some(first_segment) = meta.path.segments.first() {
@@ -43,8 +46,6 @@ pub fn extract_attrs_by_name(name: &str, action_struct: &ItemStruct) -> Option<V
         return None;
     })
 }
-
-
 
 pub fn extract_action_ident(f: &ItemFn) -> Option<&Ident> {
     if let FnArg::Typed(pt) = f.sig.inputs.first()? {
@@ -151,10 +152,7 @@ pub fn create_post_handler(action: &String) -> Ident {
 }
 
 pub fn create_route_path(action: &String) -> String {
-    format!(
-        "/api/{}",
-        action_name_without_suffix(&action.to_snek_case()).to_snek_case()
-    )
+    format!("/api/{}", &action.to_snek_case())
 }
 
 pub fn create_post_context(action: &String) -> Ident {
@@ -193,6 +191,17 @@ pub fn create_get_context(action: &String) -> Ident {
             "{}GetContext",
             action_name_without_suffix(&action.to_snek_case()).to_upper_camel_case()
         ),
+        Span::call_site(),
+    )
+}
+
+pub fn create_path(action: &String) -> Ident {
+    Ident::new(
+        &format!(
+            "{}_path",
+            action_name_without_suffix(&action.to_snek_case())
+        )
+        .to_uppercase(),
         Span::call_site(),
     )
 }

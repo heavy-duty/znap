@@ -1,8 +1,6 @@
-use heck::ToSnekCase;
+use crate::{common::create_path, CollectionMod};
 use proc_macro2::TokenStream;
 use quote::quote;
-
-use crate::{common::action_name_without_suffix, CollectionMod};
 
 pub fn generate(collection_mod: &CollectionMod) -> TokenStream {
     let collection_ident = &collection_mod.name.to_string();
@@ -10,14 +8,11 @@ pub fn generate(collection_mod: &CollectionMod) -> TokenStream {
         .actions
         .iter()
         .map(|action| {
-            let route_path = format!(
-                "/api/{}",
-                action_name_without_suffix(&action.to_string().to_snek_case()).to_snek_case()
-            );
+            let path = create_path(&action.to_string());
 
             quote! {
-                println!("  {}     {}", "GET ".bold(), #route_path.italic());
-                println!("  {}     {}", "POST".bold(), #route_path.italic());
+                println!("  {}     {}", "GET ".bold(), #path.to_string().italic());
+                println!("  {}     {}", "POST".bold(), #path.to_string().italic());
             }
         })
         .collect();

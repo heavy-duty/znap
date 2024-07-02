@@ -1,5 +1,5 @@
 use crate::{
-    common::{create_get_handler, create_post_handler, create_route_path},
+    common::{create_get_handler, create_path, create_post_handler},
     CollectionMod,
 };
 use proc_macro2::TokenStream;
@@ -12,11 +12,11 @@ pub fn generate(collection_mod: &CollectionMod) -> TokenStream {
         .map(|action| {
             let get_handler = create_get_handler(&action.to_string());
             let post_handler = create_post_handler(&action.to_string());
-            let route_path = create_route_path(&action.to_string());
+            let path = create_path(&action.to_string());
 
             quote! {
                 .route(
-                    #route_path,
+                    #path,
                     axum::routing::get(#get_handler).post(#post_handler)
                 )
             }
