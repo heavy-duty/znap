@@ -1,16 +1,41 @@
 use deluxe::parse2;
-use syn::{Ident, ItemStruct, FnArg, GenericArgument, ItemFn, PathArguments, ReturnType, Type};
 use heck::{ToSnekCase, ToUpperCamelCase};
 use proc_macro2::Span;
+use quote::ToTokens;
+use syn::{FnArg, GenericArgument, Ident, ItemFn, ItemStruct, PathArguments, ReturnType, Type};
 
-pub fn extract_query_type(action_struct: &ItemStruct) -> Option<Ident> {
+pub fn extract_query_attrs(action_struct: &ItemStruct) -> Option<Vec<(Ident, Ident)>> {
     action_struct.attrs.iter().find_map(|attr| {
         if let Ok(meta) = attr.meta.require_list() {
             if let Some(first_segment) = meta.path.segments.first() {
                 if first_segment.ident.to_string() == "query" {
-                    if let Ok(query) = parse2::<Ident>(meta.tokens.clone()) {
-                        return Some(query);
-                    }
+                    let idents: &Vec<Ident> = &meta
+                        .tokens
+                        .clone()
+                        .into_iter()
+                        .filter_map(|token| {
+                            if let proc_macro2::TokenTree::Ident(ident) = token {
+                                let ident_as_token_stream = ident.to_token_stream();
+
+                                let parsed_ident = parse2::<Ident>(ident_as_token_stream).unwrap();
+
+                                return Some(parsed_ident);
+                            }
+
+                            return None;
+                        })
+                        .collect();
+                    let chunked_idents = idents.chunks(2);
+                    let transformed_chunked_idents: Vec<(Ident, Ident)> = chunked_idents
+                        .map(|chunk| {
+                            (
+                                chunk.first().unwrap().clone(),
+                                chunk.last().unwrap().clone(),
+                            )
+                        })
+                        .collect();
+
+                    return Some(transformed_chunked_idents);
                 }
             }
         }
@@ -18,7 +43,6 @@ pub fn extract_query_type(action_struct: &ItemStruct) -> Option<Ident> {
         return None;
     })
 }
-
 
 pub fn extract_action_ident(f: &ItemFn) -> Option<&Ident> {
     if let FnArg::Typed(pt) = f.sig.inputs.first()? {
@@ -96,14 +120,20 @@ pub fn create_query(action: &String) -> Ident {
 
 pub fn create_get_handler(action: &String) -> Ident {
     Ident::new(
-        &format!("handle_get_{}", action_name_without_suffix(&action.to_snek_case())),
+        &format!(
+            "handle_get_{}",
+            action_name_without_suffix(&action.to_snek_case())
+        ),
         Span::call_site(),
     )
 }
 
 pub fn create_post_handler(action: &String) -> Ident {
     Ident::new(
-        &format!("handle_post_{}", action_name_without_suffix(&action.to_snek_case())),
+        &format!(
+            "handle_post_{}",
+            action_name_without_suffix(&action.to_snek_case())
+        ),
         Span::call_site(),
     )
 }
@@ -127,14 +157,20 @@ pub fn create_post_context(action: &String) -> Ident {
 
 pub fn create_transaction(action: &String) -> Ident {
     Ident::new(
-        &format!("{}_create_transaction", action_name_without_suffix(&action.to_snek_case())),
+        &format!(
+            "{}_create_transaction",
+            action_name_without_suffix(&action.to_snek_case())
+        ),
         Span::call_site(),
     )
 }
 
 pub fn create_metadata(action: &String) -> Ident {
     Ident::new(
-        &format!("{}_create_metadata", action_name_without_suffix(&action.to_snek_case())),
+        &format!(
+            "{}_create_metadata",
+            action_name_without_suffix(&action.to_snek_case())
+        ),
         Span::call_site(),
     )
 }
