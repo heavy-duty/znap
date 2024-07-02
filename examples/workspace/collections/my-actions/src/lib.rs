@@ -7,7 +7,7 @@ use znap::prelude::*;
 
 #[collection]
 pub mod my_actions {
-    pub use super::*;
+    use super::*;
 
     pub fn send_donation(ctx: Context<SendDonationAction>) -> Result<Transaction> {
         let account_pubkey = match Pubkey::from_str(&ctx.payload.account) {
