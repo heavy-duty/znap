@@ -1,9 +1,9 @@
 use proc_macro::TokenStream;
 use syn::parse_macro_input;
-use znap_syn::{ActionStruct, CollectionMod, ErrorEnum, QueryStruct};
+use znap_syn::{ActionStruct, CollectionMod, ErrorEnum};
 use quote::ToTokens;
 
-#[proc_macro_derive(Action, attributes(action))]
+#[proc_macro_derive(Action, attributes(action, query, params))]
 pub fn action_derive_macro(item: TokenStream) -> TokenStream {
     parse_macro_input!(item as ActionStruct)
         .to_token_stream()
@@ -13,13 +13,6 @@ pub fn action_derive_macro(item: TokenStream) -> TokenStream {
 #[proc_macro_derive(ErrorCode, attributes(error))]
 pub fn error_code_derive_macro(item: TokenStream) -> TokenStream {
     parse_macro_input!(item as ErrorEnum)
-        .to_token_stream()
-        .into()
-}
-
-#[proc_macro_attribute]
-pub fn query(_args: TokenStream, input: TokenStream) -> TokenStream {
-    parse_macro_input!(input as QueryStruct)
         .to_token_stream()
         .into()
 }

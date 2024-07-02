@@ -17,4 +17,5 @@ colored = { workspace = true }
 
 # crate specific
 deluxe = { version = "0.5.0", features = ["full"] }
+anyhow = "1.0.86"
 

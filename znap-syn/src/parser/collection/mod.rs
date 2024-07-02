@@ -1,7 +1,6 @@
 use crate::CollectionMod;
 use syn::{parse::Result as ParseResult, ItemMod};
 mod actions;
-pub mod common;
 mod get_action_fns;
 mod post_action_fns;
 

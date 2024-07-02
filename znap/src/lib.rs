@@ -79,8 +79,6 @@ use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
 use axum::Json;
 use serde::{Deserialize, Serialize};
-use solana_sdk::transaction::Transaction;
-use std::marker::PhantomData;
 pub extern crate bincode;
 pub extern crate base64;
 pub extern crate znap_macros;
@@ -102,52 +100,6 @@ pub type Result<T> = core::result::Result<T, Error>;
 pub trait ToMetadata {
     fn to_metadata() -> ActionMetadata;
 }
-
-/// Allows a struct to create a transaction.
-pub trait CreateTransaction<T> {
-    fn create_transaction(ctx: PostContext<T>) -> Result<Transaction>;
-}
-
-/// Allows a struct to create a transaction that includes query parameters.
-pub trait CreateTransactionWithQuery<T, U> {
-    fn create_transaction(ctx: PostContextWithQuery<T, U>) -> Result<Transaction>;
-}
-
-/// Allows a struct to create a metadata.
-pub trait CreateMetadata<T> {
-    fn create_metadata(ctx: GetContext<T>) -> Result<ActionMetadata>;
-}
-
-/// Allows a struct to create a metadata that includes query parameters.
-pub trait CreateMetadataWithQuery<T, U> {
-    fn create_metadata(ctx: GetContextWithQuery<T, U>) -> Result<ActionMetadata>;
-}
-
-/// Allows access to the methods and other values defined within the Action.
-pub struct PostContext<TAction> {
-    pub payload: CreateActionPayload,
-    pub action: PhantomData<TAction>,
-}
-
-/// Allows access to the methods and other values defined within the Action for requests that include query parameters.
-pub struct PostContextWithQuery<TAction, TQuery> {
-    pub payload: CreateActionPayload,
-    pub action: PhantomData<TAction>,
-    pub query: TQuery,
-}
-
-
-/// Allows access to the methods and other values defined within the Action.
-pub struct GetContext<TAction> {
-    pub action: PhantomData<TAction>,
-}
-
-/// Allows access to the methods and other values defined within the Action for requests that include query parameters.
-pub struct GetContextWithQuery<TAction, TQuery> {
-    pub action: PhantomData<TAction>,
-    pub query: TQuery,
-}
-
 
 /// Data structure required to make a POST request to an endpoint of the Solana Actions API.
 #[derive(Debug, Deserialize)]
