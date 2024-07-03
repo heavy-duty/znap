@@ -10,8 +10,8 @@ pub enum ActionError {
     InternalServerError,
     #[error(msg = "Unknown server error")]
     UnknownServerError,
-    #[error(msg = "Car not found")]
-    CarNotFound,
+    #[error(msg = "Hat not found")]
+    HatNotFound,
     #[error(msg = "Invalid response body")]
     InvalidResponseBody,
 }

@@ -1,4 +1,4 @@
-use car_api::{fetch_car, Car};
+use hat_api::{fetch_hat, Hat};
 use error::ActionError;
 use solana_sdk::{message::Message, pubkey, pubkey::Pubkey, transaction::Transaction};
 use spl_associated_token_account::get_associated_token_address;
@@ -6,7 +6,7 @@ use spl_token::{instruction::transfer_checked, ID as TOKEN_PROGRAM_ID};
 use std::str::FromStr;
 use znap::prelude::*;
 
-mod car_api;
+mod hat_api;
 mod error;
 
 const DESTINATION_PUBLIC_KEY: Pubkey = pubkey!("Fpb6uVk3tWrQ93og9WZm581s9Wge5BJPFAkbjS6nLzNJ");
@@ -17,13 +17,13 @@ const MINT_DECIMALS: u8 = 6;
 pub mod my_actions {
     use super::*;
 
-    fn buy_car(ctx: Context<BuyCarAction>) -> Result<Transaction> {
+    fn buy_hat(ctx: Context<BuyHatAction>) -> Result<Transaction> {
         let account_pubkey = match Pubkey::from_str(&ctx.payload.account) {
             Ok(account_pubkey) => account_pubkey,
             _ => return Err(Error::from(ActionError::InvalidAccountPublicKey)),
         };
 
-        let Car { price, .. } = fetch_car(&ctx.params.car_id).await?;
+        let Hat { price, .. } = fetch_hat(&ctx.params.hat_id).await?;
         let sender_pubkey = get_associated_token_address(&account_pubkey, &MINT_PUBLIC_KEY);
         let receiver_pubkey =
             get_associated_token_address(&DESTINATION_PUBLIC_KEY, &MINT_PUBLIC_KEY);
@@ -48,15 +48,15 @@ pub mod my_actions {
         Ok(Transaction::new_unsigned(transaction_message))
     }
 
-    fn get_buy_car(ctx: Context<BuyCarAction>) -> Result<ActionMetadata> {
-        let car = fetch_car(&ctx.params.car_id).await?;
+    fn get_buy_hat(ctx: Context<BuyHatAction>) -> Result<ActionMetadata> {
+        let hat = fetch_hat(&ctx.params.hat_id).await?;
         let label = "Buy Now!";
-        let description = format!("Buy a gently used {} for only ${}", car.title, car.price);
+        let description = format!("Buy a gently used {} for only ${}", hat.title, hat.price);
 
         Ok(ActionMetadata {
-            title: car.title,
+            title: hat.title,
             description: description.to_string(),
-            icon: car.image_url,
+            icon: hat.image_url,
             label: label.to_string(),
             disabled: false,
             error: None,
@@ -66,5 +66,5 @@ pub mod my_actions {
 }
 
 #[derive(Action)]
-#[params(car_id: String)]
-pub struct BuyCarAction;
+#[params(hat_id: String)]
+pub struct BuyHatAction;
