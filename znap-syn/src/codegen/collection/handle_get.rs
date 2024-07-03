@@ -22,7 +22,7 @@ pub fn generate(collection_mod: &CollectionMod) -> TokenStream {
                             params: #params,
                         }
         
-                        pub fn #create_metadata_fn(ctx: #context) -> znap::Result<znap::ActionMetadata> {
+                        pub async fn #create_metadata_fn(ctx: #context) -> znap::Result<znap::ActionMetadata> {
                             #fn_block
                         }
         
@@ -34,7 +34,7 @@ pub fn generate(collection_mod: &CollectionMod) -> TokenStream {
                                 query,
                                 params,
                             };
-                            let metadata = #create_metadata_fn(context)?;
+                            let metadata = #create_metadata_fn(context).await?;
         
                             Ok(axum::Json(metadata))
                         }
