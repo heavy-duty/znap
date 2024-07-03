@@ -1,0 +1,23 @@
+[
+  {
+    "id": "toyota-corolla",
+    "imageUrl": "/images/toyota-corolla.png",
+    "title": "2024 Toyota Corolla 2.0 16V",
+    "price": 20000,
+    "detailsUrl": "/cars/toyota-corolla"
+  },
+  {
+    "id": "ford-f-150",
+    "imageUrl": "/images/ford-f-150.png",
+    "title": "2024 Ford F-150 EcoBoost 3.5L V-6",
+    "price": 50000,
+    "detailsUrl": "/cars/ford-f-150"
+  },
+  {
+    "id": "tesla-model-3",
+    "imageUrl": "/images/tesla-model-3.png",
+    "title": "2024 Tesla Model 3 Standard",
+    "price": 30000,
+    "detailsUrl": "/cars/tesla-model-3"
+  }
+]
