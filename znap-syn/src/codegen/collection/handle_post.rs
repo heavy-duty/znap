@@ -21,7 +21,7 @@ pub fn generate(collection_mod: &CollectionMod) -> TokenStream {
                     payload: znap::CreateActionPayload
                 }
 
-                pub fn #create_transaction_fn(ctx: #context) -> znap::Result<solana_sdk::transaction::Transaction> {
+                pub async fn #create_transaction_fn(ctx: #context) -> znap::Result<solana_sdk::transaction::Transaction> {
                     #fn_block
                 }
 
@@ -35,7 +35,7 @@ pub fn generate(collection_mod: &CollectionMod) -> TokenStream {
                         query,
                         params,
                     };
-                    let transaction = #create_transaction_fn(context)?;
+                    let transaction = #create_transaction_fn(context).await?;
                     let serialized_transaction = bincode::serialize(&transaction).unwrap();
                     let encoded_transaction = BASE64_STANDARD.encode(serialized_transaction);
 
