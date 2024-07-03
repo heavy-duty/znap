@@ -10,14 +10,10 @@ pub mod my_actions {
     use super::*;
 
     pub fn send_donation(ctx: Context<SendDonationAction>) -> Result<Transaction> {
-        let account_pubkey = match Pubkey::from_str(&ctx.payload.account) {
-            Ok(account_pubkey) => account_pubkey,
-            _ => return Err(Error::from(ActionError::InvalidAccountPublicKey)),
-        };
-        let receiver_pubkey = match Pubkey::from_str(&ctx.params.receiver_address) {
-            Ok(receiver_pubkey) => receiver_pubkey,
-            _ => return Err(Error::from(ActionError::InvalidReceiverPublicKey)),
-        };
+        let account_pubkey = Pubkey::from_str(&ctx.payload.account)
+            .or_else(|_| Err(Error::from(ActionError::InvalidAccountPublicKey)))?;
+        let receiver_pubkey = Pubkey::from_str(&ctx.params.receiver_address)
+            .or_else(|_| Err(Error::from(ActionError::InvalidReceiverPublicKey)))?;
         let transfer_instruction = transfer(
             &account_pubkey,
             &receiver_pubkey,
