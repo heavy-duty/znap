@@ -51,9 +51,7 @@ use znap::prelude::*;
 pub mod my_actions {
     use super::*;
 
-    pub fn send_donation(
-        ctx: Context<SendDonationAction, SendDonationPostQuery>,
-    ) -> Result<Transaction> {
+    pub fn send_donation(ctx: Context<SendDonationAction>) -> Result<Transaction> {
         let account_pubkey = match Pubkey::from_str(&ctx.payload.account) {
             Ok(account_pubkey) => account_pubkey,
             _ => return Err(Error::from(ActionError::InvalidAccountPublicKey)),
@@ -90,12 +88,8 @@ pub mod my_actions {
         parameter = { label = "Amount in SOL", name = "amount" }
     },
 )]
+#[query(amount: u64)]
 pub struct SendDonationAction;
-
-#[query]
-pub struct SendDonationQuery {
-    pub amount: u64,
-}
 
 #[derive(ErrorCode)]
 enum ActionError {
