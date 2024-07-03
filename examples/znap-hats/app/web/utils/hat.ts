@@ -1,4 +1,4 @@
-export interface Car {
+export interface Hat {
   id: string;
   imageUrl: string;
   title: string;

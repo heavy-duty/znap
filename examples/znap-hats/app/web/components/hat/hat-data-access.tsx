@@ -31,7 +31,6 @@ export function useTransferUsdc() {
   const client = useQueryClient();
 
   return useMutation({
-    mutationKey: ['transfer-usdc', { endpoint: connection.rpcEndpoint }],
     mutationFn: async (input: { amount: number }) => {
       const publicKey = wallet.publicKey;
 
@@ -81,14 +80,6 @@ export function useTransferUsdc() {
       if (signature) {
         transactionToast(signature);
       }
-      return Promise.all([
-        client.invalidateQueries({
-          queryKey: ['get-balance', { endpoint: connection.rpcEndpoint }],
-        }),
-        client.invalidateQueries({
-          queryKey: ['get-signatures', { endpoint: connection.rpcEndpoint }],
-        }),
-      ]);
     },
     onError: (error) => {
       toast.error(`Transaction failed! ${error}`);

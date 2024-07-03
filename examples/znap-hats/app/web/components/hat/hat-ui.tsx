@@ -1,31 +1,31 @@
 'use client';
 
-import { Car } from '@/utils/cars';
-import { useTransferUsdc } from './car-data-access';
+import { Hat } from '@/utils/hat';
+import { useTransferUsdc } from './hat-data-access';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 
-export function CarDetailInfo({ car }: { car: Car }) {
+export function HatDetailInfo({ hat }: { hat: Hat }) {
   return (
     <div className="w-[300px] border-base-100 bg-base-300 shadow-xl rounded-md overflow-hidden">
       <div className="p-4 text-neutral-content h-full flex flex-col">
         <div className="grow">
-          <h2>{car.title}</h2>
+          <h2>{hat.title}</h2>
 
           <p>
-            $<span className="text-4xl">{car.price.toLocaleString()}</span>
+            $<span className="text-4xl">{hat.price.toLocaleString()}</span>
           </p>
         </div>
 
         <div>
-          <CarDetailBuyButton price={car.price} />
+          <HatDetailBuyButton price={hat.price} />
         </div>
       </div>
     </div>
   );
 }
 
-export function CarDetailBuyButton({ price }: { price: number }) {
+export function HatDetailBuyButton({ price }: { price: number }) {
   const wallet = useWallet();
   const mutation = useTransferUsdc();
 
@@ -43,17 +43,17 @@ export function CarDetailBuyButton({ price }: { price: number }) {
   );
 }
 
-export function CarListItem({ car }: { car: Car }) {
+export function HatListItem({ hat }: { hat: Hat }) {
   return (
-    <a href={car.detailsUrl}>
+    <a href={hat.detailsUrl}>
       <div className="border-2 border-base-100 bg-base-300 shadow-xl rounded-md overflow-hidden hover:bg-base-200 hover:shadow-2xl hover:rotate-1 hover:border-base-100">
-        <img src={car.imageUrl} className="w-[300px] h-[200px] object-fill" />
+        <img src={hat.imageUrl} className="w-[300px] h-[300px] object-fill" />
 
-        <div className="p-4 text-neutral-content h-24">
-          <h2>{car.title}</h2>
+        <div className="w-[300px] p-4 text-neutral-content h-24">
+          <h2 className="truncate">{hat.title}</h2>
 
           <p>
-            $<span className="text-4xl">{car.price.toLocaleString()}</span>
+            $<span className="text-4xl">{hat.price.toLocaleString()}</span>
           </p>
         </div>
       </div>
