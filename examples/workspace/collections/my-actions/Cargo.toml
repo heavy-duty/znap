@@ -7,6 +7,4 @@ edition = "2021"
 axum = "0.7.5"
 serde = "1.0.203"
 solana-sdk = "1.18.16"
-spl-associated-token-account = "3.0.2"
-spl-token = "4.0.1"
 znap = { path = "../../../../znap" }

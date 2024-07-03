@@ -47,6 +47,22 @@ pub fn extract_attrs_by_name(
     })
 }
 
+pub fn has_action(
+    action_struct: &ItemStruct,
+) -> bool {
+    action_struct.attrs.iter().any(|attr| {
+        if let Ok(meta) = attr.meta.require_list() {
+            if let Some(first_segment) = meta.path.segments.first() {
+                if first_segment.ident.to_string() == "action" {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    })
+}
+
 pub fn extract_action_ident(f: &ItemFn) -> Option<&Ident> {
     if let FnArg::Typed(pt) = f.sig.inputs.first()? {
         if let Type::Path(type_path) = pt.ty.as_ref() {
