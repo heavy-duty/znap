@@ -117,11 +117,11 @@ pub struct ActionTransaction {
 /// Represents the data structure returned by a GET request to an endpoint of the Solana Actions API.
 #[derive(Debug, Serialize, PartialEq)]
 pub struct ActionMetadata {
-    pub icon: &'static str,
-    pub title: &'static str,
-    pub description: &'static str,
-    pub label: &'static str,
-    pub links: &'static Option<ActionLinks>,
+    pub icon: String,
+    pub title: String,
+    pub description: String,
+    pub label: String,
+    pub links: Option<ActionLinks>,
     pub disabled: bool,
     pub error: Option<ActionError>,
 }
@@ -133,20 +133,20 @@ pub struct ActionError {
 
 #[derive(Debug, Serialize, PartialEq)]
 pub struct ActionLinks {
-    pub actions: &'static [LinkedAction],
+    pub actions: Vec<LinkedAction>,
 }
 
 #[derive(Debug, Serialize, PartialEq)]
 pub struct LinkedAction {
-    pub label: &'static str,
-    pub href: &'static str,
-    pub parameters: &'static [LinkedActionParameter],
+    pub label: String,
+    pub href: String,
+    pub parameters: Vec<LinkedActionParameter>,
 }
 
 #[derive(Debug, Serialize, PartialEq)]
 pub struct LinkedActionParameter {
-    pub label: &'static str,
-    pub name: &'static str,
+    pub label: String,
+    pub name: String,
     pub required: bool,
 }
 

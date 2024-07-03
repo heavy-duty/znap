@@ -66,7 +66,7 @@ pub struct PostActionFn {
 pub struct ActionStruct {
     pub name: Ident,
     pub raw_struct: ItemStruct,
-    pub attributes: ActionAttributesStruct,
+    pub attributes: Option<ActionAttributesStruct>,
     pub query_attrs: Option<Vec<(Ident, Ident)>>,
     pub params_attrs: Option<Vec<(Ident, Ident)>>,
 }
