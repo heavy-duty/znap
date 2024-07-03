@@ -1,3 +1,0 @@
-[workspace]
-members = ["collections/*", ".znap/*"]
-resolver = "2"
