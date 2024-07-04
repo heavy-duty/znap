@@ -1,2 +1,2 @@
 collections = ["my-actions"]
-identity = "/home/danmt/.config/solana/id.json"
+identity = "~/.config/solana/id.json"

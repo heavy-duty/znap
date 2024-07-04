@@ -42,7 +42,7 @@ pub fn get_identity() -> String {
     let znap_file = read_to_string(znap_file_path).expect("Should have been able to read the file");
     let config: Config = toml::from_str(&znap_file).unwrap();
 
-    config.identity
+    shellexpand::tilde(&config.identity).to_string()
 }
 
 pub fn write_file(path: &Path, content: &String) {
