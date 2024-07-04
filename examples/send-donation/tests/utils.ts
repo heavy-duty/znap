@@ -17,10 +17,10 @@ export interface Metadata {
   links: { actions: Action[] };
 }
 
-export function createClient(baseUrl: string) {
+export function createActionClient(actionUrl: string) {
   return {
-    async getMetadata(actionName: string) {
-      const url = new URL(`${baseUrl}/api/${actionName}`);
+    async getMetadata() {
+      const url = new URL(actionUrl);
       const response = await fetch(url.toString(), {
         method: "GET",
         headers: {
@@ -31,15 +31,11 @@ export function createClient(baseUrl: string) {
 
       return responseJson;
     },
-    async getTransaction<T extends {}>(
-      actionName: string,
-      account: string,
-      params: T
-    ) {
-      const url = new URL(`${baseUrl}/api/${actionName}`);
+    async getTransaction<T extends {}>(account: string, query: T) {
+      const url = new URL(actionUrl);
 
-      Object.keys(params).forEach((paramName) =>
-        url.searchParams.set(paramName, params[paramName])
+      Object.keys(query).forEach((name) =>
+        url.searchParams.set(name, query[name])
       );
 
       const response = await fetch(url.toString(), {

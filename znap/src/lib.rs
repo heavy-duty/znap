@@ -75,10 +75,16 @@
 //! }
 //! ```
 
+use std::env;
 use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
 use axum::Json;
 use serde::{Deserialize, Serialize};
+use solana_sdk::instruction::{AccountMeta, Instruction};
+use solana_sdk::message::Message;
+use solana_sdk::pubkey;
+use solana_sdk::signature::Keypair;
+use solana_sdk::signer::{EncodableKey, Signer};
 use solana_sdk::transaction::Transaction;
 pub extern crate bincode;
 pub extern crate base64;
@@ -193,4 +199,79 @@ impl IntoResponse for Error {
 struct ErrorResponse {
     name: String,
     message: String,
+}
+
+pub fn add_action_identity_proof(transaction: Transaction) -> Transaction {
+    let identity_keypair = Keypair::read_from_file(env::var("IDENTITY_KEYPAIR_PATH").unwrap()).unwrap();
+    let identity_pubkey = identity_keypair.pubkey();
+
+    let reference_keypair = Keypair::new();
+    let reference_pubkey = reference_keypair.pubkey();
+
+    let identity_signature = identity_keypair.sign_message(&reference_pubkey.to_bytes());
+    let identity_message = format!(
+        "solana-action:{}:{}:{}",
+        identity_pubkey.to_string(),
+        reference_pubkey.to_string(),
+        identity_signature.to_string()
+    );
+
+    let mut identity_added = false;
+
+    let mut instructions_with_identity: Vec<Instruction> = transaction
+        .message
+        .instructions
+        .iter()
+        .map(|instruction| {
+            let program_id =
+                transaction.message.account_keys[instruction.program_id_index as usize];
+
+            let mut accounts: Vec<AccountMeta> = instruction
+                .accounts
+                .iter()
+                .map(|account_index| {
+                    let pubkey = transaction.message.account_keys[*account_index as usize];
+
+                    match transaction
+                        .message
+                        .is_maybe_writable(*account_index as usize, None)
+                    {
+                        true => AccountMeta::new(
+                            pubkey,
+                            transaction.message.is_signer(*account_index as usize),
+                        ),
+                        false => AccountMeta::new_readonly(
+                            pubkey,
+                            transaction.message.is_signer(*account_index as usize),
+                        ),
+                    }
+                })
+                .collect();
+
+            if !identity_added
+                && program_id.to_string() != "MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr"
+            {
+                accounts.push(AccountMeta::new_readonly(reference_pubkey, false));
+                accounts.push(AccountMeta::new_readonly(identity_pubkey, false));
+
+                identity_added = true;
+            }
+
+            Instruction {
+                program_id,
+                data: instruction.data.clone(),
+                accounts,
+            }
+        })
+        .collect();
+
+    instructions_with_identity.push(Instruction {
+        accounts: vec![],
+        data: identity_message.as_bytes().to_vec(),
+        program_id: pubkey!("MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr"),
+    });
+
+    let transaction_message_with_identity = Message::new(&instructions_with_identity, None);
+
+    Transaction::new_unsigned(transaction_message_with_identity)
 }

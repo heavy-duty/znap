@@ -9,7 +9,7 @@ use znap::prelude::*;
 pub mod my_actions {
     use super::*;
 
-    pub fn send_donation(ctx: Context<SendDonationAction>) -> Result<Transaction> {
+    pub fn send_donation(ctx: Context<SendDonationAction>) -> Result<ActionTransaction> {
         let account_pubkey = Pubkey::from_str(&ctx.payload.account)
             .or_else(|_| Err(Error::from(ActionError::InvalidAccountPublicKey)))?;
         let receiver_pubkey = Pubkey::from_str(&ctx.params.receiver_address)
@@ -20,8 +20,12 @@ pub mod my_actions {
             ctx.query.amount * LAMPORTS_PER_SOL,
         );
         let transaction_message = Message::new(&[transfer_instruction], None);
+        let transaction = Transaction::new_unsigned(transaction_message);
 
-        Ok(Transaction::new_unsigned(transaction_message))
+        Ok(ActionTransaction {
+            transaction,
+            message: Some("send donation to alice".to_string()),
+        })
     }
 }
 
