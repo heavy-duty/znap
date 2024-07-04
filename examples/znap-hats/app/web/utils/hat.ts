@@ -4,5 +4,5 @@ export interface Hat {
   title: string;
   price: number;
   detailsUrl: string;
-  sharedImage: string
+  shareImageUrl: string
 }
