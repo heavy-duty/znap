@@ -16,12 +16,19 @@ pub struct Collection {
     pub name: String,
 }
 
-pub fn get_collections() -> Vec<Collection> {
+
+pub fn get_config() -> Config {
     let cwd: PathBuf = std::env::current_dir().unwrap();
     let cwd_string = cwd.to_str().unwrap();
     let znap_file_path = format!("{}/Znap.toml", cwd_string);
     let znap_file = read_to_string(znap_file_path).expect("Should have been able to read the file");
-    let config: Config = toml::from_str(&znap_file).unwrap();
+
+    toml::from_str(&znap_file).unwrap()
+}
+
+pub fn get_collections() -> Vec<Collection> {
+    let cwd: PathBuf = std::env::current_dir().unwrap();
+    let config: Config = get_config();
     let collections_dir_path = cwd.join("collections");
     let collections: Vec<Collection> = config
         .collections
@@ -36,11 +43,7 @@ pub fn get_collections() -> Vec<Collection> {
 }
 
 pub fn get_identity() -> String {
-    let cwd: PathBuf = std::env::current_dir().unwrap();
-    let cwd_string = cwd.to_str().unwrap();
-    let znap_file_path = format!("{}/Znap.toml", cwd_string);
-    let znap_file = read_to_string(znap_file_path).expect("Should have been able to read the file");
-    let config: Config = toml::from_str(&znap_file).unwrap();
+    let config: Config = get_config();
 
     shellexpand::tilde(&config.identity).to_string()
 }
