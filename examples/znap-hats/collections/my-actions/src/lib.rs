@@ -57,7 +57,7 @@ pub mod my_actions {
         Ok(ActionMetadata {
             title: hat.title,
             description: description.to_string(),
-            icon: hat.image_url,
+            icon: hat.share_image_url,
             label: label.to_string(),
             disabled: false,
             error: None,

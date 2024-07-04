@@ -12,6 +12,7 @@ pub struct Hat {
     pub title: String,
     pub price: u64,
     pub details_url: String,
+    pub share_image_url: String,
 }
 
 pub async fn fetch_hat(hat_id: &String) -> Result<Hat> {
