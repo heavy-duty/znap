@@ -79,6 +79,7 @@ use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
 use axum::Json;
 use serde::{Deserialize, Serialize};
+use solana_sdk::transaction::Transaction;
 pub extern crate bincode;
 pub extern crate base64;
 pub extern crate znap_macros;
@@ -107,10 +108,17 @@ pub struct CreateActionPayload {
     pub account: String,
 }
 
+/// Represents the data structure returned by the POST handlers.
+#[derive(Debug, Serialize)]
+pub struct ActionResponse {
+    pub transaction: String,
+    pub message: Option<String>,
+}
+
 /// Represents the data structure returned by a POST request to an endpoint of the Solana Actions API.
 #[derive(Debug, Serialize)]
 pub struct ActionTransaction {
-    pub transaction: String,
+    pub transaction: Transaction,
     pub message: Option<String>,
 }
 

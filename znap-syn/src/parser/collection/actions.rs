@@ -16,7 +16,7 @@ pub fn parse(collection_mod: &ItemMod) -> ParseResult<Vec<Ident>> {
         .iter()
         .filter_map(|item| match item {
             Item::Fn(item_fn) => {
-                if extract_fn_result_type(&item_fn).unwrap() == "Transaction" {
+                if extract_fn_result_type(&item_fn).unwrap() == "ActionTransaction" {
                     return Some(item_fn);
                 }
 

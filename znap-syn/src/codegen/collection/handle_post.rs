@@ -21,7 +21,7 @@ pub fn generate(collection_mod: &CollectionMod) -> TokenStream {
                     payload: znap::CreateActionPayload
                 }
 
-                pub async fn #create_transaction_fn(ctx: #context) -> znap::Result<solana_sdk::transaction::Transaction> {
+                pub async fn #create_transaction_fn(ctx: #context) -> znap::Result<znap::ActionTransaction> {
                     #fn_block
                 }
 
@@ -29,19 +29,19 @@ pub fn generate(collection_mod: &CollectionMod) -> TokenStream {
                     axum::extract::Query(query): axum::extract::Query<#query>,
                     axum::extract::Path(params): axum::extract::Path<#params>,
                     axum::Json(payload): axum::Json<znap::CreateActionPayload>,
-                ) -> znap::Result<axum::Json<znap::ActionTransaction>> {
+                ) -> znap::Result<axum::Json<znap::ActionResponse>> {
                     let context = #context {
                         payload,
                         query,
                         params,
                     };
-                    let transaction = #create_transaction_fn(context).await?;
+                    let znap::ActionTransaction { transaction, message } = #create_transaction_fn(context).await?;
                     let serialized_transaction = bincode::serialize(&transaction).unwrap();
                     let encoded_transaction = BASE64_STANDARD.encode(serialized_transaction);
 
-                    Ok(axum::Json(znap::ActionTransaction {
+                    Ok(axum::Json(znap::ActionResponse {
                         transaction: encoded_transaction,
-                        message: None
+                        message
                     }))
                 }
             }

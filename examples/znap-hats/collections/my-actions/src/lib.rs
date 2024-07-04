@@ -17,11 +17,11 @@ const MINT_DECIMALS: u8 = 6;
 pub mod my_actions {
     use super::*;
 
-    fn buy_hat(ctx: Context<BuyHatAction>) -> Result<Transaction> {
+    fn buy_hat(ctx: Context<BuyHatAction>) -> Result<ActionTransaction> {
         let account_pubkey = Pubkey::from_str(&ctx.payload.account)
             .or_else(|_| Err(Error::from(ActionError::InvalidAccountPublicKey)))?;
 
-        let Hat { price, .. } = fetch_hat(&ctx.params.hat_id).await?;
+        let Hat { price, title, .. } = fetch_hat(&ctx.params.hat_id).await?;
         let sender_pubkey = get_associated_token_address(&account_pubkey, &MINT_PUBLIC_KEY);
         let receiver_pubkey =
             get_associated_token_address(&DESTINATION_PUBLIC_KEY, &MINT_PUBLIC_KEY);
@@ -40,8 +40,13 @@ pub mod my_actions {
         .or_else(|_| Err(Error::from(ActionError::InvalidTransferInstruction)))?;
 
         let transaction_message = Message::new(&[transfer_checked_instruction], None);
+        let transaction = Transaction::new_unsigned(transaction_message);
+        let message = format!("Buy a gently used {} for only ${}", title, price);
 
-        Ok(Transaction::new_unsigned(transaction_message))
+        Ok(ActionTransaction {
+            transaction,
+            message: Some(message),
+        })
     }
 
     fn get_buy_hat(ctx: Context<BuyHatAction>) -> Result<ActionMetadata> {
