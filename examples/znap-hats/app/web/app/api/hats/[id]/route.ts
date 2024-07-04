@@ -2,7 +2,7 @@ import hats from '../../data.json';
 import { NextResponse } from 'next/server';
 
 export async function GET(_req: Request, context: any) {
-  let hat = hats.find((hat) => hat.id === context.params.id);
+  const hat = hats.find((hat) => hat.id === context.params.id);
 
   if (!hat) {
     return NextResponse.json({ error: 'Hat not found.' }, { status: 404 });

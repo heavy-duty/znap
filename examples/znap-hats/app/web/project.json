@@ -10,7 +10,8 @@
       "outputs": ["{options.outputPath}"],
       "defaultConfiguration": "production",
       "options": {
-        "outputPath": "dist/web"
+        "outputPath": "dist/web",
+        "generatePackageJson": true
       },
       "configurations": {
         "development": {
@@ -25,7 +26,7 @@
       "options": {
         "buildTarget": "web:build",
         "dev": true,
-        "port": 3000
+        "port": 5020
       },
       "configurations": {
         "development": {
