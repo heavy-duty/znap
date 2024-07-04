@@ -1,91 +1,9 @@
 use solana_sdk::{
-    instruction::{AccountMeta, Instruction},
-    message::Message,
-    native_token::LAMPORTS_PER_SOL,
-    pubkey,
-    pubkey::Pubkey,
-    signature::Keypair,
-    signer::{EncodableKey, Signer},
-    system_instruction::transfer,
+    message::Message, native_token::LAMPORTS_PER_SOL, pubkey::Pubkey, system_instruction::transfer,
     transaction::Transaction,
 };
-use std::{env, str::FromStr};
+use std::str::FromStr;
 use znap::prelude::*;
-
-fn add_action_identity_proof(transaction: Transaction) -> Transaction {
-    let identity_keypair = Keypair::read_from_file(env::var("IDENTITY_KEYPAIR_PATH").unwrap()).unwrap();
-    let identity_pubkey = identity_keypair.pubkey();
-
-    let reference_keypair = Keypair::new();
-    let reference_pubkey = reference_keypair.pubkey();
-
-    let identity_signature = identity_keypair.sign_message(&reference_pubkey.to_bytes());
-    let identity_message = format!(
-        "solana-action:{}:{}:{}",
-        identity_pubkey.to_string(),
-        reference_pubkey.to_string(),
-        identity_signature.to_string()
-    );
-
-    let mut identity_added = false;
-
-    let mut instructions_with_identity: Vec<Instruction> = transaction
-        .message
-        .instructions
-        .iter()
-        .map(|instruction| {
-            let program_id =
-                transaction.message.account_keys[instruction.program_id_index as usize];
-
-            let mut accounts: Vec<AccountMeta> = instruction
-                .accounts
-                .iter()
-                .map(|account_index| {
-                    let pubkey = transaction.message.account_keys[*account_index as usize];
-
-                    match transaction
-                        .message
-                        .is_maybe_writable(*account_index as usize, None)
-                    {
-                        true => AccountMeta::new(
-                            pubkey,
-                            transaction.message.is_signer(*account_index as usize),
-                        ),
-                        false => AccountMeta::new_readonly(
-                            pubkey,
-                            transaction.message.is_signer(*account_index as usize),
-                        ),
-                    }
-                })
-                .collect();
-
-            if !identity_added
-                && program_id.to_string() != "MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr"
-            {
-                accounts.push(AccountMeta::new_readonly(reference_pubkey, false));
-                accounts.push(AccountMeta::new_readonly(identity_pubkey, false));
-
-                identity_added = true;
-            }
-
-            Instruction {
-                program_id,
-                data: instruction.data.clone(),
-                accounts,
-            }
-        })
-        .collect();
-
-    instructions_with_identity.push(Instruction {
-        accounts: vec![],
-        data: identity_message.as_bytes().to_vec(),
-        program_id: pubkey!("MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr"),
-    });
-
-    let transaction_message_with_identity = Message::new(&instructions_with_identity, None);
-
-    Transaction::new_unsigned(transaction_message_with_identity)
-}
 
 #[collection]
 pub mod my_actions {
@@ -105,7 +23,7 @@ pub mod my_actions {
         let transaction = Transaction::new_unsigned(transaction_message);
 
         Ok(ActionTransaction {
-            transaction: add_action_identity_proof(transaction),
+            transaction,
             message: Some("send donation to alice".to_string()),
         })
     }

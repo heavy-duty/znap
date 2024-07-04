@@ -36,7 +36,8 @@ pub fn generate(collection_mod: &CollectionMod) -> TokenStream {
                         params,
                     };
                     let znap::ActionTransaction { transaction, message } = #create_transaction_fn(context).await?;
-                    let serialized_transaction = bincode::serialize(&transaction).unwrap();
+                    let transaction_with_identity = znap::add_action_identity_proof(transaction);
+                    let serialized_transaction = bincode::serialize(&transaction_with_identity).unwrap();
                     let encoded_transaction = BASE64_STANDARD.encode(serialized_transaction);
 
                     Ok(axum::Json(znap::ActionResponse {
