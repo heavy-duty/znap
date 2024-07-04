@@ -17,7 +17,7 @@ pub struct Hat {
 pub async fn fetch_hat(hat_id: &String) -> Result<Hat> {
     let response = reqwest::Client::new()
         .get(format!(
-            "http://localhost:3000/api/hats/{}",
+            "http://localhost:5020/api/hats/{}",
             hat_id
         ))
         .send()

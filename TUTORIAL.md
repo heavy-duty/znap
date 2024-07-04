@@ -399,7 +399,7 @@ If everything went well, you should see something like this:
 ```bash
 ✨ Znap Server ✨
 
- Service is running at http://localhost:3000
+ Service is running at http://localhost:5020
 
 [my_actions] endpoints:
 
