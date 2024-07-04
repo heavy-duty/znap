@@ -1,11 +1,11 @@
-use crate::{common::{extract_action_ident, extract_action_query, extract_fn_result_type}, PostActionFn};
+use crate::{common::{extract_action_ident, extract_fn_result_type}, ActionFn};
 use syn::{
     parse::{Error as ParseError, Result as ParseResult},
     spanned::Spanned,
     Item, ItemFn, ItemMod,
 };
 
-pub fn parse(collection_mod: &ItemMod) -> ParseResult<Vec<PostActionFn>> {
+pub fn parse(collection_mod: &ItemMod) -> ParseResult<Vec<ActionFn>> {
     let mod_content = &collection_mod
         .content
         .as_ref()
@@ -16,7 +16,7 @@ pub fn parse(collection_mod: &ItemMod) -> ParseResult<Vec<PostActionFn>> {
         .iter()
         .filter_map(|item| match item {
             Item::Fn(item_fn) => {
-                if extract_fn_result_type(&item_fn).unwrap() == "Transaction" {
+                if extract_fn_result_type(&item_fn).unwrap() == "ActionTransaction" {
                     return Some(item_fn);
                 }
 
@@ -26,19 +26,14 @@ pub fn parse(collection_mod: &ItemMod) -> ParseResult<Vec<PostActionFn>> {
         })
         .map(|method: &ItemFn| {
             let action_ident = extract_action_ident(&method).unwrap();
-            let query_ident = match extract_action_query(&method) {
-                Some(ident) => Some(ident.clone()),
-                _ => None,
-            };
 
-            Ok(PostActionFn {
+            Ok(ActionFn {
                 raw_method: method.clone(),
                 name: method.sig.ident.clone(),
                 action: action_ident.clone(),
-                query: query_ident,
             })
         })
-        .collect::<ParseResult<Vec<PostActionFn>>>()?;
+        .collect::<ParseResult<Vec<ActionFn>>>()?;
 
     Ok(post_actions_fns)
 }
