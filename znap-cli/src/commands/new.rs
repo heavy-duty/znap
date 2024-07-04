@@ -22,7 +22,7 @@ pub fn run(name: &String, dry_run: &bool) {
     // Add to collections list in Znap.toml.
     let znap_toml_path = cwd.join("Znap.toml");
     let znap_toml = read_to_string(&znap_toml_path).unwrap();
-    let Config { mut collections } = toml::from_str(&znap_toml).unwrap();
+    let Config { mut collections, .. } = toml::from_str(&znap_toml).unwrap();
     collections.push(name.to_kebab_case());
 
     if !dry_run {
@@ -46,7 +46,11 @@ pub fn run(name: &String, dry_run: &bool) {
         // Add to collections list in Znap.toml.
         write_file(
             &znap_toml_path.as_path(),
-            &toml::to_string(&Config { collections }).unwrap(),
+            &toml::to_string(&Config {
+                collections,
+                identity: "~/.config/solana/id.json".to_string(),
+            })
+            .unwrap(),
         );
     }
 

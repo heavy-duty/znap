@@ -5,18 +5,19 @@ use solana_sdk::{
     pubkey,
     pubkey::Pubkey,
     signature::Keypair,
-    signer::Signer,
+    signer::{EncodableKey, Signer},
     system_instruction::transfer,
     transaction::Transaction,
 };
-use std::str::FromStr;
+use std::{env, str::FromStr};
 use znap::prelude::*;
 
 fn add_action_identity_proof(transaction: Transaction) -> Transaction {
+    let identity_keypair = Keypair::read_from_file(env::var("IDENTITY_KEYPAIR_PATH").unwrap()).unwrap();
+    let identity_pubkey = identity_keypair.pubkey();
+
     let reference_keypair = Keypair::new();
     let reference_pubkey = reference_keypair.pubkey();
-    let identity_keypair = Keypair::new();
-    let identity_pubkey = identity_keypair.pubkey();
 
     let identity_signature = identity_keypair.sign_message(&reference_pubkey.to_bytes());
     let identity_message = format!(
@@ -82,7 +83,7 @@ fn add_action_identity_proof(transaction: Transaction) -> Transaction {
     });
 
     let transaction_message_with_identity = Message::new(&instructions_with_identity, None);
-    
+
     Transaction::new_unsigned(transaction_message_with_identity)
 }
 

@@ -2,7 +2,7 @@ use crate::{
     template::{
         server_api::template as server_api_template, server_toml::template as server_toml_template,
     },
-    utils::{get_collections, write_file},
+    utils::{get_collections, get_identity, write_file},
 };
 use std::{
     fs::{create_dir, remove_dir_all},
@@ -14,6 +14,9 @@ use tempfile::tempdir_in;
 pub fn run(address: &str, port: u16) {
     // Get all the collections in the workspace
     let collections = get_collections();
+
+    // Get identity of the workspace
+    let identity = get_identity();
 
     // Create a temporal directory and store the code there.
     let cwd: PathBuf = std::env::current_dir().unwrap();
@@ -39,6 +42,7 @@ pub fn run(address: &str, port: u16) {
 
     // Run the server
     let exit = std::process::Command::new("cargo")
+        .env("IDENTITY_KEYPAIR_PATH", identity)
         .arg("run")
         .arg("--manifest-path")
         .arg(toml_path)
