@@ -1,1 +1,2 @@
 collections = ["my-actions"]
+identity = "~/.config/solana/id.json"
