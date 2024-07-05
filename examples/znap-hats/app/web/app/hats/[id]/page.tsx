@@ -29,7 +29,7 @@ export async function generateMetadata( { params }: Props) {
       url: `https://testing-store.heavyduty.builders/hats/${hat.id}`,
       siteName: 'Znap Store',
       images: [{
-        url: hat.sharedImage, 
+        url: hat.shareImageUrl, 
         width: 2250,
         height: 2250, 
       }],
@@ -39,7 +39,7 @@ export async function generateMetadata( { params }: Props) {
       title: hat.title,
       description: 'Check out this awesome cap',
       creator: '@HeavyDutyBuild',
-      images: [hat.sharedImage],
+      images: [hat.shareImageUrl],
     }
   }
 }
