@@ -1,10 +1,99 @@
 use handlebars::Handlebars;
+use serde::Serialize;
 use solana_sdk::{
     message::Message, native_token::LAMPORTS_PER_SOL, pubkey::Pubkey, system_instruction::transfer,
     transaction::Transaction,
 };
 use std::str::FromStr;
 use znap::prelude::*;
+
+fn render_source<T>(source: &String, data: &T) -> String
+where
+    T: Serialize,
+{
+    let mut handlebars = Handlebars::new();
+
+    assert!(handlebars
+        .register_template_string(&"template", &source)
+        .is_ok());
+    let output = handlebars.render(&"template", &data).unwrap();
+
+    handlebars.clear_templates();
+
+    output
+}
+
+fn render_parameters<T>(
+    parameters: &Vec<LinkedActionParameter>,
+    data: &T,
+) -> Vec<LinkedActionParameter>
+where
+    T: Serialize,
+{
+    parameters
+        .iter()
+        .map(|parameter| {
+            let name = render_source(&parameter.name, &data);
+            let label = render_source(&parameter.label, &data);
+
+            LinkedActionParameter {
+                label,
+                name,
+                required: parameter.required,
+            }
+        })
+        .collect()
+}
+
+fn render_action_links<T>(links: &Option<ActionLinks>, data: &T) -> Option<ActionLinks>
+where
+    T: Serialize,
+{
+    match links {
+        Some(ActionLinks { actions }) => Some(ActionLinks {
+            actions: actions
+                .iter()
+                .map(|link| {
+                    let label = render_source(&link.label, &data);
+                    let href = render_source(&link.href, &data);
+
+                    LinkedAction {
+                        label,
+                        href,
+                        parameters: render_parameters(&link.parameters, &data),
+                    }
+                })
+                .collect(),
+        }),
+        _ => None,
+    }
+}
+
+fn render_metadata<T>(
+    metadata: &ActionMetadata,
+    data: &T,
+    disabled: bool,
+    error: Option<znap::ActionError>,
+) -> ActionMetadata
+where
+    T: Serialize,
+{
+    let title = render_source(&metadata.title, &data);
+    let description = render_source(&metadata.description, &data);
+    let label = render_source(&metadata.label, &data);
+    let icon = render_source(&metadata.icon, &data);
+    let links = render_action_links(&metadata.links, &data);
+
+    ActionMetadata {
+        title,
+        icon,
+        description,
+        label,
+        links,
+        disabled,
+        error,
+    }
+}
 
 #[collection]
 pub mod my_actions {
@@ -30,191 +119,7 @@ pub mod my_actions {
     }
 
     pub fn get_send_donation(ctx: Context<SendDonationAction>) -> Result<ActionMetadata> {
-        let metadata = SendDonationAction::to_metadata();
-
-        let mut handlebars = Handlebars::new();
-
-        let title_source = metadata.title.clone();
-        assert!(handlebars
-            .register_template_string(
-                &format!("{}-title", SendDonationAction::name()),
-                &title_source
-            )
-            .is_ok());
-        let title = handlebars
-            .render(&format!("{}-title", SendDonationAction::name()), &ctx)
-            .unwrap();
-
-        let description_source = metadata.description.clone();
-        assert!(handlebars
-            .register_template_string(
-                &format!("{}-description", SendDonationAction::name()),
-                &description_source
-            )
-            .is_ok());
-        let description = handlebars
-            .render(&format!("{}-description", SendDonationAction::name()), &ctx)
-            .unwrap();
-
-        let label_source = metadata.label.clone();
-        assert!(handlebars
-            .register_template_string(
-                &format!("{}-label", SendDonationAction::name()),
-                &label_source
-            )
-            .is_ok());
-        let label = handlebars
-            .render(&format!("{}-label", SendDonationAction::name()), &ctx)
-            .unwrap();
-
-        let icon_source = metadata.icon.clone();
-        assert!(handlebars
-            .register_template_string(
-                &format!("{}-icon", SendDonationAction::name()),
-                &icon_source
-            )
-            .is_ok());
-        let icon = handlebars
-            .render(&format!("{}-icon", SendDonationAction::name()), &ctx)
-            .unwrap();
-
-        let links = match metadata.links {
-            Some(ActionLinks { actions }) => {
-                let linked_actions: Vec<LinkedAction> = actions
-                    .iter()
-                    .enumerate()
-                    .map(|(action_index, link)| {
-                        let label_source = link.label.clone();
-                        assert!(handlebars
-                            .register_template_string(
-                                &format!(
-                                    "{}-link-{}-label",
-                                    SendDonationAction::name(),
-                                    action_index
-                                ),
-                                &label_source
-                            )
-                            .is_ok());
-                        let label = handlebars
-                            .render(
-                                &format!(
-                                    "{}-link-{}-label",
-                                    SendDonationAction::name(),
-                                    action_index
-                                ),
-                                &ctx,
-                            )
-                            .unwrap();
-
-                        let href_source = link.href.clone();
-                        assert!(handlebars
-                            .register_template_string(
-                                &format!(
-                                    "{}-link-{}-href",
-                                    SendDonationAction::name(),
-                                    action_index
-                                ),
-                                &href_source
-                            )
-                            .is_ok());
-                        let href = handlebars
-                            .render(
-                                &format!(
-                                    "{}-link-{}-href",
-                                    SendDonationAction::name(),
-                                    action_index
-                                ),
-                                &ctx,
-                            )
-                            .unwrap();
-
-                        let parameters: Vec<LinkedActionParameter> = link
-                            .parameters
-                            .iter()
-                            .enumerate()
-                            .map(|(parameter_index, parameter)| {
-                                let label_source = parameter.label.clone();
-                                assert!(handlebars
-                                    .register_template_string(
-                                        &format!(
-                                            "{}-link-{}-parameter-{}-label",
-                                            SendDonationAction::name(),
-                                            action_index,
-                                            parameter_index
-                                        ),
-                                        &label_source
-                                    )
-                                    .is_ok());
-                                let label = handlebars
-                                    .render(
-                                        &format!(
-                                            "{}-link-{}-parameter-{}-label",
-                                            SendDonationAction::name(),
-                                            action_index,
-                                            parameter_index
-                                        ),
-                                        &ctx,
-                                    )
-                                    .unwrap();
-
-                                let name_source = parameter.name.clone();
-                                assert!(handlebars
-                                    .register_template_string(
-                                        &format!(
-                                            "{}-link-{}-parameter-{}-name",
-                                            SendDonationAction::name(),
-                                            action_index,
-                                            parameter_index
-                                        ),
-                                        &name_source
-                                    )
-                                    .is_ok());
-                                let name = handlebars
-                                    .render(
-                                        &format!(
-                                            "{}-link-{}-parameter-{}-name",
-                                            SendDonationAction::name(),
-                                            action_index,
-                                            parameter_index
-                                        ),
-                                        &ctx,
-                                    )
-                                    .unwrap();
-
-                                LinkedActionParameter {
-                                    label,
-                                    name,
-                                    required: parameter.required,
-                                }
-                            })
-                            .collect();
-
-                        LinkedAction {
-                            label,
-                            href,
-                            parameters,
-                        }
-                    })
-                    .collect();
-
-                Some(ActionLinks {
-                    actions: linked_actions,
-                })
-            }
-            _ => None,
-        };
-
-        handlebars.clear_templates();
-
-        Ok(ActionMetadata {
-            title,
-            icon,
-            description,
-            label,
-            links,
-            disabled: false,
-            error: None,
-        })
+        Ok(render_metadata(&SendDonationAction::to_metadata(), &ctx, false, None))
     }
 }
 
@@ -241,7 +146,6 @@ pub mod my_actions {
 #[query(amount: u64)]
 #[params(receiver_address: String)]
 pub struct SendDonationAction;
-
 
 #[derive(ErrorCode)]
 enum ActionError {
