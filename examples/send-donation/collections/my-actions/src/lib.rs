@@ -36,27 +36,47 @@ pub mod my_actions {
 
         let title_source = metadata.title.clone();
         assert!(handlebars
-            .register_template_string("title", &title_source)
+            .register_template_string(
+                &format!("{}-title", SendDonationAction::name()),
+                &title_source
+            )
             .is_ok());
-        let title = handlebars.render("title", &ctx).unwrap();
+        let title = handlebars
+            .render(&format!("{}-title", SendDonationAction::name()), &ctx)
+            .unwrap();
 
         let description_source = metadata.description.clone();
         assert!(handlebars
-            .register_template_string("description", &description_source)
+            .register_template_string(
+                &format!("{}-description", SendDonationAction::name()),
+                &description_source
+            )
             .is_ok());
-        let description = handlebars.render("description", &ctx).unwrap();
+        let description = handlebars
+            .render(&format!("{}-description", SendDonationAction::name()), &ctx)
+            .unwrap();
 
         let label_source = metadata.label.clone();
         assert!(handlebars
-            .register_template_string("label", &label_source)
+            .register_template_string(
+                &format!("{}-label", SendDonationAction::name()),
+                &label_source
+            )
             .is_ok());
-        let label = handlebars.render("label", &ctx).unwrap();
+        let label = handlebars
+            .render(&format!("{}-label", SendDonationAction::name()), &ctx)
+            .unwrap();
 
         let icon_source = metadata.icon.clone();
         assert!(handlebars
-            .register_template_string("icon", &icon_source)
+            .register_template_string(
+                &format!("{}-icon", SendDonationAction::name()),
+                &icon_source
+            )
             .is_ok());
-        let icon = handlebars.render("icon", &ctx).unwrap();
+        let icon = handlebars
+            .render(&format!("{}-icon", SendDonationAction::name()), &ctx)
+            .unwrap();
 
         let links = match metadata.links {
             Some(ActionLinks { actions }) => {
@@ -67,23 +87,49 @@ pub mod my_actions {
                         let label_source = link.label.clone();
                         assert!(handlebars
                             .register_template_string(
-                                &format!("link-{}-label", action_index).to_string(),
+                                &format!(
+                                    "{}-link-{}-label",
+                                    SendDonationAction::name(),
+                                    action_index
+                                )
+                                .to_string(),
                                 &label_source
                             )
                             .is_ok());
                         let label = handlebars
-                            .render(&format!("link-{}-label", action_index).to_string(), &ctx)
+                            .render(
+                                &format!(
+                                    "{}-link-{}-label",
+                                    SendDonationAction::name(),
+                                    action_index
+                                )
+                                .to_string(),
+                                &ctx,
+                            )
                             .unwrap();
 
                         let href_source = link.href.clone();
                         assert!(handlebars
                             .register_template_string(
-                                &format!("link-{}-href", action_index).to_string(),
+                                &format!(
+                                    "{}-link-{}-href",
+                                    SendDonationAction::name(),
+                                    action_index
+                                )
+                                .to_string(),
                                 &href_source
                             )
                             .is_ok());
                         let href = handlebars
-                            .render(&format!("link-{}-href", action_index).to_string(), &ctx)
+                            .render(
+                                &format!(
+                                    "{}-link-{}-href",
+                                    SendDonationAction::name(),
+                                    action_index
+                                )
+                                .to_string(),
+                                &ctx,
+                            )
                             .unwrap();
 
                         let parameters: Vec<LinkedActionParameter> = link
@@ -95,8 +141,10 @@ pub mod my_actions {
                                 assert!(handlebars
                                     .register_template_string(
                                         &format!(
-                                            "link-{}-parameter-{}-label",
-                                            action_index, parameter_index
+                                            "{}-link-{}-parameter-{}-label",
+                                            SendDonationAction::name(),
+                                            action_index,
+                                            parameter_index
                                         )
                                         .to_string(),
                                         &label_source
@@ -105,8 +153,10 @@ pub mod my_actions {
                                 let label = handlebars
                                     .render(
                                         &format!(
-                                            "link-{}-parameter-{}-label",
-                                            action_index, parameter_index
+                                            "{}-link-{}-parameter-{}-label",
+                                            SendDonationAction::name(),
+                                            action_index,
+                                            parameter_index
                                         )
                                         .to_string(),
                                         &ctx,
@@ -117,8 +167,10 @@ pub mod my_actions {
                                 assert!(handlebars
                                     .register_template_string(
                                         &format!(
-                                            "link-{}-parameter-{}-name",
-                                            action_index, parameter_index
+                                            "{}-link-{}-parameter-{}-name",
+                                            SendDonationAction::name(),
+                                            action_index,
+                                            parameter_index
                                         )
                                         .to_string(),
                                         &name_source
@@ -127,8 +179,10 @@ pub mod my_actions {
                                 let name = handlebars
                                     .render(
                                         &format!(
-                                            "link-{}-parameter-{}-name",
-                                            action_index, parameter_index
+                                            "{}-link-{}-parameter-{}-name",
+                                            SendDonationAction::name(),
+                                            action_index,
+                                            parameter_index
                                         )
                                         .to_string(),
                                         &ctx,
@@ -157,6 +211,8 @@ pub mod my_actions {
             }
             _ => None,
         };
+
+        handlebars.clear_templates();
 
         Ok(ActionMetadata {
             title,
@@ -193,6 +249,12 @@ pub mod my_actions {
 #[query(amount: u64)]
 #[params(receiver_address: String)]
 pub struct SendDonationAction;
+
+impl SendDonationAction {
+    pub fn name() -> &'static str {
+        "SendDonationAction"
+    }
+}
 
 #[derive(ErrorCode)]
 enum ActionError {
