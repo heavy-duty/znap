@@ -91,8 +91,7 @@ pub mod my_actions {
                                     "{}-link-{}-label",
                                     SendDonationAction::name(),
                                     action_index
-                                )
-                                .to_string(),
+                                ),
                                 &label_source
                             )
                             .is_ok());
@@ -102,8 +101,7 @@ pub mod my_actions {
                                     "{}-link-{}-label",
                                     SendDonationAction::name(),
                                     action_index
-                                )
-                                .to_string(),
+                                ),
                                 &ctx,
                             )
                             .unwrap();
@@ -115,8 +113,7 @@ pub mod my_actions {
                                     "{}-link-{}-href",
                                     SendDonationAction::name(),
                                     action_index
-                                )
-                                .to_string(),
+                                ),
                                 &href_source
                             )
                             .is_ok());
@@ -126,8 +123,7 @@ pub mod my_actions {
                                     "{}-link-{}-href",
                                     SendDonationAction::name(),
                                     action_index
-                                )
-                                .to_string(),
+                                ),
                                 &ctx,
                             )
                             .unwrap();
@@ -145,8 +141,7 @@ pub mod my_actions {
                                             SendDonationAction::name(),
                                             action_index,
                                             parameter_index
-                                        )
-                                        .to_string(),
+                                        ),
                                         &label_source
                                     )
                                     .is_ok());
@@ -157,8 +152,7 @@ pub mod my_actions {
                                             SendDonationAction::name(),
                                             action_index,
                                             parameter_index
-                                        )
-                                        .to_string(),
+                                        ),
                                         &ctx,
                                     )
                                     .unwrap();
@@ -171,8 +165,7 @@ pub mod my_actions {
                                             SendDonationAction::name(),
                                             action_index,
                                             parameter_index
-                                        )
-                                        .to_string(),
+                                        ),
                                         &name_source
                                     )
                                     .is_ok());
@@ -183,8 +176,7 @@ pub mod my_actions {
                                             SendDonationAction::name(),
                                             action_index,
                                             parameter_index
-                                        )
-                                        .to_string(),
+                                        ),
                                         &ctx,
                                     )
                                     .unwrap();
@@ -250,11 +242,6 @@ pub mod my_actions {
 #[params(receiver_address: String)]
 pub struct SendDonationAction;
 
-impl SendDonationAction {
-    pub fn name() -> &'static str {
-        "SendDonationAction"
-    }
-}
 
 #[derive(ErrorCode)]
 enum ActionError {
