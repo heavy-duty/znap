@@ -188,6 +188,16 @@ pub fn create_get_context(action: &String) -> Ident {
     )
 }
 
+pub fn create_get_context_with_metadata(action: &String) -> Ident {
+    Ident::new(
+        &format!(
+            "{}GetContextWithMetadata",
+            action_name_without_suffix(&action.to_snek_case()).to_upper_camel_case()
+        ),
+        Span::call_site(),
+    )
+}
+
 pub fn create_path(action: &String) -> Ident {
     Ident::new(
         &format!(

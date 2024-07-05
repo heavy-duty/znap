@@ -19,24 +19,24 @@ describe("My actions", () => {
   );
   const actionMetadata: Metadata = {
     icon: "https://media.discordapp.net/attachments/1205590693041541181/1212566609202520065/icon.png?ex=667eb568&is=667d63e8&hm=0f247078545828c0a5cf8300a5601c56bbc9b59d3d87a0c74b082df0f3a6d6bd&=&format=webp&quality=lossless&width=660&height=660",
-    title: "Alice's website",
-    description: "Website to make a donation to Alice",
+    title: `Send a Donation to ${aliceKeypair.publicKey.toBase58()}`,
+    description: `Send a donation to ${aliceKeypair.publicKey.toBase58()} using the Solana blockchain via a Blink.`,
     label: "Send",
     links: {
       actions: [
         {
           label: "Send 1 SOL",
-          href: "/api/send_donation?amount=1",
+          href: `/api/send_donation/${aliceKeypair.publicKey.toBase58()}?amount=1`,
           parameters: [],
         },
         {
           label: "Send 5 SOL",
-          href: "/api/send_donation?amount=5",
+          href: `/api/send_donation/${aliceKeypair.publicKey.toBase58()}?amount=5`,
           parameters: [],
         },
         {
           label: "Send SOL",
-          href: "/api/send_donation?amount={amount}",
+          href: `/api/send_donation/${aliceKeypair.publicKey.toBase58()}?amount={amount}`,
           parameters: [
             {
               label: "Amount in SOL",

@@ -14,7 +14,7 @@ export interface Metadata {
   label: string;
   disabled: boolean;
   error: null;
-  links: { actions: Action[] };
+  links: { actions: Action[] } | null;
 }
 
 export function createActionClient(actionUrl: string) {

@@ -15,6 +15,7 @@ pub fn generate(collection_mod: &CollectionMod) -> TokenStream {
             let params = create_params(&action.to_string());
 
             quote! {
+                #[derive(Debug, serde::Serialize, serde::Deserialize)]
                 pub struct #context {
                     query: #query,
                     params: #params,
