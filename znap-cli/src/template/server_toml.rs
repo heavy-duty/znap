@@ -3,7 +3,7 @@ use crate::utils::Collection;
 pub fn template(collections: &Vec<Collection>) -> String {
     let cargo_content_without_collections = format!("[package]\n\
         name = \"znap-server\"\n\
-        version = \"0.1.20\"\n\
+        version = \"0.1.21\"\n\
         edition = \"2021\"\n\
         \n[dependencies]\n\
         tokio = {{ version = \"1\", features = [\"full\"] }}\n\

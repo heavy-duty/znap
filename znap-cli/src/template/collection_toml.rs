@@ -9,9 +9,7 @@ pub fn template(name: &String) -> String {
         axum = \"0.7.5\"\n\
         serde = \"1.0.203\"\n\
         solana-sdk = \"2.0.1\"\n\
-        spl-associated-token-account = \"3.0.2\"\n\
-        spl-token = \"4.0.1\"\n\
-        znap = \"0.1.20\"\n\
+        znap = \"0.1.21\"\n\
     ", name.to_kebab_case())
 }
 
