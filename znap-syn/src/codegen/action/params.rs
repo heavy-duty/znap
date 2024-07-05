@@ -13,14 +13,14 @@ pub fn generate(action_struct: &ActionStruct) -> TokenStream {
         });
 
         quote! {
-            #[derive(Debug, serde::Deserialize)]
+            #[derive(Debug, serde::Serialize, serde::Deserialize)]
             struct #params {
                 #(#attributes),*
             }
         }
     } else {
         quote! {
-            #[derive(Debug, serde::Deserialize)]
+            #[derive(Debug, serde::Serialize, serde::Deserialize)]
             struct #params {}
         }
     }

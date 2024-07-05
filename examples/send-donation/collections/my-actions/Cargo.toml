@@ -5,6 +5,7 @@ edition = "2021"
 
 [dependencies]
 axum = "0.7.5"
+handlebars = "5.1.2"
 serde = "1.0.203"
 solana-sdk = "2.0.1"
 znap = { path = "../../../../znap" }

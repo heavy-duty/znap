@@ -109,7 +109,7 @@ pub trait ToMetadata {
 }
 
 /// Data structure required to make a POST request to an endpoint of the Solana Actions API.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct CreateActionPayload {
     pub account: String,
 }
