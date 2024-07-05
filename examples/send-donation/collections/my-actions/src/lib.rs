@@ -1,99 +1,9 @@
-use handlebars::Handlebars;
-use serde::Serialize;
 use solana_sdk::{
     message::Message, native_token::LAMPORTS_PER_SOL, pubkey::Pubkey, system_instruction::transfer,
     transaction::Transaction,
 };
 use std::str::FromStr;
 use znap::prelude::*;
-
-fn render_source<T>(source: &String, data: &T) -> String
-where
-    T: Serialize,
-{
-    let mut handlebars = Handlebars::new();
-
-    assert!(handlebars
-        .register_template_string(&"template", &source)
-        .is_ok());
-    let output = handlebars.render(&"template", &data).unwrap();
-
-    handlebars.clear_templates();
-
-    output
-}
-
-fn render_parameters<T>(
-    parameters: &Vec<LinkedActionParameter>,
-    data: &T,
-) -> Vec<LinkedActionParameter>
-where
-    T: Serialize,
-{
-    parameters
-        .iter()
-        .map(|parameter| {
-            let name = render_source(&parameter.name, &data);
-            let label = render_source(&parameter.label, &data);
-
-            LinkedActionParameter {
-                label,
-                name,
-                required: parameter.required,
-            }
-        })
-        .collect()
-}
-
-fn render_action_links<T>(links: &Option<ActionLinks>, data: &T) -> Option<ActionLinks>
-where
-    T: Serialize,
-{
-    match links {
-        Some(ActionLinks { actions }) => Some(ActionLinks {
-            actions: actions
-                .iter()
-                .map(|link| {
-                    let label = render_source(&link.label, &data);
-                    let href = render_source(&link.href, &data);
-
-                    LinkedAction {
-                        label,
-                        href,
-                        parameters: render_parameters(&link.parameters, &data),
-                    }
-                })
-                .collect(),
-        }),
-        _ => None,
-    }
-}
-
-fn render_metadata<T>(
-    metadata: &ActionMetadata,
-    data: &T,
-    disabled: bool,
-    error: Option<znap::ActionError>,
-) -> ActionMetadata
-where
-    T: Serialize,
-{
-    let title = render_source(&metadata.title, &data);
-    let description = render_source(&metadata.description, &data);
-    let label = render_source(&metadata.label, &data);
-    let icon = render_source(&metadata.icon, &data);
-    let links = render_action_links(&metadata.links, &data);
-
-    ActionMetadata {
-        title,
-        icon,
-        description,
-        label,
-        links,
-        disabled,
-        error,
-    }
-}
 
 #[collection]
 pub mod my_actions {
@@ -116,10 +26,6 @@ pub mod my_actions {
             transaction,
             message: Some("send donation to alice".to_string()),
         })
-    }
-
-    pub fn get_send_donation(ctx: Context<SendDonationAction>) -> Result<ActionMetadata> {
-        Ok(render_metadata(&SendDonationAction::to_metadata(), &ctx, false, None))
     }
 }
 

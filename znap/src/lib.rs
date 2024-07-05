@@ -75,10 +75,10 @@
 //! }
 //! ```
 
-use std::env;
 use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
 use axum::Json;
+use handlebars::Handlebars;
 use serde::{Deserialize, Serialize};
 use solana_sdk::instruction::{AccountMeta, Instruction};
 use solana_sdk::message::Message;
@@ -86,11 +86,12 @@ use solana_sdk::pubkey;
 use solana_sdk::signature::Keypair;
 use solana_sdk::signer::{EncodableKey, Signer};
 use solana_sdk::transaction::Transaction;
-pub extern crate bincode;
+use std::env;
 pub extern crate base64;
-pub extern crate znap_macros;
+pub extern crate bincode;
 pub extern crate colored;
 pub extern crate tower_http;
+pub extern crate znap_macros;
 
 pub mod prelude;
 
@@ -122,14 +123,14 @@ pub struct ActionResponse {
 }
 
 /// Represents the data structure returned by a POST request to an endpoint of the Solana Actions API.
-#[derive(Debug, Serialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct ActionTransaction {
     pub transaction: Transaction,
     pub message: Option<String>,
 }
 
 /// Represents the data structure returned by a GET request to an endpoint of the Solana Actions API.
-#[derive(Debug, Serialize, PartialEq)]
+#[derive(Debug, Deserialize, Serialize, PartialEq)]
 pub struct ActionMetadata {
     pub icon: String,
     pub title: String,
@@ -140,24 +141,24 @@ pub struct ActionMetadata {
     pub error: Option<ActionError>,
 }
 
-#[derive(Debug, Serialize, PartialEq)]
+#[derive(Debug, Deserialize, Serialize, PartialEq)]
 pub struct ActionError {
     pub message: String,
 }
 
-#[derive(Debug, Serialize, PartialEq)]
+#[derive(Debug, Deserialize, Serialize, PartialEq)]
 pub struct ActionLinks {
     pub actions: Vec<LinkedAction>,
 }
 
-#[derive(Debug, Serialize, PartialEq)]
+#[derive(Debug, Deserialize, Serialize, PartialEq)]
 pub struct LinkedAction {
     pub label: String,
     pub href: String,
     pub parameters: Vec<LinkedActionParameter>,
 }
 
-#[derive(Debug, Serialize, PartialEq)]
+#[derive(Debug, Deserialize, Serialize, PartialEq)]
 pub struct LinkedActionParameter {
     pub label: String,
     pub name: String,
@@ -202,7 +203,8 @@ struct ErrorResponse {
 }
 
 pub fn add_action_identity_proof(transaction: Transaction) -> Transaction {
-    let identity_keypair = Keypair::read_from_file(env::var("IDENTITY_KEYPAIR_PATH").unwrap()).unwrap();
+    let identity_keypair =
+        Keypair::read_from_file(env::var("IDENTITY_KEYPAIR_PATH").unwrap()).unwrap();
     let identity_pubkey = identity_keypair.pubkey();
 
     let reference_keypair = Keypair::new();
@@ -274,4 +276,92 @@ pub fn add_action_identity_proof(transaction: Transaction) -> Transaction {
     let transaction_message_with_identity = Message::new(&instructions_with_identity, None);
 
     Transaction::new_unsigned(transaction_message_with_identity)
+}
+
+pub fn render_source<T>(source: &String, data: &T) -> String
+where
+    T: Serialize,
+{
+    let mut handlebars = Handlebars::new();
+
+    assert!(handlebars
+        .register_template_string(&"template", &source)
+        .is_ok());
+    let output = handlebars.render(&"template", &data).unwrap();
+
+    handlebars.clear_templates();
+
+    output
+}
+
+pub fn render_parameters<T>(
+    parameters: &Vec<LinkedActionParameter>,
+    data: &T,
+) -> Vec<LinkedActionParameter>
+where
+    T: Serialize,
+{
+    parameters
+        .iter()
+        .map(|parameter| {
+            let name = render_source(&parameter.name, &data);
+            let label = render_source(&parameter.label, &data);
+
+            LinkedActionParameter {
+                label,
+                name,
+                required: parameter.required,
+            }
+        })
+        .collect()
+}
+
+pub fn render_action_links<T>(links: &Option<ActionLinks>, data: &T) -> Option<ActionLinks>
+where
+    T: Serialize,
+{
+    match links {
+        Some(ActionLinks { actions }) => Some(ActionLinks {
+            actions: actions
+                .iter()
+                .map(|link| {
+                    let label = render_source(&link.label, &data);
+                    let href = render_source(&link.href, &data);
+
+                    LinkedAction {
+                        label,
+                        href,
+                        parameters: render_parameters(&link.parameters, &data),
+                    }
+                })
+                .collect(),
+        }),
+        _ => None,
+    }
+}
+
+pub fn render_metadata<T>(
+    metadata: &ActionMetadata,
+    data: &T,
+    disabled: bool,
+    error: Option<ActionError>,
+) -> ActionMetadata
+where
+    T: Serialize,
+{
+    let title = render_source(&metadata.title, &data);
+    let description = render_source(&metadata.description, &data);
+    let label = render_source(&metadata.label, &data);
+    let icon = render_source(&metadata.icon, &data);
+    let links = render_action_links(&metadata.links, &data);
+
+    ActionMetadata {
+        title,
+        icon,
+        description,
+        label,
+        links,
+        disabled,
+        error,
+    }
 }
