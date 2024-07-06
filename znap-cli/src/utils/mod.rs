@@ -28,7 +28,7 @@ pub fn get_cwd() -> PathBuf {
 pub fn get_config() -> Config {
     let cwd = get_cwd();
     let znap_file_path = cwd.join("Znap.toml");
-    let znap_file = read_to_string(znap_file_path).expect("Should be able to read Znap.toml file");
+    let znap_file = read_to_string(znap_file_path).expect("Should be able to read Znap.toml file. Make sure you are in a Znap workspace.");
     let config: Config =
         toml::from_str(&znap_file).expect("Znap.toml file should have the proper format");
 
