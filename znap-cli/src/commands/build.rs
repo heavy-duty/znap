@@ -1,8 +1,9 @@
-use crate::utils::get_collections;
+use crate::utils::{get_collections, get_config};
 use std::process::Stdio;
 
 pub fn run() {
-    let collections = get_collections();
+    let config = get_config();
+    let collections = get_collections(&config);
 
     for collection in collections.iter() {
         let maybe_exit = std::process::Command::new("cargo")
