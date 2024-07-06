@@ -1,33 +1,22 @@
-use anyhow::anyhow;
-use std::process::Stdio;
+use crate::utils::{
+    generate_server_files, get_config, run_test_suite, start_server, wait_for_server,
+};
 
-pub fn run() {
-    let mut serve_handle = std::process::Command::new("znap")
-        .arg("serve")
-        .stdout(Stdio::inherit())
-        .stderr(Stdio::inherit())
-        .spawn()
-        .map_err(|e| anyhow!("Failed to spawn `znap serve`: {e}"))
-        .unwrap();
+pub fn run(address: &str, port: &u16, protocol: &str) {
+    let config = get_config();
 
-    std::thread::sleep(std::time::Duration::from_millis(5000));
+    // Generate all server
+    generate_server_files(&config, address, port, protocol);
 
-    std::process::Command::new("npm")
-        .arg("run")
-        .arg("test")
-        .stdout(Stdio::inherit())
-        .stderr(Stdio::inherit())
-        .output()
-        .map_err(anyhow::Error::from)
-        .unwrap();
+    // Start server in background
+    let mut start_server_process = start_server(&config);
 
-    serve_handle.kill().unwrap();
+    // While true with a sleep until server is online
+    wait_for_server(address, port, protocol);
 
-    std::process::Command::new("znap")
-        .arg("clean")
-        .stdout(Stdio::inherit())
-        .stderr(Stdio::inherit())
-        .output()
-        .map_err(anyhow::Error::from)
-        .unwrap();
+    // Run tests suite
+    run_test_suite();
+
+    // Kill the server process.
+    start_server_process.kill().unwrap();
 }

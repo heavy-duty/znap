@@ -13,17 +13,29 @@ pub struct Opts {
 
 #[derive(Debug, Parser)]
 pub enum Command {
-    /// Builds all collections from the workspace
-    Build,
     /// Serves all collections from the workspace
     Serve {
         #[clap(short, long, default_value = "127.0.0.1")]
         address: String,
         #[clap(short, long, default_value = "3000")]
         port: u16,
+        #[clap(long, default_value = "http")]
+        protocol: String,
     },
     /// Runs the test suite for the workspace
-    Test,
+    Test {
+        #[clap(short, long, default_value = "127.0.0.1")]
+        address: String,
+        #[clap(short, long, default_value = "3000")]
+        port: u16,
+        #[clap(long, default_value = "http")]
+        protocol: String,
+    },
+    /// Deploys a workspace using shuttle
+    Deploy {
+        /// The name of the project in shuttle
+        name: String,
+    },
     /// Cleans all the temp files
     Clean,
     /// Initializes a new workspace
@@ -45,16 +57,23 @@ pub enum Command {
 
 fn process_command(opts: Opts) -> Result<()> {
     match &opts.command {
-        Command::Build => Ok(commands::build::run()),
-        Command::Serve { address, port } => Ok(commands::serve::run(&address, *port)),
-        Command::Test => Ok(commands::test::run()),
+        Command::Serve {
+            address,
+            port,
+            protocol,
+        } => Ok(commands::serve::run(&address, port, protocol)),
+        Command::Test {
+            address,
+            port,
+            protocol,
+        } => Ok(commands::test::run(&address, port, protocol)),
         Command::Clean => Ok(commands::clean::run()),
         Command::Init { name, dry_run } => Ok(commands::init::run(&name, &dry_run)),
         Command::New { name, dry_run } => Ok(commands::new::run(&name, &dry_run)),
+        Command::Deploy { name } => Ok(commands::deploy::run(name)),
     }
 }
 
 pub fn entry(opts: Opts) -> Result<()> {
     process_command(opts)
 }
-

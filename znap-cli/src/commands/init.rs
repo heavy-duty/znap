@@ -49,7 +49,7 @@ pub fn run(name: &String, dry_run: &bool) {
         write_file(
             workspace_dir.join("Cargo.toml").as_path(),
             &String::from(
-                "[workspace]\nmembers = [\"collections/*\", \".znap/*\"]\nresolver = \"2\"",
+                "[workspace]\nmembers = [\"collections/*\", \".znap/*\"]\nresolver = \"2\"\n\n[patch.crates-io]\ncurve25519-dalek = {{ git = \"https://github.com/dalek-cryptography/curve25519-dalek\", rev = \"8274d5cbb6fc3f38cdc742b4798173895cd2a290\" }}",
             ),
         );
 
