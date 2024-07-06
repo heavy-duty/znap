@@ -4,7 +4,7 @@ use crate::template::{
 use serde::{Deserialize, Serialize};
 use std::fs::create_dir;
 use std::io::Write;
-use std::process::Stdio;
+use std::process::{Child, Stdio};
 use std::{
     fs::{read_to_string, File},
     path::{Path, PathBuf},
@@ -28,7 +28,8 @@ pub fn get_cwd() -> PathBuf {
 pub fn get_config() -> Config {
     let cwd = get_cwd();
     let znap_file_path = cwd.join("Znap.toml");
-    let znap_file = read_to_string(znap_file_path).expect("Should be able to read Znap.toml file. Make sure you are in a Znap workspace.");
+    let znap_file = read_to_string(znap_file_path)
+        .expect("Should be able to read Znap.toml file. Make sure you are in a Znap workspace.");
     let config: Config =
         toml::from_str(&znap_file).expect("Znap.toml file should have the proper format");
 
@@ -98,17 +99,42 @@ pub fn generate_server_files(config: &Config, address: &str, port: u16) {
     write_file(&znap_server_toml_path, &server_toml_template(&collections));
 }
 
-pub fn start_server(config: &Config) {
-    let exit = std::process::Command::new("cargo")
+pub fn start_server_blocking(config: &Config) {
+    let start_server_process = start_server(&config);
+    let exit = start_server_process
+        .wait_with_output()
+        .expect("Should be able to start server");
+
+    if !exit.status.success() {
+        std::process::exit(exit.status.code().unwrap_or(1));
+    }
+}
+
+pub fn start_server(config: &Config) -> Child {
+    std::process::Command::new("cargo")
         .env("IDENTITY_KEYPAIR_PATH", get_identity(config))
         .arg("run")
         .arg("--manifest-path")
         .arg(get_cwd().join(".znap/server/Cargo.toml"))
         .stdout(Stdio::inherit())
         .stderr(Stdio::inherit())
-        .output()
+        .spawn()
         .map_err(|e| anyhow::format_err!("{}", e.to_string()))
-        .expect("Should be able to start server");
+        .expect("Should be able to start server")
+}
+
+pub fn run_test_suite() {
+    let test_suite_process = std::process::Command::new("npm")
+        .arg("run")
+        .arg("test")
+        .stdout(Stdio::inherit())
+        .stderr(Stdio::inherit())
+        .spawn()
+        .map_err(anyhow::Error::from)
+        .expect("Should be able to run tests");
+    let exit = test_suite_process
+        .wait_with_output()
+        .expect("Should wait until the tests are over");
 
     if !exit.status.success() {
         std::process::exit(exit.status.code().unwrap_or(1));

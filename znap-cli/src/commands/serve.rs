@@ -1,4 +1,4 @@
-use crate::utils::{generate_server_files, get_config, start_server};
+use crate::utils::{generate_server_files, get_config, start_server_blocking};
 
 pub fn run(address: &str, port: u16) {
     let config = get_config();
@@ -7,5 +7,5 @@ pub fn run(address: &str, port: u16) {
     generate_server_files(&config, address, port);
 
     // Run the server
-    start_server(&config);
+    start_server_blocking(&config);
 }
