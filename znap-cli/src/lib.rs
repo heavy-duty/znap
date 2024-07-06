@@ -13,8 +13,6 @@ pub struct Opts {
 
 #[derive(Debug, Parser)]
 pub enum Command {
-    /// Builds all collections from the workspace
-    Build,
     /// Serves all collections from the workspace
     Serve {
         #[clap(short, long, default_value = "127.0.0.1")]
@@ -45,7 +43,6 @@ pub enum Command {
 
 fn process_command(opts: Opts) -> Result<()> {
     match &opts.command {
-        Command::Build => Ok(commands::build::run()),
         Command::Serve { address, port } => Ok(commands::serve::run(&address, *port)),
         Command::Test => Ok(commands::test::run()),
         Command::Clean => Ok(commands::clean::run()),
