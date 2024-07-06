@@ -31,6 +31,11 @@ pub enum Command {
         #[clap(long, default_value = "http")]
         protocol: String,
     },
+    /// Deploys a workspace using shuttle
+    Deploy {
+        /// The name of the project in shuttle
+        name: String,
+    },
     /// Cleans all the temp files
     Clean,
     /// Initializes a new workspace
@@ -52,15 +57,23 @@ pub enum Command {
 
 fn process_command(opts: Opts) -> Result<()> {
     match &opts.command {
-        Command::Serve { address, port, protocol } => Ok(commands::serve::run(&address, port, protocol)),
-        Command::Test { address, port, protocol } => Ok(commands::test::run(&address, port, protocol)),
+        Command::Serve {
+            address,
+            port,
+            protocol,
+        } => Ok(commands::serve::run(&address, port, protocol)),
+        Command::Test {
+            address,
+            port,
+            protocol,
+        } => Ok(commands::test::run(&address, port, protocol)),
         Command::Clean => Ok(commands::clean::run()),
         Command::Init { name, dry_run } => Ok(commands::init::run(&name, &dry_run)),
         Command::New { name, dry_run } => Ok(commands::new::run(&name, &dry_run)),
+        Command::Deploy { name } => Ok(commands::deploy::run(name)),
     }
 }
 
 pub fn entry(opts: Opts) -> Result<()> {
     process_command(opts)
 }
-

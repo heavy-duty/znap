@@ -1,4 +1,5 @@
 use crate::template::{
+    deploy_api::template as deploy_api_template, deploy_toml::template as deploy_toml_template,
     server_api::template as server_api_template, server_toml::template as server_toml_template,
 };
 use serde::{Deserialize, Serialize};
@@ -100,6 +101,43 @@ pub fn generate_server_files(config: &Config, address: &str, port: &u16, protoco
     write_file(&znap_server_toml_path, &server_toml_template(&collections));
 }
 
+pub fn generate_deploy_files(config: &Config) {
+    // Get all the collections in the workspace
+    let collections = get_collections(&config);
+
+    // Create a deploy directories if they dont exists.
+    let cwd = get_cwd();
+
+    let znap_path = cwd.join(".znap");
+
+    if !znap_path.exists() {
+        create_dir(&znap_path).expect("Could not create .znap folder");
+    }
+
+    let znap_deploy_path = znap_path.join("deploy");
+
+    if !znap_deploy_path.exists() {
+        create_dir(&znap_deploy_path).expect("Could not create .znap/deploy folder");
+    }
+
+    let znap_deploy_src_path = znap_deploy_path.join("src");
+
+    if !znap_deploy_src_path.exists() {
+        create_dir(&znap_deploy_src_path).expect("Could not create .znap/deploy/src folder");
+    }
+
+    // Generate api file
+    let znap_deploy_src_api_path = znap_deploy_src_path.join("main.rs");
+    write_file(
+        &znap_deploy_src_api_path,
+        &deploy_api_template(&collections),
+    );
+
+    // Generate cargo file
+    let znap_deploy_toml_path = znap_deploy_path.join("Cargo.toml");
+    write_file(&znap_deploy_toml_path, &deploy_toml_template(&collections));
+}
+
 pub fn start_server_blocking(config: &Config) {
     let start_server_process = start_server(&config);
     let exit = start_server_process
@@ -151,4 +189,20 @@ pub fn wait_for_server(address: &str, port: &u16, protocol: &str) {
 
         std::thread::sleep(std::time::Duration::from_millis(1000));
     }
+}
+
+pub fn deploy_to_shuttle(name: &String) {
+    std::process::Command::new("cargo")
+        .arg("shuttle")
+        .arg("deploy")
+        .arg("--allow-dirty")
+        .arg("--name")
+        .arg(name)
+        .stdout(Stdio::inherit())
+        .stderr(Stdio::inherit())
+        .spawn()
+        .map_err(anyhow::Error::from)
+        .expect("Make sure you are logged into shuttle.")
+        .wait_with_output()
+        .expect("Should wait until the deploy is over");
 }
