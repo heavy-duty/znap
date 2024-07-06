@@ -365,3 +365,8 @@ where
         error,
     }
 }
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct Status {
+    pub active: bool,
+}

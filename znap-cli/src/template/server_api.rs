@@ -2,7 +2,7 @@ use heck::ToSnekCase;
 
 use crate::utils::Collection;
 
-pub fn template(collections: &[Collection], address: &str, port: u16) -> String {
+pub fn template(collections: &[Collection], address: &str, port: &u16, protocol: &str) -> String {
     let collection_imports: Vec<String> = collections
         .iter()
         .map(|collection| {
@@ -51,7 +51,7 @@ async fn main() -> Result<(), axum::Error> {{
         "{{}} Znap Server {{}} \n\n Service is running at {{}}",
         Emoji("✨", ""),
         Emoji("✨", ""),
-        "http://{address}:{port}".cyan()
+        "{protocol}://{address}:{port}".cyan()
     );
 
     {}

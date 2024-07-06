@@ -23,3 +23,7 @@ anyhow = "1.0.86"
 clap = { version = "4.5.7", features = ["derive"] }
 toml = "0.8.14"
 shellexpand = "3.1.0"
+reqwest = { version = "0.12.5", features = ["blocking", "json"] }
+
+# local
+znap = { path = "../znap", version = "0.1.21" }

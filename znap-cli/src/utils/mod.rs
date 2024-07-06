@@ -9,6 +9,7 @@ use std::{
     fs::{read_to_string, File},
     path::{Path, PathBuf},
 };
+use znap::Status;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Config {
@@ -62,7 +63,7 @@ pub fn write_file(path: &Path, content: &String) {
         .expect("Should be able to write file");
 }
 
-pub fn generate_server_files(config: &Config, address: &str, port: u16) {
+pub fn generate_server_files(config: &Config, address: &str, port: &u16, protocol: &str) {
     // Get all the collections in the workspace
     let collections = get_collections(&config);
 
@@ -91,7 +92,7 @@ pub fn generate_server_files(config: &Config, address: &str, port: u16) {
     let znap_server_src_api_path = znap_server_src_path.join("main.rs");
     write_file(
         &znap_server_src_api_path,
-        &server_api_template(&collections, address, port),
+        &server_api_template(&collections, address, port, protocol),
     );
 
     // Generate cargo file
@@ -124,19 +125,30 @@ pub fn start_server(config: &Config) -> Child {
 }
 
 pub fn run_test_suite() {
-    let test_suite_process = std::process::Command::new("npm")
+    std::process::Command::new("npm")
         .arg("run")
         .arg("test")
         .stdout(Stdio::inherit())
         .stderr(Stdio::inherit())
         .spawn()
         .map_err(anyhow::Error::from)
-        .expect("Should be able to run tests");
-    let exit = test_suite_process
+        .expect("Should be able to run tests")
         .wait_with_output()
         .expect("Should wait until the tests are over");
+}
 
-    if !exit.status.success() {
-        std::process::exit(exit.status.code().unwrap_or(1));
+pub fn wait_for_server(address: &str, port: &u16, protocol: &str) {
+    let url = format!("{protocol}://{address}:{port}/status");
+
+    loop {
+        if let Ok(response) = reqwest::blocking::get(&url) {
+            if let Ok(status) = response.json::<Status>() {
+                if status.active {
+                    break;
+                }
+            }
+        }
+
+        std::thread::sleep(std::time::Duration::from_millis(1000));
     }
 }

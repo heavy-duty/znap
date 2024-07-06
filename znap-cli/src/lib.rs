@@ -19,6 +19,8 @@ pub enum Command {
         address: String,
         #[clap(short, long, default_value = "3000")]
         port: u16,
+        #[clap(long, default_value = "http")]
+        protocol: String,
     },
     /// Runs the test suite for the workspace
     Test {
@@ -26,6 +28,8 @@ pub enum Command {
         address: String,
         #[clap(short, long, default_value = "3000")]
         port: u16,
+        #[clap(long, default_value = "http")]
+        protocol: String,
     },
     /// Cleans all the temp files
     Clean,
@@ -48,8 +52,8 @@ pub enum Command {
 
 fn process_command(opts: Opts) -> Result<()> {
     match &opts.command {
-        Command::Serve { address, port } => Ok(commands::serve::run(&address, *port)),
-        Command::Test { address, port } => Ok(commands::test::run(&address, *port)),
+        Command::Serve { address, port, protocol } => Ok(commands::serve::run(&address, port, protocol)),
+        Command::Test { address, port, protocol } => Ok(commands::test::run(&address, port, protocol)),
         Command::Clean => Ok(commands::clean::run()),
         Command::Init { name, dry_run } => Ok(commands::init::run(&name, &dry_run)),
         Command::New { name, dry_run } => Ok(commands::new::run(&name, &dry_run)),

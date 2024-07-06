@@ -24,6 +24,10 @@ pub fn generate(collection_mod: &CollectionMod) -> TokenStream {
         .collect();
 
     quote! {
+        pub async fn handle_status_request() -> znap::Result<axum::Json<znap::Status>> {
+            Ok(axum::Json(znap::Status { active: true }))
+        }
+
         pub fn collection_router() -> axum::Router {
             let cors = tower_http::cors::CorsLayer::new()
                 .allow_methods([axum::http::Method::GET, axum::http::Method::POST])
@@ -37,6 +41,7 @@ pub fn generate(collection_mod: &CollectionMod) -> TokenStream {
 
             axum::Router::new()
                 #(#routes)*
+                .route("/status", axum::routing::get(handle_status_request))
                 .route_service("/actions.json", tower_http::services::ServeFile::new("actions.json"))
                 .layer(cors)
         }
