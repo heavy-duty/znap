@@ -17,7 +17,7 @@ serde = { version = "1.0.203", features = ["derive"] }
 tower-http = { version = "0.5.2", features = ["cors", "fs"] }
 
 # solana
-solana-sdk = "1.18.17"
+solana-sdk = "2.0.1"
 
 # macros
 proc-macro2 = "1.0"
