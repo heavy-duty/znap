@@ -2,7 +2,7 @@ use crate::utils::{
     build_for_release, generate_collection_executable_files, get_collections, get_config,
 };
 
-pub fn run(name: &String, address: &String, port: &u16, protocol: &String) {
+pub fn run(name: &String) {
     let config = get_config();
 
     let collections = get_collections(&config);
@@ -14,7 +14,7 @@ pub fn run(name: &String, address: &String, port: &u16, protocol: &String) {
         panic!("Collection not found.")
     }
 
-    generate_collection_executable_files(name, address, port, protocol);
+    generate_collection_executable_files(name);
 
     build_for_release(name);
 }

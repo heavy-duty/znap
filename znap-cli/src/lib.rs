@@ -17,15 +17,6 @@ pub enum Command {
     Build {
         /// The name of the collection
         name: String,
-        /// Address that will be used for the server once running.
-        #[clap(short, long, default_value = "127.0.0.1")]
-        address: String,
-        /// Port that wuill be used for the server once running.
-        #[clap(short, long, default_value = "3000")]
-        port: u16,
-        /// Protocol that wuill be used for the server once running.
-        #[clap(long, default_value = "http")]
-        protocol: String,
     },
     /// Serves all collections from the workspace
     Serve {
@@ -83,12 +74,7 @@ pub enum Command {
 
 fn process_command(opts: Opts) -> Result<()> {
     match &opts.command {
-        Command::Build {
-            name,
-            address,
-            port,
-            protocol,
-        } => Ok(commands::build::run(name, address, port, protocol)),
+        Command::Build { name } => Ok(commands::build::run(name)),
         Command::Serve {
             name,
             address,

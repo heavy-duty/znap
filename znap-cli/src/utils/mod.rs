@@ -65,8 +65,14 @@ pub fn write_file(path: &Path, content: &String) {
         .expect("Should be able to write file");
 }
 
-pub fn start_server_blocking(name: &String, config: &Config) {
-    let start_server_process = start_server(name, config);
+pub fn start_server_blocking(
+    name: &String,
+    config: &Config,
+    address: &String,
+    port: &u16,
+    protocol: &String,
+) {
+    let start_server_process = start_server(name, config, address, port, protocol);
     let exit = start_server_process
         .wait_with_output()
         .expect("Should be able to start server");
@@ -76,9 +82,18 @@ pub fn start_server_blocking(name: &String, config: &Config) {
     }
 }
 
-pub fn start_server(name: &String, config: &Config) -> Child {
+pub fn start_server(
+    name: &String,
+    config: &Config,
+    address: &String,
+    port: &u16,
+    protocol: &String,
+) -> Child {
     std::process::Command::new("cargo")
         .env("IDENTITY_KEYPAIR_PATH", get_identity(config))
+        .env("COLLECTION_ADDRESS", address)
+        .env("COLLECTION_PORT", port.to_string())
+        .env("COLLECTION_PROTOCOL", protocol)
         .arg("run")
         .arg("--manifest-path")
         .arg(get_cwd().join(&format!(".znap/collections/{name}/Cargo.toml")))
@@ -104,7 +119,7 @@ pub fn run_test_suite() {
         .expect("Should wait until the tests are over");
 }
 
-pub fn wait_for_server(address: &str, port: &u16, protocol: &str) {
+pub fn wait_for_server(address: &String, port: &u16, protocol: &String) {
     let url = format!("{protocol}://{address}:{port}/status");
 
     loop {
@@ -151,12 +166,7 @@ pub fn copy_recursively(source: impl AsRef<Path>, destination: impl AsRef<Path>)
     }
 }
 
-pub fn generate_collection_executable_files(
-    name: &String,
-    address: &String,
-    port: &u16,
-    protocol: &String,
-) {
+pub fn generate_collection_executable_files(name: &String) {
     let cwd = get_cwd();
 
     let znap_path = cwd.join(".znap");
@@ -208,7 +218,7 @@ pub fn generate_collection_executable_files(
     let znap_collection_src_bin_serve_path = znap_collection_src_bin_path.join("serve.rs");
     write_file(
         &znap_collection_src_bin_serve_path,
-        &template::collection_serve_binary::template(name, address, port, protocol),
+        &template::collection_serve_binary::template(name),
     );
 
     let znap_collection_src_bin_deploy_path = znap_collection_src_bin_path.join("deploy.rs");
