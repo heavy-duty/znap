@@ -9,6 +9,6 @@ pub fn template(name: &String) -> String {
         axum = \"0.7.5\"\n\
         serde = \"1.0.203\"\n\
         solana-sdk = \"2.0.1\"\n\
-        znap = \"0.1.25\"\n\
+        znap = \"0.1.26\"\n\
     ", name.to_kebab_case())
 }
