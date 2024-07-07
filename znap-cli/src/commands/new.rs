@@ -1,8 +1,5 @@
 use crate::{
-    template::{
-        collection_body::template as collection_body_template,
-        collection_toml::template as collection_toml_template,
-    },
+    template,
     utils::{write_file, Config},
 };
 use colored::Colorize;
@@ -31,7 +28,7 @@ pub fn run(name: &String, dry_run: &bool) {
         // Create a Cargo.toml for the collection.
         write_file(
             collection_dir.join("Cargo.toml").as_path(),
-            &collection_toml_template(&name),
+            &template::new_collection_toml::template(&name),
         );
 
         // Create a src folder.
@@ -40,7 +37,7 @@ pub fn run(name: &String, dry_run: &bool) {
         // Create a lib.rs in the src folder.
         write_file(
             collection_src_dir.join("lib.rs").as_path(),
-            &collection_body_template(&name),
+            &template::new_collection_body::template(&name),
         );
 
         // Add to collections list in Znap.toml.

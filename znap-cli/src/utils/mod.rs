@@ -187,13 +187,13 @@ pub fn generate_collection_executable_files(
     let znap_collection_src_bin_serve_path = znap_collection_src_bin_path.join("serve.rs");
     write_file(
         &znap_collection_src_bin_serve_path,
-        &template::serve_binary::template(name, address, port, protocol),
+        &template::collection_serve_binary::template(name, address, port, protocol),
     );
 
     let znap_collection_src_bin_deploy_path = znap_collection_src_bin_path.join("deploy.rs");
     write_file(
         &znap_collection_src_bin_deploy_path,
-        &template::deploy_binary::template(name),
+        &template::collection_deploy_binary::template(name),
     );
 
     // Generate a toml with collection and extras for serve/deploy
