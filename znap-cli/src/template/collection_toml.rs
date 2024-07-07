@@ -8,7 +8,7 @@ pub fn template(name: &String) -> String {
         \n[dependencies]\n\
         axum = \"0.7.5\"\n\
         serde = \"1.0.203\"\n\
-        solana-sdk = \"2.0.1\"\n\
+        solana-sdk = \"1.18.17\"\n\
         znap = \"0.1.24\"\n\
     ", name.to_kebab_case())
 }
