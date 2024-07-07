@@ -27,6 +27,3 @@ reqwest = { version = "0.12.5", features = ["blocking", "json"] }
 
 # local
 znap = { path = "../znap", version = "0.1.22" }
-
-[patch.crates-io]
-curve25519-dalek = { git = "https://github.com/dalek-cryptography/curve25519-dalek", rev = "8274d5cbb6fc3f38cdc742b4798173895cd2a290" }
