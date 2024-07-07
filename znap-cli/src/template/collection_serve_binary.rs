@@ -6,6 +6,7 @@ pub fn template(name: &String) -> String {
 use tokio::net::TcpListener;
 use colored::Colorize;
 use console::Emoji;
+use std::env;
 use {}::{{collection_router, display_collection_routes}};
 
 #[tokio::main]
@@ -19,7 +20,7 @@ async fn main() -> Result<(), axum::Error> {{
         "{{}} Znap Server {{}} \n\n Service is running at {{}}",
         Emoji("✨", ""),
         Emoji("✨", ""),
-        "{{protocol}}://{{address}}:{{port}}".cyan()
+        format!("{{protocol}}://{{address}}:{{port}}").cyan()
     );
 
     display_collection_routes();
@@ -30,7 +31,7 @@ async fn main() -> Result<(), axum::Error> {{
         "Press Ctrl+C to stop the server".bright_red().italic(), 
     );
     
-    let listener = TcpListener::bind("{{address}}:{{port}}").await.unwrap();
+    let listener = TcpListener::bind(format!("{{address}}:{{port}}")).await.unwrap();
     axum::serve(listener, collection_router().into_make_service())
         .await
         .unwrap();
