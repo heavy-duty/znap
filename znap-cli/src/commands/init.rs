@@ -72,7 +72,7 @@ pub fn run(name: &String, dry_run: &bool) {
         // Create a .gitignore file.
         write_file(
             workspace_dir.join(".gitignore").as_path(),
-            &String::from("/target\n.znap/.tmp*\nnode_modules"),
+            &String::from("/target\n.znap\nnode_modules"),
         );
 
         // Create a package.json file.
