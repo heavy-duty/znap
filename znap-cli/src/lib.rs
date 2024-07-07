@@ -29,6 +29,8 @@ pub enum Command {
     },
     /// Serves all collections from the workspace
     Serve {
+        /// The name of the collection
+        name: String,
         /// Address that will be used for the server once running.
         #[clap(short, long, default_value = "127.0.0.1")]
         address: String,
@@ -41,6 +43,8 @@ pub enum Command {
     },
     /// Runs the test suite for the workspace
     Test {
+        /// The name of the collection
+        name: String,
         /// Address that will be used for the server once running.
         #[clap(short, long, default_value = "127.0.0.1")]
         address: String,
@@ -53,8 +57,10 @@ pub enum Command {
     },
     /// Deploys a workspace using shuttle
     Deploy {
-        /// The name of the project in shuttle
+        /// The name of the collection
         name: String,
+        /// The name of the project in shuttle
+        project: String,
     },
     /// Cleans all the temp files
     Clean,
@@ -82,21 +88,23 @@ fn process_command(opts: Opts) -> Result<()> {
             address,
             port,
             protocol,
-        } => Ok(commands::build::run(&name, &address, port, protocol)),
+        } => Ok(commands::build::run(name, address, port, protocol)),
         Command::Serve {
+            name,
             address,
             port,
             protocol,
-        } => Ok(commands::serve::run(&address, port, protocol)),
+        } => Ok(commands::serve::run(name, address, port, protocol)),
         Command::Test {
+            name,
             address,
             port,
             protocol,
-        } => Ok(commands::test::run(&address, port, protocol)),
+        } => Ok(commands::test::run(name, address, port, protocol)),
         Command::Clean => Ok(commands::clean::run()),
-        Command::Init { name, dry_run } => Ok(commands::init::run(&name, &dry_run)),
-        Command::New { name, dry_run } => Ok(commands::new::run(&name, &dry_run)),
-        Command::Deploy { name } => Ok(commands::deploy::run(name)),
+        Command::Init { name, dry_run } => Ok(commands::init::run(name, dry_run)),
+        Command::New { name, dry_run } => Ok(commands::new::run(name, dry_run)),
+        Command::Deploy { name, project } => Ok(commands::deploy::run(name, project)),
     }
 }
 

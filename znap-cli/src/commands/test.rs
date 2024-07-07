@@ -1,12 +1,22 @@
 use crate::utils::{
-    generate_server_files, get_config, run_test_suite, start_server, wait_for_server,
+    generate_collection_executable_files, get_collections, get_config, run_test_suite,
+    start_server, wait_for_server,
 };
 
-pub fn run(address: &String, port: &u16, protocol: &String) {
+pub fn run(name: &String, address: &String, port: &u16, protocol: &String) {
     let config = get_config();
 
+    let collections = get_collections(&config);
+
+    if collections
+        .iter()
+        .all(|collection| &collection.name != name)
+    {
+        panic!("Collection not found.")
+    }
+
     // Generate all server
-    generate_server_files(&config, address, port, protocol);
+    generate_collection_executable_files(name, address, port, protocol);
 
     // Start server in background
     let mut start_server_process = start_server(&config);

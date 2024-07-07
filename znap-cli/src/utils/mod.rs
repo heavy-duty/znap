@@ -1,8 +1,4 @@
 use crate::template;
-use crate::template::{
-    deploy_api::template as deploy_api_template, deploy_toml::template as deploy_toml_template,
-    server_api::template as server_api_template, server_toml::template as server_toml_template,
-};
 use serde::{Deserialize, Serialize};
 use std::fs::{copy, create_dir, create_dir_all, read_dir, remove_dir_all};
 use std::io::Write;
@@ -65,80 +61,6 @@ pub fn write_file(path: &Path, content: &String) {
         .expect("Should be able to write file");
 }
 
-pub fn generate_server_files(config: &Config, address: &str, port: &u16, protocol: &str) {
-    // Get all the collections in the workspace
-    let collections = get_collections(&config);
-
-    // Create a server directories if they dont exists.
-    let cwd = get_cwd();
-
-    let znap_path = cwd.join(".znap");
-
-    if !znap_path.exists() {
-        create_dir(&znap_path).expect("Could not create .znap folder");
-    }
-
-    let znap_server_path = znap_path.join("server");
-
-    if !znap_server_path.exists() {
-        create_dir(&znap_server_path).expect("Could not create .znap/server folder");
-    }
-
-    let znap_server_src_path = znap_server_path.join("src");
-
-    if !znap_server_src_path.exists() {
-        create_dir(&znap_server_src_path).expect("Could not create .znap/server/src folder");
-    }
-
-    // Generate api file
-    let znap_server_src_api_path = znap_server_src_path.join("main.rs");
-    write_file(
-        &znap_server_src_api_path,
-        &server_api_template(&collections, address, port, protocol),
-    );
-
-    // Generate cargo file
-    let znap_server_toml_path = znap_server_path.join("Cargo.toml");
-    write_file(&znap_server_toml_path, &server_toml_template(&collections));
-}
-
-pub fn generate_deploy_files(config: &Config) {
-    // Get all the collections in the workspace
-    let collections = get_collections(&config);
-
-    // Create a deploy directories if they dont exists.
-    let cwd = get_cwd();
-
-    let znap_path = cwd.join(".znap");
-
-    if !znap_path.exists() {
-        create_dir(&znap_path).expect("Could not create .znap folder");
-    }
-
-    let znap_deploy_path = znap_path.join("deploy");
-
-    if !znap_deploy_path.exists() {
-        create_dir(&znap_deploy_path).expect("Could not create .znap/deploy folder");
-    }
-
-    let znap_deploy_src_path = znap_deploy_path.join("src");
-
-    if !znap_deploy_src_path.exists() {
-        create_dir(&znap_deploy_src_path).expect("Could not create .znap/deploy/src folder");
-    }
-
-    // Generate api file
-    let znap_deploy_src_api_path = znap_deploy_src_path.join("main.rs");
-    write_file(
-        &znap_deploy_src_api_path,
-        &deploy_api_template(&collections),
-    );
-
-    // Generate cargo file
-    let znap_deploy_toml_path = znap_deploy_path.join("Cargo.toml");
-    write_file(&znap_deploy_toml_path, &deploy_toml_template(&collections));
-}
-
 pub fn start_server_blocking(config: &Config) {
     let start_server_process = start_server(&config);
     let exit = start_server_process
@@ -192,13 +114,15 @@ pub fn wait_for_server(address: &str, port: &u16, protocol: &str) {
     }
 }
 
-pub fn deploy_to_shuttle(name: &String) {
+pub fn deploy_to_shuttle(name: &String, project: &String) {
     std::process::Command::new("cargo")
         .arg("shuttle")
         .arg("deploy")
         .arg("--allow-dirty")
         .arg("--name")
-        .arg(name)
+        .arg(project)
+        .arg("--working-directory")
+        .arg(get_cwd().join(&format!(".znap/{name}")))
         .stdout(Stdio::inherit())
         .stderr(Stdio::inherit())
         .spawn()
@@ -269,7 +193,7 @@ pub fn generate_collection_executable_files(
     let znap_collection_src_bin_deploy_path = znap_collection_src_bin_path.join("deploy.rs");
     write_file(
         &znap_collection_src_bin_deploy_path,
-        &template::deploy_binary::template(),
+        &template::deploy_binary::template(name),
     );
 
     // Generate a toml with collection and extras for serve/deploy
