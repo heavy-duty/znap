@@ -7,7 +7,11 @@ use std::{
     fs::{read_to_string, File},
     path::{Path, PathBuf},
 };
-use znap::Status;
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct Status {
+    pub active: bool,
+}
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Config {
