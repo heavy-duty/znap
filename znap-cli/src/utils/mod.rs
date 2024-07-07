@@ -61,8 +61,8 @@ pub fn write_file(path: &Path, content: &String) {
         .expect("Should be able to write file");
 }
 
-pub fn start_server_blocking(config: &Config) {
-    let start_server_process = start_server(&config);
+pub fn start_server_blocking(name: &String, config: &Config) {
+    let start_server_process = start_server(name, config);
     let exit = start_server_process
         .wait_with_output()
         .expect("Should be able to start server");
@@ -72,12 +72,14 @@ pub fn start_server_blocking(config: &Config) {
     }
 }
 
-pub fn start_server(config: &Config) -> Child {
+pub fn start_server(name: &String, config: &Config) -> Child {
     std::process::Command::new("cargo")
         .env("IDENTITY_KEYPAIR_PATH", get_identity(config))
         .arg("run")
         .arg("--manifest-path")
-        .arg(get_cwd().join(".znap/server/Cargo.toml"))
+        .arg(get_cwd().join(&format!(".znap/collections/{name}/Cargo.toml")))
+        .arg("--bin")
+        .arg("serve")
         .stdout(Stdio::inherit())
         .stderr(Stdio::inherit())
         .spawn()
@@ -122,7 +124,7 @@ pub fn deploy_to_shuttle(name: &String, project: &String) {
         .arg("--name")
         .arg(project)
         .arg("--working-directory")
-        .arg(get_cwd().join(&format!(".znap/{name}")))
+        .arg(get_cwd().join(&format!(".znap/collections/{name}")))
         .stdout(Stdio::inherit())
         .stderr(Stdio::inherit())
         .spawn()
@@ -159,7 +161,22 @@ pub fn generate_collection_executable_files(
         create_dir(&znap_path).expect("Could not create .znap folder");
     }
 
-    let znap_collection_path = znap_path.join(name);
+    let znap_toml_path = znap_path.join("Cargo.toml");
+
+    write_file(
+        &znap_toml_path,
+        &String::from(
+            "[workspace]\nmembers = [\"collections/*\"]\nresolver = \"2\"\n\n[patch.crates-io]\ncurve25519-dalek = { git = \"https://github.com/dalek-cryptography/curve25519-dalek\", rev = \"8274d5cbb6fc3f38cdc742b4798173895cd2a290\" }",
+        ),
+    );
+
+    let znap_collections_path = znap_path.join("collections");
+
+    if !znap_collections_path.exists() {
+        create_dir(&znap_collections_path).expect("Could not create .znap/collections folder");
+    }
+
+    let znap_collection_path = znap_collections_path.join(name);
 
     if znap_collection_path.exists() {
         remove_dir_all(&znap_collection_path)
@@ -213,7 +230,7 @@ pub fn build_for_release(name: &String) {
     std::process::Command::new("cargo")
         .arg("build")
         .arg("--manifest-path")
-        .arg(get_cwd().join(&format!(".znap/{name}/Cargo.toml")))
+        .arg(get_cwd().join(&format!(".znap/collections/{name}/Cargo.toml")))
         .arg("--release")
         .arg("--bin")
         .arg("serve")

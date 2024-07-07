@@ -18,5 +18,5 @@ pub fn run(name: &String, address: &String, port: &u16, protocol: &String) {
     generate_collection_executable_files(name, address, port, protocol);
 
     // Run the server
-    start_server_blocking(&config);
+    start_server_blocking(name, &config);
 }

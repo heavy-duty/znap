@@ -19,7 +19,7 @@ pub fn run(name: &String, address: &String, port: &u16, protocol: &String) {
     generate_collection_executable_files(name, address, port, protocol);
 
     // Start server in background
-    let mut start_server_process = start_server(&config);
+    let mut start_server_process = start_server(name, &config);
 
     // While true with a sleep until server is online
     wait_for_server(address, port, protocol);
