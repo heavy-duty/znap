@@ -9,7 +9,7 @@ shuttle-axum = "0.46.0"
 shuttle-runtime = "0.46.0"
 solana-sdk = "2.0.1"
 tokio = "1.28.2"
-znap = "0.1.28"
+znap = "0.1.29"
 serde = { version = "1.0.203", features = ["derive"] }
 tower-http = { version = "0.5.2", features = ["cors"] }
 
