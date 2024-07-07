@@ -2,7 +2,7 @@ use crate::utils::{
     generate_server_files, get_config, run_test_suite, start_server, wait_for_server,
 };
 
-pub fn run(address: &str, port: &u16, protocol: &str) {
+pub fn run(address: &String, port: &u16, protocol: &String) {
     let config = get_config();
 
     // Generate all server

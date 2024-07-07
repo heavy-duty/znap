@@ -13,21 +13,41 @@ pub struct Opts {
 
 #[derive(Debug, Parser)]
 pub enum Command {
-    /// Serves all collections from the workspace
-    Serve {
+    /// Build a collection from the workspace
+    Build {
+        /// The name of the collection
+        name: String,
+        /// Address that will be used for the server once running.
         #[clap(short, long, default_value = "127.0.0.1")]
         address: String,
+        /// Port that wuill be used for the server once running.
         #[clap(short, long, default_value = "3000")]
         port: u16,
+        /// Protocol that wuill be used for the server once running.
+        #[clap(long, default_value = "http")]
+        protocol: String,
+    },
+    /// Serves all collections from the workspace
+    Serve {
+        /// Address that will be used for the server once running.
+        #[clap(short, long, default_value = "127.0.0.1")]
+        address: String,
+        /// Port that wuill be used for the server once running.
+        #[clap(short, long, default_value = "3000")]
+        port: u16,
+        /// Protocol that wuill be used for the server once running.
         #[clap(long, default_value = "http")]
         protocol: String,
     },
     /// Runs the test suite for the workspace
     Test {
+        /// Address that will be used for the server once running.
         #[clap(short, long, default_value = "127.0.0.1")]
         address: String,
+        /// Port that wuill be used for the server once running.
         #[clap(short, long, default_value = "3000")]
         port: u16,
+        /// Protocol that wuill be used for the server once running.
         #[clap(long, default_value = "http")]
         protocol: String,
     },
@@ -57,6 +77,12 @@ pub enum Command {
 
 fn process_command(opts: Opts) -> Result<()> {
     match &opts.command {
+        Command::Build {
+            name,
+            address,
+            port,
+            protocol,
+        } => Ok(commands::build::run(&name, &address, port, protocol)),
         Command::Serve {
             address,
             port,
