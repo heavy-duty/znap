@@ -8,7 +8,7 @@ members = [
 resolver = "2"
 
 [workspace.package]
-version = "0.1.21"
+version = "0.1.25"
 
 [workspace.dependencies]
 # znap specific
@@ -17,7 +17,7 @@ serde = { version = "1.0.203", features = ["derive"] }
 tower-http = { version = "0.5.2", features = ["cors", "fs"] }
 
 # solana
-solana-sdk = "2.0.1"
+solana-sdk = "1.18.17"
 
 # macros
 proc-macro2 = "1.0"
@@ -28,6 +28,3 @@ syn = "2.0"
 heck = "0.5.0"
 colored = "2.1.0"
 console = "0.15.8"
-
-[patch.crates-io]
-curve25519-dalek = { git = "https://github.com/dalek-cryptography/curve25519-dalek", rev = "8274d5cbb6fc3f38cdc742b4798173895cd2a290" }
