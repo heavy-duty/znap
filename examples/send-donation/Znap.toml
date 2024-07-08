@@ -4,4 +4,4 @@ identity = "~/.config/solana/id.json"
 name = "my-actions"
 address = "localhost"
 port = 3000
-protocol = ""
+protocol = "http"
