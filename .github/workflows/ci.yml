@@ -48,6 +48,18 @@ jobs:
       - name: Run cargo fmt
         run: cargo fmt --all -- --check
 
+  # Run cargo fmt --all -- --check
+  test:
+    name: Run API Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+      - uses: Swatinem/rust-cache@v2
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Run tests
+        run: cargo test
+
   build-znap:
     name: Build Znap Cli
     runs-on: ubuntu-latest
