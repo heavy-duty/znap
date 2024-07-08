@@ -1,22 +1,19 @@
-use crate::utils::{deploy_to_shuttle, generate_collection_executable_files, get_config, Config};
+use crate::utils::{deploy_to_shuttle, generate_collection_executable_files, get_config};
 
 pub fn run(name: &String, project: &String) {
-    let Config { collections, .. } = get_config();
+    let config = get_config();
+    let collections = config.collections.unwrap_or(vec![]);
+    let collection = collections
+        .iter()
+        .find(|collection| collection.name == *name);
 
-    if let Some(collections) = collections {
-        if collections
-            .iter()
-            .all(|collection| &collection.name != name)
-        {
-            panic!("Collection not found.")
-        }
+    if let Some(collection) = collection {
+        // Generate all the required files
+        generate_collection_executable_files(collection);
+
+        // Deploy to shuttle
+        deploy_to_shuttle(name, project);
     } else {
-        panic!("Workspace has no collections.")
+        panic!("Collection not found in the workspace.")
     }
-
-    // Generate all the required files
-    generate_collection_executable_files(name);
-
-    // Deploy to shuttle
-    deploy_to_shuttle(name, project);
 }

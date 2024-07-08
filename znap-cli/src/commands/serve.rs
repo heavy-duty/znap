@@ -1,24 +1,27 @@
 use crate::utils::{
-    generate_collection_executable_files, get_config, get_identity, start_server_blocking, Config,
+    generate_collection_executable_files, get_config, get_identity, start_server_blocking,
 };
 
 pub fn run(name: &String, address: &String, port: &u16, protocol: &String) {
-    let Config { collections, identity } = get_config();
+    let config = get_config();
+    let collections = config.collections.unwrap_or(vec![]);
+    let collection = collections
+        .iter()
+        .find(|collection| collection.name == *name);
 
-    if let Some(collections) = collections {
-        if collections
-            .iter()
-            .all(|collection| &collection.name != name)
-        {
-            panic!("Collection not found.")
-        }
+    if let Some(collection) = collection {
+        // Generate all the required files
+        generate_collection_executable_files(collection);
+
+        // Run the server
+        start_server_blocking(
+            name,
+            &get_identity(&config.identity),
+            address,
+            port,
+            protocol,
+        );
     } else {
-        panic!("Workspace has no collections.")
+        panic!("Collection not found in the workspace.")
     }
-
-    // Generate all the required files
-    generate_collection_executable_files(name);
-
-    // Run the server
-    start_server_blocking(name, &get_identity(&identity), address, port, protocol);
 }

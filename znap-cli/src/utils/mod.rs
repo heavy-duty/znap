@@ -156,7 +156,7 @@ pub fn copy_recursively(source: impl AsRef<Path>, destination: impl AsRef<Path>)
     }
 }
 
-pub fn generate_collection_executable_files(name: &String) {
+pub fn generate_collection_executable_files(collection: &Collection) {
     let cwd = get_cwd();
 
     let znap_path = cwd.join(".znap");
@@ -180,26 +180,26 @@ pub fn generate_collection_executable_files(name: &String) {
         create_dir(&znap_collections_path).expect("Could not create .znap/collections folder");
     }
 
-    let znap_collection_path = znap_collections_path.join(name);
+    let znap_collection_path = znap_collections_path.join(&collection.name);
 
     if znap_collection_path.exists() {
         remove_dir_all(&znap_collection_path)
-            .expect(&format!("Could not delete .znap/{name} folder"))
+            .expect(&format!("Could not delete .znap/{} folder", &collection.name))
     }
 
-    create_dir(&znap_collection_path).expect(&format!("Could not create .znap/{name} folder"));
+    create_dir(&znap_collection_path).expect(&format!("Could not create .znap/{} folder", &collection.name));
 
     let znap_collection_src_path = znap_collection_path.join("src");
 
     create_dir(&znap_collection_src_path)
-        .expect(&format!("Could not create .znap/{name}/src folder"));
+        .expect(&format!("Could not create .znap/{}/src folder", &collection.name));
 
     let znap_collection_src_bin_path = znap_collection_src_path.join("bin");
 
     create_dir(&znap_collection_src_bin_path)
-        .expect(&format!("Could not create .znap/{name}/src/bin folder"));
+        .expect(&format!("Could not create .znap/{}/src/bin folder", &collection.name));
 
-    let collection_path = cwd.join(&format!("collections/{name}"));
+    let collection_path = cwd.join(&format!("collections/{}", &collection.name));
     let collection_src_path = collection_path.join("src");
 
     copy_recursively(collection_src_path, znap_collection_src_path);
@@ -208,13 +208,13 @@ pub fn generate_collection_executable_files(name: &String) {
     let znap_collection_src_bin_serve_path = znap_collection_src_bin_path.join("serve.rs");
     write_file(
         &znap_collection_src_bin_serve_path,
-        &template::collection_serve_binary::template(name),
+        &template::collection_serve_binary::template(collection),
     );
 
     let znap_collection_src_bin_deploy_path = znap_collection_src_bin_path.join("deploy.rs");
     write_file(
         &znap_collection_src_bin_deploy_path,
-        &template::collection_deploy_binary::template(name),
+        &template::collection_deploy_binary::template(&collection.name),
     );
 
     // Generate a toml with collection and extras for serve/deploy
@@ -222,7 +222,7 @@ pub fn generate_collection_executable_files(name: &String) {
     let collection_toml_path = collection_path.join("Cargo.toml");
 
     let collection_toml = read_to_string(collection_toml_path).unwrap();
-    let znap_toml_extras = template::collection_toml::template(name);
+    let znap_toml_extras = template::collection_toml::template(&collection.name);
 
     write_file(
         &znap_collection_toml_path,
