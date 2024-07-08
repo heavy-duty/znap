@@ -9,9 +9,8 @@ shuttle-axum = "0.46.0"
 shuttle-runtime = "0.46.0"
 solana-sdk = "2.0.1"
 tokio = "1.28.2"
-znap = "1"
+znap = "0.1"
 serde = { version = "1.0.203", features = ["derive"] }
-tower-http = { version = "0.5.2", features = ["cors"] }
 
 [patch.crates-io]
 curve25519-dalek = { git = "https://github.com/dalek-cryptography/curve25519-dalek", rev = "8274d5cbb6fc3f38cdc742b4798173895cd2a290" }
