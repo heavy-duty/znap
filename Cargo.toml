@@ -1,10 +1,5 @@
 [workspace]
-members = [ 
-    "znap-syn",
-    "znap-macros",
-    "znap", 
-    "znap-cli",
-]
+members = ["znap-syn", "znap-macros", "znap", "znap-cli"]
 resolver = "2"
 
 [workspace.package]
