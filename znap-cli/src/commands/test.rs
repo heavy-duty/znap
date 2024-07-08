@@ -18,9 +18,9 @@ pub fn run(name: &String, address: &String, port: &u16, protocol: &String) {
         let mut start_server_process = start_server(
             name,
             &get_identity(&config.identity),
-            address,
-            port,
-            protocol,
+            &Some(address.clone()),
+            &Some(port.clone()),
+            &Some(protocol.clone()),
         );
 
         // While true with a sleep until server is online

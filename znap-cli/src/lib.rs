@@ -23,14 +23,14 @@ pub enum Command {
         /// The name of the collection
         name: String,
         /// Address that will be used for the server once running.
-        #[clap(short, long, default_value = "127.0.0.1")]
-        address: String,
+        #[clap(short, long)]
+        address: Option<String>,
         /// Port that wuill be used for the server once running.
-        #[clap(short, long, default_value = "3000")]
-        port: u16,
+        #[clap(short, long)]
+        port: Option<u16>,
         /// Protocol that wuill be used for the server once running.
-        #[clap(long, default_value = "http")]
-        protocol: String,
+        #[clap(long)]
+        protocol: Option<String>,
     },
     /// Runs the test suite for the workspace
     Test {

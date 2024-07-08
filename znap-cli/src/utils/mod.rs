@@ -1,5 +1,6 @@
 use crate::template;
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 use std::fs::{copy, create_dir, create_dir_all, read_dir, remove_dir_all};
 use std::io::Write;
 use std::process::{Child, Stdio};
@@ -58,9 +59,9 @@ pub fn write_file(path: &Path, content: &String) {
 pub fn start_server_blocking(
     name: &String,
     identity: &String,
-    address: &String,
-    port: &u16,
-    protocol: &String,
+    address: &Option<String>,
+    port: &Option<u16>,
+    protocol: &Option<String>,
 ) {
     let start_server_process = start_server(name, identity, address, port, protocol);
     let exit = start_server_process
@@ -75,15 +76,28 @@ pub fn start_server_blocking(
 pub fn start_server(
     name: &String,
     identity: &String,
-    address: &String,
-    port: &u16,
-    protocol: &String,
+    address: &Option<String>,
+    port: &Option<u16>,
+    protocol: &Option<String>,
 ) -> Child {
+    let mut env_vars: HashMap<String, String> = HashMap::new();
+
+    env_vars.insert("IDENTITY_KEYPAIR_PATH".to_string(), identity.clone());
+
+    if let Some(address) = address {
+        env_vars.insert("COLLECTION_ADDRESS".to_string(), address.clone());
+    }
+
+    if let Some(port) = port {
+        env_vars.insert("COLLECTION_PORT".to_string(), port.to_string());
+    }
+
+    if let Some(protocol) = protocol {
+        env_vars.insert("COLLECTION_PROTOCOL".to_string(), protocol.clone());
+    }
+
     std::process::Command::new("cargo")
-        .env("IDENTITY_KEYPAIR_PATH", identity)
-        .env("COLLECTION_ADDRESS", address)
-        .env("COLLECTION_PORT", port.to_string())
-        .env("COLLECTION_PROTOCOL", protocol)
+        .envs(env_vars)
         .arg("run")
         .arg("--manifest-path")
         .arg(get_cwd().join(&format!(".znap/collections/{name}/Cargo.toml")))
@@ -183,21 +197,30 @@ pub fn generate_collection_executable_files(collection: &Collection) {
     let znap_collection_path = znap_collections_path.join(&collection.name);
 
     if znap_collection_path.exists() {
-        remove_dir_all(&znap_collection_path)
-            .expect(&format!("Could not delete .znap/{} folder", &collection.name))
+        remove_dir_all(&znap_collection_path).expect(&format!(
+            "Could not delete .znap/{} folder",
+            &collection.name
+        ))
     }
 
-    create_dir(&znap_collection_path).expect(&format!("Could not create .znap/{} folder", &collection.name));
+    create_dir(&znap_collection_path).expect(&format!(
+        "Could not create .znap/{} folder",
+        &collection.name
+    ));
 
     let znap_collection_src_path = znap_collection_path.join("src");
 
-    create_dir(&znap_collection_src_path)
-        .expect(&format!("Could not create .znap/{}/src folder", &collection.name));
+    create_dir(&znap_collection_src_path).expect(&format!(
+        "Could not create .znap/{}/src folder",
+        &collection.name
+    ));
 
     let znap_collection_src_bin_path = znap_collection_src_path.join("bin");
 
-    create_dir(&znap_collection_src_bin_path)
-        .expect(&format!("Could not create .znap/{}/src/bin folder", &collection.name));
+    create_dir(&znap_collection_src_bin_path).expect(&format!(
+        "Could not create .znap/{}/src/bin folder",
+        &collection.name
+    ));
 
     let collection_path = cwd.join(&format!("collections/{}", &collection.name));
     let collection_src_path = collection_path.join("src");

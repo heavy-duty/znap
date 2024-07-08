@@ -2,7 +2,7 @@ use crate::utils::{
     generate_collection_executable_files, get_config, get_identity, start_server_blocking,
 };
 
-pub fn run(name: &String, address: &String, port: &u16, protocol: &String) {
+pub fn run(name: &String, address: &Option<String>, port: &Option<u16>, protocol: &Option<String>) {
     let config = get_config();
     let collections = config.collections.unwrap_or(vec![]);
     let collection = collections
