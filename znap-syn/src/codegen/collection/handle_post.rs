@@ -1,58 +1,50 @@
 use proc_macro2::TokenStream;
 use quote::quote;
-use crate::CollectionMod;
+use crate::{common::{create_params, create_post_context, create_post_handler, create_query, create_transaction}, CollectionMod};
 
 pub fn generate(collection_mod: &CollectionMod) -> TokenStream {
-    let impls: Vec<TokenStream> = collection_mod.action_fns
+    let impls: Vec<TokenStream> = collection_mod.post_action_fns
         .iter()
         .map(|action_fn| {
-            let action_ident = &action_fn.action_ident;
-            let handler_ident = &action_fn.handle_post_ident;
-            
-            match &action_fn.action_query_ident {
-                Some(action_query_ident) => {
-                    quote! {
-                        pub async fn #handler_ident(
-                            axum::extract::Query(query): axum::extract::Query<#action_query_ident>,
-                            axum::Json(payload): axum::Json<znap::CreateActionPayload>,
-                        ) -> znap::Result<axum::Json<znap::ActionTransaction>> {
-                            let action = #action_ident;
-                            let context_with_query = znap::ContextWithQuery::<#action_ident, #action_query_ident> {
-                                payload,
-                                action: std::marker::PhantomData,
-                                query
-                            };
-                            let transaction = action.create_transaction(context_with_query)?;
-                            let serialized_transaction = bincode::serialize(&transaction).unwrap();
-                            let encoded_transaction = BASE64_STANDARD.encode(serialized_transaction);
-        
-                            Ok(axum::Json(znap::ActionTransaction {
-                                transaction: encoded_transaction,
-                                message: None
-                            }))
-                        }
-                    }
-                },
-                _ => {
-                    quote! {
-                        pub async fn #handler_ident(
-                            axum::Json(payload): axum::Json<znap::CreateActionPayload>
-                        )  -> znap::Result<axum::Json<znap::ActionTransaction>>{
-                            let action = #action_ident {};
-                            let context = znap::Context::<#action_ident> {
-                                payload,
-                                action: std::marker::PhantomData,
-                            };
-                            let transaction = action.create_transaction(context)?;
-                            let serialized_transaction = bincode::serialize(&transaction).unwrap();
-                            let encoded_transaction = BASE64_STANDARD.encode(serialized_transaction);
-        
-                            Ok(axum::Json(znap::ActionTransaction {
-                                transaction: encoded_transaction,
-                                message: None
-                            }))
-                        }
-                    }
+            let action = &action_fn.action;            
+            let handler = create_post_handler(&action.to_string());
+            let context = create_post_context(&action.to_string());
+            let create_transaction_fn = create_transaction(&action.to_string());
+            let fn_block = &action_fn.raw_method.block;
+            let query = create_query(&action.to_string());
+            let params = create_params(&action.to_string());
+
+            quote! {
+                #[derive(Debug, serde::Serialize, serde::Deserialize)]
+                pub struct #context {
+                    query: #query,
+                    params: #params,
+                    payload: znap::CreateActionPayload
+                }
+
+                pub async fn #create_transaction_fn(ctx: #context) -> znap::Result<znap::ActionTransaction> {
+                    #fn_block
+                }
+
+                pub async fn #handler(
+                    axum::extract::Query(query): axum::extract::Query<#query>,
+                    axum::extract::Path(params): axum::extract::Path<#params>,
+                    axum::Json(payload): axum::Json<znap::CreateActionPayload>,
+                ) -> znap::Result<axum::Json<znap::ActionResponse>> {
+                    let context = #context {
+                        payload,
+                        query,
+                        params,
+                    };
+                    let znap::ActionTransaction { transaction, message } = #create_transaction_fn(context).await?;
+                    let transaction_with_identity = znap::add_action_identity_proof(transaction);
+                    let serialized_transaction = bincode::serialize(&transaction_with_identity).unwrap();
+                    let encoded_transaction = BASE64_STANDARD.encode(serialized_transaction);
+
+                    Ok(axum::Json(znap::ActionResponse {
+                        transaction: encoded_transaction,
+                        message
+                    }))
                 }
             }
         })

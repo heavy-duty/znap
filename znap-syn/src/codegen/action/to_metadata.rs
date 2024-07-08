@@ -11,20 +11,20 @@ fn generate_parameter(parameters: &[ActionLinkParameterStruct]) -> TokenStream {
             let required = p.required;
 
             quote! {
-                ActionLinkParameterMetadata {
-                    label: #label,
-                    name: #name,
+                LinkedActionParameter {
+                    label: #label.to_string(),
+                    name: #name.to_string(),
                     required: #required,
                 }
             }
         })
         .collect();
     quote! {
-        &[ #(#parameters),* ]
+        vec!(#(#parameters),*)
     }
 }
 
-fn generate_links(links: &[ActionLinkStruct]) -> TokenStream {
+fn generate_links(links: &Vec<ActionLinkStruct>) -> TokenStream {
     let links: Vec<_> = links
         .iter()
         .map(|l| {
@@ -33,45 +33,80 @@ fn generate_links(links: &[ActionLinkStruct]) -> TokenStream {
             let params = generate_parameter(&l.parameters);
 
             quote! {
-                ActionLinkMetadata {
-                    label: #label,
-                    href: #href,
+                LinkedAction {
+                    label: #label.to_string(),
+                    href: #href.to_string(),
                     parameters: #params,
                 }
             }
         })
         .collect();
 
-    quote! {
-        &[ #(#links),* ]
+    if links.len() == 0 {
+        quote! {
+            None
+        }
+    } else {
+        quote! {
+            Some(
+                ActionLinks {
+                    actions: vec!(#(#links),*)
+                }
+            )        
+        }
     }
 }
 
 pub fn generate(action_struct: &ActionStruct) -> TokenStream {
-    let ActionStruct {
-        name, attributes, ..
-    } = action_struct;
-    let ActionAttributesStruct {
-        title,
-        description,
-        label,
-        icon,
-        links,
-    } = attributes;
+    let name = &action_struct.name;
 
-    let links = generate_links(links);
+    if let Some(action_attributes) = &action_struct.attributes {
 
-    quote! {
-        impl ToMetadata for #name {
-            fn to_metadata(&self) -> ActionMetadata {
-                ActionMetadata {
-                    icon: #icon,
-                    title: #title,
-                    description: #description,
-                    label: #label,
-                    links: #links,
+        let ActionAttributesStruct {
+            title,
+            description,
+            label,
+            icon,
+            links,
+        } = action_attributes;
+    
+        let links = generate_links(links);
+    
+        quote! {
+            impl ToMetadata for #name {
+                fn to_metadata() -> ActionMetadata {
+                    ActionMetadata {
+                        icon: #icon.to_string(),
+                        title: #title.to_string(),
+                        description: #description.to_string(),
+                        label: #label.to_string(),
+                        links: #links,
+                        disabled: false,
+                        error: None,
+                    }
+                }
+            }
+        }
+    } else {
+        quote! {
+            impl ToMetadata for #name {
+                fn to_metadata() -> ActionMetadata {
+                    ActionMetadata {
+                        icon: "".to_string(),
+                        title: "".to_string(),
+                        description: "".to_string(),
+                        label: "".to_string(),
+                        links: Some(
+                            ActionLinks {
+                                actions: vec!()
+                            }
+                        ),
+                        disabled: false,
+                        error: None,
+                    }
                 }
             }
         }
     }
+
 }

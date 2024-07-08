@@ -1,15 +1,14 @@
 pub mod codegen;
 pub mod parser;
+pub mod common;
 use codegen::action as action_codegen;
 use codegen::collection as collection_codegen;
 use codegen::error_code as error_code_codegen;
-use codegen::query as query_codegen;
 use deluxe::ExtractAttributes;
 use deluxe::ParseMetaItem;
 use parser::action as action_parser;
 use parser::collection as collection_parser;
 use parser::error_code as error_code_parser;
-use parser::query as query_parser;
 use proc_macro2::TokenStream;
 use quote::ToTokens;
 use syn::ItemEnum;
@@ -21,7 +20,9 @@ use syn::{
 
 #[derive(Debug)]
 pub struct CollectionMod {
-    pub action_fns: Vec<ActionFn>,
+    pub actions: Vec<Ident>,
+    pub get_action_fns: Vec<ActionFn>,
+    pub post_action_fns: Vec<ActionFn>,
     pub name: Ident,
     pub collection_mod: ItemMod,
 }
@@ -46,21 +47,26 @@ impl ToTokens for CollectionMod {
 }
 
 #[derive(Debug)]
+pub struct GetActionFn {
+    pub raw_method: ItemFn,
+    pub name: Ident,
+    pub action: Ident,
+}
+
+#[derive(Debug)]
 pub struct ActionFn {
     pub raw_method: ItemFn,
     pub name: Ident,
-    pub handle_get_ident: Ident,
-    pub handle_post_ident: Ident,
-    pub action_ident: Ident,
-    pub action_query_ident: Option<Ident>,
-    pub route_path: String,
+    pub action: Ident,
 }
 
 #[derive(Debug)]
 pub struct ActionStruct {
     pub name: Ident,
     pub raw_struct: ItemStruct,
-    pub attributes: ActionAttributesStruct,
+    pub attributes: Option<ActionAttributesStruct>,
+    pub query_attrs: Option<Vec<(Ident, Ident)>>,
+    pub params_attrs: Option<Vec<(Ident, Ident)>>,
 }
 
 impl Parse for ActionStruct {
@@ -107,31 +113,6 @@ pub struct ActionLinkParameterStruct {
     name: String,
     #[deluxe(default = false)]
     required: bool,
-}
-
-#[derive(Debug)]
-pub struct QueryStruct {
-    pub name: Ident,
-    pub raw_struct: ItemStruct,
-}
-
-impl Parse for QueryStruct {
-    fn parse(input: ParseStream) -> ParseResult<Self> {
-        let query_struct = <ItemStruct as Parse>::parse(input)?;
-        query_parser::parse(&query_struct)
-    }
-}
-
-impl From<&QueryStruct> for TokenStream {
-    fn from(query_struct: &QueryStruct) -> Self {
-        query_codegen::generate(query_struct)
-    }
-}
-
-impl ToTokens for QueryStruct {
-    fn to_tokens(&self, tokens: &mut TokenStream) {
-        tokens.extend::<TokenStream>(self.into());
-    }
 }
 
 #[derive(Debug)]

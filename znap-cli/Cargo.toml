@@ -16,11 +16,11 @@ path = "src/bin/main.rs"
 heck = { workspace = true }
 serde = { workspace = true }
 colored = { workspace = true }
+console = { workspace = true }
 
 # crate specific
 anyhow = "1.0.86"
 clap = { version = "4.5.7", features = ["derive"] }
-ctrlc = "3.4.4"
-tempfile = "3.10.1"
 toml = "0.8.14"
-console = "0.15.8"
+shellexpand = "3.1.0"
+reqwest = { version = "0.12.5", default_features = false, features = ["blocking", "json"] }

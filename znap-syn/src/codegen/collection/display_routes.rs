@@ -1,17 +1,18 @@
+use crate::{common::create_path, CollectionMod};
 use proc_macro2::TokenStream;
 use quote::quote;
-use crate::CollectionMod;
 
 pub fn generate(collection_mod: &CollectionMod) -> TokenStream {
     let collection_ident = &collection_mod.name.to_string();
-    let routes: Vec<TokenStream> = collection_mod.action_fns
+    let routes: Vec<TokenStream> = collection_mod
+        .actions
         .iter()
-        .map(|action_fn| {
-            let route_path = &action_fn.route_path;
-            
+        .map(|action| {
+            let path = create_path(&action.to_string());
+
             quote! {
-                println!("  {}     {}", "GET ".bold(), #route_path.italic());
-                println!("  {}     {}", "POST".bold(), #route_path.italic());
+                println!("  {}     {}", "GET ".bold(), #path.to_string().italic());
+                println!("  {}     {}", "POST".bold(), #path.to_string().italic());
             }
         })
         .collect();
@@ -24,4 +25,3 @@ pub fn generate(collection_mod: &CollectionMod) -> TokenStream {
         }
     }
 }
-

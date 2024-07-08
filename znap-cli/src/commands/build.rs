@@ -1,26 +1,17 @@
-use crate::utils::get_collections;
-use std::process::Stdio;
+use crate::utils::{build_for_release, generate_collection_executable_files, get_config};
 
-pub fn run() {
-    let collections = get_collections();
+pub fn run(name: &String) {
+    let config = get_config();
+    let collections = config.collections.unwrap_or(vec![]);
+    let collection = collections
+        .iter()
+        .find(|collection| collection.name == *name);
 
-    for collection in collections.iter() {
-        let maybe_exit = std::process::Command::new("cargo")
-            .arg("build")
-            .arg("-p")
-            .arg(&collection.name)
-            .stdout(Stdio::inherit())
-            .stderr(Stdio::inherit())
-            .output()
-            .map_err(|e| anyhow::format_err!("{}", e.to_string()));
+    if let Some(collection) = collection {
+        generate_collection_executable_files(collection);
 
-        match maybe_exit {
-            Ok(exit) => {
-                if !exit.status.success() {
-                    std::process::exit(exit.status.code().unwrap_or(1));
-                }
-            }
-            _ => panic!("Failed to build collection: {}", collection.name),
-        }
+        build_for_release(name);
+    } else {
+        panic!("Collection not found in the workspace.")
     }
 }

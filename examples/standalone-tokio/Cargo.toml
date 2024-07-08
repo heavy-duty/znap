@@ -1,19 +1,17 @@
 [package]
-name = "my-actions"
-version.workspace = true
+name = "my-znap-workspace"
+version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-# workspace dep
-axum = { workspace = true }
-serde = { workspace = true }
-solana-sdk = { workspace = true }
-
-# crate specific
+axum = "0.7.5"
+serde = "1.0.203"
+solana-sdk = "2.0.1"
 spl-associated-token-account = "3.0.2"
 spl-token = "4.0.1"
 tokio = { version = "1", features = ["full"] }
-
-# local
 znap = { path = "../../znap" }
 
+[workspace]
+members = []
+resolver = "2"
