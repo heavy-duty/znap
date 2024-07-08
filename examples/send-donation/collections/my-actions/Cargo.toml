@@ -7,4 +7,4 @@ edition = "2021"
 axum = "0.7.5"
 serde = "1.0.203"
 solana-sdk = "1.18.17"
-znap = { path = "../../../../znap" }
+znap = "0.1"
