@@ -14,14 +14,17 @@ pub struct Status {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct Config {
-    pub collections: Vec<String>,
-    pub identity: String,
+pub struct Collection {
+    pub name: String,
+    pub address: String,
+    pub port: u16,
+    pub protocol: String,
 }
 
-pub struct Collection {
-    pub path: PathBuf,
-    pub name: String,
+#[derive(Serialize, Deserialize, Debug)]
+pub struct Config {
+    pub collections: Option<Vec<Collection>>,
+    pub identity: String,
 }
 
 pub fn get_cwd() -> PathBuf {
@@ -42,21 +45,8 @@ pub fn get_config() -> Config {
     }
 }
 
-pub fn get_collections(Config { collections, .. }: &Config) -> Vec<Collection> {
-    let cwd = get_cwd();
-    let collections_dir_path = cwd.join("collections");
-
-    collections
-        .iter()
-        .map(|collection| Collection {
-            path: collections_dir_path.join(collection),
-            name: collection.clone(),
-        })
-        .collect()
-}
-
-pub fn get_identity(Config { identity, .. }: &Config) -> String {
-    shellexpand::tilde(&identity).into()
+pub fn get_identity(identity: &String) -> String {
+    shellexpand::tilde(identity).into()
 }
 
 pub fn write_file(path: &Path, content: &String) {
@@ -67,12 +57,12 @@ pub fn write_file(path: &Path, content: &String) {
 
 pub fn start_server_blocking(
     name: &String,
-    config: &Config,
+    identity: &String,
     address: &String,
     port: &u16,
     protocol: &String,
 ) {
-    let start_server_process = start_server(name, config, address, port, protocol);
+    let start_server_process = start_server(name, identity, address, port, protocol);
     let exit = start_server_process
         .wait_with_output()
         .expect("Should be able to start server");
@@ -84,13 +74,13 @@ pub fn start_server_blocking(
 
 pub fn start_server(
     name: &String,
-    config: &Config,
+    identity: &String,
     address: &String,
     port: &u16,
     protocol: &String,
 ) -> Child {
     std::process::Command::new("cargo")
-        .env("IDENTITY_KEYPAIR_PATH", get_identity(config))
+        .env("IDENTITY_KEYPAIR_PATH", identity)
         .env("COLLECTION_ADDRESS", address)
         .env("COLLECTION_PORT", port.to_string())
         .env("COLLECTION_PROTOCOL", protocol)
