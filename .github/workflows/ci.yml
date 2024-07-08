@@ -7,7 +7,6 @@ on:
       - main
       - master
     paths-ignore:
-      - ".github/**"
       - "LICENSE*"
       - "**.md"
       - "**.png"
@@ -19,7 +18,6 @@ on:
       - master
       - dev
     paths-ignore:
-      - ".github/**"
       - "LICENSE*"
       - "**.md"
       - "**.png"
@@ -48,7 +46,7 @@ jobs:
       - name: Run cargo fmt
         run: cargo fmt --all -- --check
 
-  # Run cargo fmt --all -- --check
+  # Run cargo test
   test:
     name: Run API Tests
     runs-on: ubuntu-latest
@@ -63,6 +61,9 @@ jobs:
   build-znap:
     name: Build Znap Cli
     runs-on: ubuntu-latest
+    if: ${{ hashFiles('tests/*/Cargo.toml') != '' }}
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
       - name: Checkout sources
         uses: actions/checkout@v4
@@ -76,11 +77,18 @@ jobs:
           name: znap-cli
           path: ./target/release/znap
           retention-days: 1
+      - uses: actions/checkout@v3
+      - id: set-matrix
+        run: |
+          FOLDERS=$(ls -d tests/*/ | jq -R -s -c 'split("\n")[:-1]')
+          echo "matrix={\"folder\":$FOLDERS}" >> $GITHUB_OUTPUT
 
   run-tests:
     name: Run Tests
     needs: [build-znap]
     runs-on: ubuntu-latest
+    strategy:
+      matrix: ${{ fromJSON(needs.build-znap.outputs.matrix) }}
     steps:
       - name: Checkout sources
         uses: actions/checkout@v4
@@ -90,7 +98,7 @@ jobs:
         with:
           name: znap-cli
           path: bin
-      - name: Run Tests on folder
+      - name: Run Tests on folder ${{ matrix.folder }}
         run: |
           echo "Running tests..."
-          find . -path "./tests/*" -type d | xargs -I {} sh -c './bin/znap test'
+          cd "${{ matrix.folder }}" && ./bin/znap test
