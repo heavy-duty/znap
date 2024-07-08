@@ -18,6 +18,11 @@ on:
       - main
       - master
       - dev
+    paths-ignore:
+      - ".github/**"
+      - "LICENSE*"
+      - "**.md"
+      - "**.png"
 
 jobs:
   # Run cargo clippy -- -D warnings
@@ -42,3 +47,38 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
       - name: Run cargo fmt
         run: cargo fmt --all -- --check
+
+  build-znap:
+    name: Build Znap Cli
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+      - uses: Swatinem/rust-cache@v2
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Build
+        run: cargo b -r -p znap-cli
+      - uses: actions/upload-artifact@v3
+        name: Upload Artifact
+        with:
+          name: znap-cli
+          path: ./target/release/znap
+          retention-days: 1
+
+  run-tests:
+    name: Run Tests
+    needs: [build-znap]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+      - uses: Swatinem/rust-cache@v2
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: actions/download-artifact@v4
+        with:
+          name: znap-cli
+          path: bin
+      - name: Run Tests on folder
+        run: |
+          echo "Running tests..."
+          find . -path "./tests/*" -type d | xargs -I {} sh -c './bin/znap test'
