@@ -2,36 +2,41 @@ use crate::utils::{
     generate_collection_executable_files, get_config, get_identity, run_test_suite, start_server,
     wait_for_server,
 };
+use std::process::Child;
 
-pub fn run(name: &String, address: &String, port: &u16, protocol: &String) {
+pub fn run() {
+    // get config
     let config = get_config();
     let collections = config.collections.unwrap_or(vec![]);
-    let collection = collections
-        .iter()
-        .find(|collection| collection.name == *name);
 
-    if let Some(collection) = collection {
+    // start and wait for each server to be running
+    let mut server_processes: Vec<Child> = vec![];
+
+    for collection in collections {
         // Generate all server
-        generate_collection_executable_files(collection);
+        generate_collection_executable_files(&collection);
 
         // Start server in background
-        let mut start_server_process = start_server(
-            name,
+        let server_process = start_server(
+            &collection.name,
             &get_identity(&config.identity),
-            &Some(address.clone()),
-            &Some(port.clone()),
-            &Some(protocol.clone()),
+            &Some(collection.address.clone()),
+            &Some(collection.port.clone()),
+            &Some(collection.protocol.clone()),
         );
 
         // While true with a sleep until server is online
-        wait_for_server(address, port, protocol);
+        wait_for_server(&collection.address, &collection.port, &collection.protocol);
 
-        // Run tests suite
-        run_test_suite();
+        // Push to vector of processes
+        server_processes.push(server_process);
+    }
 
-        // Kill the server process.
-        start_server_process.kill().unwrap();
-    } else {
-        panic!("Collection not found in the workspace.")
+    // Run the test suite
+    run_test_suite();
+
+    // kill all servers
+    for mut process in server_processes {
+        process.kill().unwrap();
     }
 }
