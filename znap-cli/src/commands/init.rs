@@ -1,4 +1,4 @@
-use crate::utils::{write_file, Config};
+use crate::utils::write_file;
 use colored::Colorize;
 use console::Emoji;
 use heck::ToKebabCase;
@@ -54,13 +54,10 @@ pub fn run(name: &String, dry_run: &bool) {
         );
 
         // Create a Znap.toml file.
+
         write_file(
             workspace_dir.join("Znap.toml").as_path(),
-            &toml::to_string(&Config {
-                collections: vec![],
-                identity: "~/.config/solana/id.json".to_string(),
-            })
-            .unwrap(),
+            &format!("identity = \"~/.config/solana/id.json\""),
         );
 
         // Create a default actions.json file

@@ -1,5 +1,6 @@
 use crate::template;
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 use std::fs::{copy, create_dir, create_dir_all, read_dir, remove_dir_all};
 use std::io::Write;
 use std::process::{Child, Stdio};
@@ -14,14 +15,17 @@ pub struct Status {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct Config {
-    pub collections: Vec<String>,
-    pub identity: String,
+pub struct Collection {
+    pub name: String,
+    pub address: String,
+    pub port: u16,
+    pub protocol: String,
 }
 
-pub struct Collection {
-    pub path: PathBuf,
-    pub name: String,
+#[derive(Serialize, Deserialize, Debug)]
+pub struct Config {
+    pub collections: Option<Vec<Collection>>,
+    pub identity: String,
 }
 
 pub fn get_cwd() -> PathBuf {
@@ -42,21 +46,8 @@ pub fn get_config() -> Config {
     }
 }
 
-pub fn get_collections(Config { collections, .. }: &Config) -> Vec<Collection> {
-    let cwd = get_cwd();
-    let collections_dir_path = cwd.join("collections");
-
-    collections
-        .iter()
-        .map(|collection| Collection {
-            path: collections_dir_path.join(collection),
-            name: collection.clone(),
-        })
-        .collect()
-}
-
-pub fn get_identity(Config { identity, .. }: &Config) -> String {
-    shellexpand::tilde(&identity).into()
+pub fn get_identity(identity: &String) -> String {
+    shellexpand::tilde(identity).into()
 }
 
 pub fn write_file(path: &Path, content: &String) {
@@ -67,12 +58,12 @@ pub fn write_file(path: &Path, content: &String) {
 
 pub fn start_server_blocking(
     name: &String,
-    config: &Config,
-    address: &String,
-    port: &u16,
-    protocol: &String,
+    identity: &String,
+    address: &Option<String>,
+    port: &Option<u16>,
+    protocol: &Option<String>,
 ) {
-    let start_server_process = start_server(name, config, address, port, protocol);
+    let start_server_process = start_server(name, identity, address, port, protocol);
     let exit = start_server_process
         .wait_with_output()
         .expect("Should be able to start server");
@@ -84,16 +75,29 @@ pub fn start_server_blocking(
 
 pub fn start_server(
     name: &String,
-    config: &Config,
-    address: &String,
-    port: &u16,
-    protocol: &String,
+    identity: &String,
+    address: &Option<String>,
+    port: &Option<u16>,
+    protocol: &Option<String>,
 ) -> Child {
+    let mut env_vars: HashMap<String, String> = HashMap::new();
+
+    env_vars.insert("IDENTITY_KEYPAIR_PATH".to_string(), identity.clone());
+
+    if let Some(address) = address {
+        env_vars.insert("COLLECTION_ADDRESS".to_string(), address.clone());
+    }
+
+    if let Some(port) = port {
+        env_vars.insert("COLLECTION_PORT".to_string(), port.to_string());
+    }
+
+    if let Some(protocol) = protocol {
+        env_vars.insert("COLLECTION_PROTOCOL".to_string(), protocol.clone());
+    }
+
     std::process::Command::new("cargo")
-        .env("IDENTITY_KEYPAIR_PATH", get_identity(config))
-        .env("COLLECTION_ADDRESS", address)
-        .env("COLLECTION_PORT", port.to_string())
-        .env("COLLECTION_PROTOCOL", protocol)
+        .envs(env_vars)
         .arg("run")
         .arg("--manifest-path")
         .arg(get_cwd().join(&format!(".znap/collections/{name}/Cargo.toml")))
@@ -166,7 +170,7 @@ pub fn copy_recursively(source: impl AsRef<Path>, destination: impl AsRef<Path>)
     }
 }
 
-pub fn generate_collection_executable_files(name: &String) {
+pub fn generate_collection_executable_files(collection: &Collection) {
     let cwd = get_cwd();
 
     let znap_path = cwd.join(".znap");
@@ -190,26 +194,35 @@ pub fn generate_collection_executable_files(name: &String) {
         create_dir(&znap_collections_path).expect("Could not create .znap/collections folder");
     }
 
-    let znap_collection_path = znap_collections_path.join(name);
+    let znap_collection_path = znap_collections_path.join(&collection.name);
 
     if znap_collection_path.exists() {
-        remove_dir_all(&znap_collection_path)
-            .expect(&format!("Could not delete .znap/{name} folder"))
+        remove_dir_all(&znap_collection_path).expect(&format!(
+            "Could not delete .znap/{} folder",
+            &collection.name
+        ))
     }
 
-    create_dir(&znap_collection_path).expect(&format!("Could not create .znap/{name} folder"));
+    create_dir(&znap_collection_path).expect(&format!(
+        "Could not create .znap/{} folder",
+        &collection.name
+    ));
 
     let znap_collection_src_path = znap_collection_path.join("src");
 
-    create_dir(&znap_collection_src_path)
-        .expect(&format!("Could not create .znap/{name}/src folder"));
+    create_dir(&znap_collection_src_path).expect(&format!(
+        "Could not create .znap/{}/src folder",
+        &collection.name
+    ));
 
     let znap_collection_src_bin_path = znap_collection_src_path.join("bin");
 
-    create_dir(&znap_collection_src_bin_path)
-        .expect(&format!("Could not create .znap/{name}/src/bin folder"));
+    create_dir(&znap_collection_src_bin_path).expect(&format!(
+        "Could not create .znap/{}/src/bin folder",
+        &collection.name
+    ));
 
-    let collection_path = cwd.join(&format!("collections/{name}"));
+    let collection_path = cwd.join(&format!("collections/{}", &collection.name));
     let collection_src_path = collection_path.join("src");
 
     copy_recursively(collection_src_path, znap_collection_src_path);
@@ -218,13 +231,13 @@ pub fn generate_collection_executable_files(name: &String) {
     let znap_collection_src_bin_serve_path = znap_collection_src_bin_path.join("serve.rs");
     write_file(
         &znap_collection_src_bin_serve_path,
-        &template::collection_serve_binary::template(name),
+        &template::collection_serve_binary::template(collection),
     );
 
     let znap_collection_src_bin_deploy_path = znap_collection_src_bin_path.join("deploy.rs");
     write_file(
         &znap_collection_src_bin_deploy_path,
-        &template::collection_deploy_binary::template(name),
+        &template::collection_deploy_binary::template(&collection.name),
     );
 
     // Generate a toml with collection and extras for serve/deploy
@@ -232,7 +245,7 @@ pub fn generate_collection_executable_files(name: &String) {
     let collection_toml_path = collection_path.join("Cargo.toml");
 
     let collection_toml = read_to_string(collection_toml_path).unwrap();
-    let znap_toml_extras = template::collection_toml::template(name);
+    let znap_toml_extras = template::collection_toml::template(&collection.name);
 
     write_file(
         &znap_collection_toml_path,

@@ -1,32 +1,42 @@
 use crate::utils::{
-    generate_collection_executable_files, get_collections, get_config, run_test_suite,
-    start_server, wait_for_server,
+    generate_collection_executable_files, get_config, get_identity, run_test_suite, start_server,
+    wait_for_server,
 };
+use std::process::Child;
 
-pub fn run(name: &String, address: &String, port: &u16, protocol: &String) {
+pub fn run() {
+    // get config
     let config = get_config();
+    let collections = config.collections.unwrap_or(vec![]);
 
-    let collections = get_collections(&config);
+    // start and wait for each server to be running
+    let mut server_processes: Vec<Child> = vec![];
 
-    if collections
-        .iter()
-        .all(|collection| &collection.name != name)
-    {
-        panic!("Collection not found.")
+    for collection in collections {
+        // Generate all server
+        generate_collection_executable_files(&collection);
+
+        // Start server in background
+        let server_process = start_server(
+            &collection.name,
+            &get_identity(&config.identity),
+            &Some(collection.address.clone()),
+            &Some(collection.port.clone()),
+            &Some(collection.protocol.clone()),
+        );
+
+        // While true with a sleep until server is online
+        wait_for_server(&collection.address, &collection.port, &collection.protocol);
+
+        // Push to vector of processes
+        server_processes.push(server_process);
     }
 
-    // Generate all server
-    generate_collection_executable_files(name);
-
-    // Start server in background
-    let mut start_server_process = start_server(name, &config, address, port, protocol);
-
-    // While true with a sleep until server is online
-    wait_for_server(address, port, protocol);
-
-    // Run tests suite
+    // Run the test suite
     run_test_suite();
 
-    // Kill the server process.
-    start_server_process.kill().unwrap();
+    // kill all servers
+    for mut process in server_processes {
+        process.kill().unwrap();
+    }
 }

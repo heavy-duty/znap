@@ -23,29 +23,17 @@ pub enum Command {
         /// The name of the collection
         name: String,
         /// Address that will be used for the server once running.
-        #[clap(short, long, default_value = "127.0.0.1")]
-        address: String,
+        #[clap(short, long)]
+        address: Option<String>,
         /// Port that wuill be used for the server once running.
-        #[clap(short, long, default_value = "3000")]
-        port: u16,
+        #[clap(short, long)]
+        port: Option<u16>,
         /// Protocol that wuill be used for the server once running.
-        #[clap(long, default_value = "http")]
-        protocol: String,
+        #[clap(long)]
+        protocol: Option<String>,
     },
     /// Runs the test suite for the workspace
-    Test {
-        /// The name of the collection
-        name: String,
-        /// Address that will be used for the server once running.
-        #[clap(short, long, default_value = "127.0.0.1")]
-        address: String,
-        /// Port that wuill be used for the server once running.
-        #[clap(short, long, default_value = "3000")]
-        port: u16,
-        /// Protocol that wuill be used for the server once running.
-        #[clap(long, default_value = "http")]
-        protocol: String,
-    },
+    Test,
     /// Deploys a workspace using shuttle
     Deploy {
         /// The name of the collection
@@ -81,12 +69,7 @@ fn process_command(opts: Opts) -> Result<()> {
             port,
             protocol,
         } => Ok(commands::serve::run(name, address, port, protocol)),
-        Command::Test {
-            name,
-            address,
-            port,
-            protocol,
-        } => Ok(commands::test::run(name, address, port, protocol)),
+        Command::Test => Ok(commands::test::run()),
         Command::Clean => Ok(commands::clean::run()),
         Command::Init { name, dry_run } => Ok(commands::init::run(name, dry_run)),
         Command::New { name, dry_run } => Ok(commands::new::run(name, dry_run)),

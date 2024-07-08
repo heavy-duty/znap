@@ -1,6 +1,8 @@
 use heck::ToSnekCase;
 
-pub fn template(name: &String) -> String {
+use crate::utils::Collection;
+
+pub fn template(collection: &Collection) -> String {
     format!(
         r#"
 use tokio::net::TcpListener;
@@ -11,9 +13,9 @@ use {}::{{collection_router, display_collection_routes}};
 
 #[tokio::main]
 async fn main() -> Result<(), axum::Error> {{
-    let address = env::var("COLLECTION_ADDRESS").unwrap_or("127.0.0.1".to_string());
-    let port = env::var("COLLECTION_PORT").unwrap_or("3000".to_string());
-    let protocol = env::var("COLLECTION_PROTOCOL").unwrap_or("http".to_string());
+    let address = env::var("COLLECTION_ADDRESS").unwrap_or("{}".to_string());
+    let port = env::var("COLLECTION_PORT").unwrap_or("{}".to_string());
+    let protocol = env::var("COLLECTION_PROTOCOL").unwrap_or("{}".to_string());
 
     println!("");
     println!(
@@ -39,6 +41,9 @@ async fn main() -> Result<(), axum::Error> {{
     Ok(())
 }}
 "#,
-        name.to_snek_case()
+        &collection.name.to_snek_case(),
+        &collection.address,
+        &collection.port,
+        &collection.protocol,
     )
 }

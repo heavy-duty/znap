@@ -1,6 +1,6 @@
 use crate::{
     template,
-    utils::{write_file, Config},
+    utils::{write_file, Collection, Config},
 };
 use colored::Colorize;
 use heck::ToKebabCase;
@@ -19,9 +19,28 @@ pub fn run(name: &String, dry_run: &bool) {
     // Add to collections list in Znap.toml.
     let znap_toml_path = cwd.join("Znap.toml");
     let znap_toml = read_to_string(&znap_toml_path).unwrap();
-    let Config { mut collections, .. } = toml::from_str(&znap_toml).unwrap();
-    collections.push(name.to_kebab_case());
+    let config: Config = toml::from_str(&znap_toml).unwrap();
+    
+    let collections = if let Some(collections) = config.collections {
+        let port: u16 = (3000 + &collections.len()).try_into().unwrap();
 
+        let new_collections = vec!(Collection {
+            name: name.to_kebab_case(),
+            address: "127.0.0.1".to_string(),
+            port,
+            protocol: "http".to_string(),
+        });
+
+        Some(collections.into_iter().chain(new_collections).collect::<Vec<Collection>>())
+    } else {
+        Some(vec!(Collection {
+            name: name.to_kebab_case(),
+            address: "127.0.0.1".to_string(),
+            port: 3000,
+            protocol: "http".to_string(),
+        }))
+    };
+    
     if !dry_run {
         create_dir(&collection_dir).unwrap();
 

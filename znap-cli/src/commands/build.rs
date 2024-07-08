@@ -1,20 +1,17 @@
-use crate::utils::{
-    build_for_release, generate_collection_executable_files, get_collections, get_config,
-};
+use crate::utils::{build_for_release, generate_collection_executable_files, get_config};
 
 pub fn run(name: &String) {
     let config = get_config();
-
-    let collections = get_collections(&config);
-
-    if collections
+    let collections = config.collections.unwrap_or(vec![]);
+    let collection = collections
         .iter()
-        .all(|collection| &collection.name != name)
-    {
-        panic!("Collection not found.")
+        .find(|collection| collection.name == *name);
+
+    if let Some(collection) = collection {
+        generate_collection_executable_files(collection);
+
+        build_for_release(name);
+    } else {
+        panic!("Collection not found in the workspace.")
     }
-
-    generate_collection_executable_files(name);
-
-    build_for_release(name);
 }
