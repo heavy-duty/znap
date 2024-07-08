@@ -1,0 +1,44 @@
+name: CI
+on:
+  workflow_call:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - master
+    paths-ignore:
+      - ".github/**"
+      - "LICENSE*"
+      - "**.md"
+      - "**.png"
+    tags-ignore:
+      - "**"
+  pull_request:
+    branches:
+      - main
+      - master
+      - dev
+
+jobs:
+  # Run cargo clippy -- -D warnings
+  clippy_check:
+    name: Clippy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+      - uses: Swatinem/rust-cache@v2
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Run clippy
+        run: cargo clippy -- -D warnings
+
+  # Run cargo fmt --all -- --check
+  format:
+    name: Format
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Run cargo fmt
+        run: cargo fmt --all -- --check
