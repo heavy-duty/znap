@@ -1,4 +1,7 @@
-use crate::{common::{extract_action_ident, extract_fn_result_type}, ActionFn};
+use crate::{
+    common::{extract_action_ident, extract_fn_result_type},
+    ActionFn,
+};
 use syn::{
     parse::{Error as ParseError, Result as ParseResult},
     spanned::Spanned,

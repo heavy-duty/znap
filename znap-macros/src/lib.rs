@@ -1,7 +1,7 @@
 use proc_macro::TokenStream;
+use quote::ToTokens;
 use syn::parse_macro_input;
 use znap_syn::{ActionStruct, CollectionMod, ErrorEnum};
-use quote::ToTokens;
 
 #[proc_macro_derive(Action, attributes(action, query, params))]
 pub fn action_derive_macro(item: TokenStream) -> TokenStream {

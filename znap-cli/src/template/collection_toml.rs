@@ -22,7 +22,7 @@ path = "src/bin/deploy.rs"
 [[bin]]
 name = "serve"
 path = "src/bin/serve.rs"
-"#,     
+"#,
         name.to_kebab_case()
     )
 }

@@ -1,10 +1,10 @@
 use crate::ActionStruct;
 use quote::quote;
-mod query;
+mod name;
 mod params;
 mod path;
+mod query;
 mod to_metadata;
-mod name;
 
 pub fn generate(action_struct: &ActionStruct) -> proc_macro2::TokenStream {
     let to_metadata = to_metadata::generate(action_struct);

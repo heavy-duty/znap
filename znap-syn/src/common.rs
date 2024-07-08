@@ -47,9 +47,7 @@ pub fn extract_attrs_by_name(
     })
 }
 
-pub fn has_action(
-    action_struct: &ItemStruct,
-) -> bool {
+pub fn has_action(action_struct: &ItemStruct) -> bool {
     action_struct.attrs.iter().any(|attr| {
         if let Ok(meta) = attr.meta.require_list() {
             if let Some(first_segment) = meta.path.segments.first() {

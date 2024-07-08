@@ -1,12 +1,17 @@
+use crate::{
+    common::{
+        create_params, create_post_context, create_post_handler, create_query, create_transaction,
+    },
+    CollectionMod,
+};
 use proc_macro2::TokenStream;
 use quote::quote;
-use crate::{common::{create_params, create_post_context, create_post_handler, create_query, create_transaction}, CollectionMod};
 
 pub fn generate(collection_mod: &CollectionMod) -> TokenStream {
     let impls: Vec<TokenStream> = collection_mod.post_action_fns
         .iter()
         .map(|action_fn| {
-            let action = &action_fn.action;            
+            let action = &action_fn.action;
             let handler = create_post_handler(&action.to_string());
             let context = create_post_context(&action.to_string());
             let create_transaction_fn = create_transaction(&action.to_string());
@@ -54,4 +59,3 @@ pub fn generate(collection_mod: &CollectionMod) -> TokenStream {
         #(#impls)*
     }
 }
-

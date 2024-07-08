@@ -1,9 +1,9 @@
+use crate::common::{extract_action_ident, extract_fn_result_type};
 use syn::{
     parse::{Error as ParseError, Result as ParseResult},
     spanned::Spanned,
     Ident, Item, ItemFn, ItemMod,
 };
-use crate::common::{extract_action_ident, extract_fn_result_type};
 
 pub fn parse(collection_mod: &ItemMod) -> ParseResult<Vec<Ident>> {
     let mod_content = &collection_mod

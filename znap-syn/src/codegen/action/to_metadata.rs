@@ -52,7 +52,7 @@ fn generate_links(links: &Vec<ActionLinkStruct>) -> TokenStream {
                 ActionLinks {
                     actions: vec!(#(#links),*)
                 }
-            )        
+            )
         }
     }
 }
@@ -61,7 +61,6 @@ pub fn generate(action_struct: &ActionStruct) -> TokenStream {
     let name = &action_struct.name;
 
     if let Some(action_attributes) = &action_struct.attributes {
-
         let ActionAttributesStruct {
             title,
             description,
@@ -69,9 +68,9 @@ pub fn generate(action_struct: &ActionStruct) -> TokenStream {
             icon,
             links,
         } = action_attributes;
-    
+
         let links = generate_links(links);
-    
+
         quote! {
             impl ToMetadata for #name {
                 fn to_metadata() -> ActionMetadata {
@@ -108,5 +107,4 @@ pub fn generate(action_struct: &ActionStruct) -> TokenStream {
             }
         }
     }
-
 }

@@ -1,6 +1,6 @@
 pub mod codegen;
-pub mod parser;
 pub mod common;
+pub mod parser;
 use codegen::action as action_codegen;
 use codegen::collection as collection_codegen;
 use codegen::error_code as error_code_codegen;
@@ -153,4 +153,3 @@ pub struct ErrorVariant {
     pub raw_variant: Variant,
     pub msg: String,
 }
-

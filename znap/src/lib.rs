@@ -17,7 +17,7 @@
 //! - [`znap-syn`](https://docs.rs/znap-syn/latest/znap_syn/)
 //! - [`znap-macros`](https://docs.rs/znap-macros/latest/znap_macros/)
 //! - [`znap-cli`](https://docs.rs/znap-cli/latest/znap_cli/)
-//! 
+//!
 //! ## Example
 //!
 //! ```rust

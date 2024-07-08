@@ -1,6 +1,12 @@
+use crate::{
+    common::{
+        create_get_context, create_get_context_with_metadata, create_get_handler, create_metadata,
+        create_params,
+    },
+    CollectionMod,
+};
 use proc_macro2::TokenStream;
 use quote::quote;
-use crate::{common::{create_get_context, create_get_context_with_metadata, create_get_handler, create_metadata, create_params}, CollectionMod};
 
 pub fn generate(collection_mod: &CollectionMod) -> TokenStream {
     let impls: Vec<TokenStream> = collection_mod.actions
@@ -15,23 +21,23 @@ pub fn generate(collection_mod: &CollectionMod) -> TokenStream {
             match &collection_mod.get_action_fns.iter().find(|get_action_fn| get_action_fn.action == *action) {
                 Some(get_action_fn) => {
                     let fn_block = &get_action_fn.raw_method.block;
-                    
+
                     quote! {
                         #[derive(Debug, serde::Serialize, serde::Deserialize)]
                         pub struct #context {
                             params: #params,
                         }
-        
+
                         #[derive(Debug, serde::Serialize, serde::Deserialize)]
                         pub struct #context_with_metadata {
                             params: #params,
                             metadata: znap::ActionMetadata,
                         }
-                        
+
                         pub async fn #create_metadata_fn(ctx: #context_with_metadata) -> znap::Result<znap::ActionMetadata> {
                             #fn_block
                         }
-        
+
                         pub async fn #handler(
                             axum::extract::Path(params): axum::extract::Path<#params>,
                         ) -> znap::Result<axum::Json<znap::ActionMetadata>> {
@@ -45,7 +51,7 @@ pub fn generate(collection_mod: &CollectionMod) -> TokenStream {
                                 metadata: rendered_metadata,
                             };
                             let metadata = #create_metadata_fn(context_with_metadata).await?;
-        
+
                             Ok(axum::Json(metadata))
                         }
                     }

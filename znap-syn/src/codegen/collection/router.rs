@@ -31,7 +31,7 @@ pub fn generate(collection_mod: &CollectionMod) -> TokenStream {
         pub fn collection_router() -> axum::Router {
             let cors = tower_http::cors::CorsLayer::new()
                 .allow_methods([
-                    axum::http::Method::GET, 
+                    axum::http::Method::GET,
                     axum::http::Method::POST,
                     axum::http::Method::OPTIONS,
                 ])
