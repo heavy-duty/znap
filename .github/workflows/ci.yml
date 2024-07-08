@@ -61,7 +61,7 @@ jobs:
   build-znap:
     name: Build Znap Cli
     runs-on: ubuntu-latest
-    if: ${{ hashFiles('tests/*/Cargo.toml') != '' }}
+    if: ${{ hashFiles('tests/**/Cargo.toml') != '' }}
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
@@ -101,4 +101,4 @@ jobs:
       - name: Run Tests on folder ${{ matrix.folder }}
         run: |
           echo "Running tests..."
-          cd "${{ matrix.folder }}" && ./bin/znap test
+          cd "${{ matrix.folder }}" && ${{ github.workspace }}/bin/znap test
