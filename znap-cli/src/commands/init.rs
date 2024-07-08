@@ -49,7 +49,7 @@ pub fn run(name: &String, dry_run: &bool) {
         write_file(
             workspace_dir.join("Cargo.toml").as_path(),
             &String::from(
-                "[workspace]\nmembers = [\"collections/*\", \".znap/*\"]\nresolver = \"2\"\n\n[patch.crates-io]\ncurve25519-dalek = {{ git = \"https://github.com/dalek-cryptography/curve25519-dalek\", rev = \"8274d5cbb6fc3f38cdc742b4798173895cd2a290\" }}",
+                "[workspace]\nmembers = [\"collections/*\"]\nresolver = \"2\"\n\n[patch.crates-io]\ncurve25519-dalek = { git = \"https://github.com/dalek-cryptography/curve25519-dalek\", rev = \"8274d5cbb6fc3f38cdc742b4798173895cd2a290\" }",
             ),
         );
 
@@ -57,10 +57,10 @@ pub fn run(name: &String, dry_run: &bool) {
         write_file(
             workspace_dir.join("Znap.toml").as_path(),
             &toml::to_string(&Config {
-              collections: vec!(),
-              identity: "~/.config/solana/id.json".to_string(),
-          })
-          .unwrap(),
+                collections: vec![],
+                identity: "~/.config/solana/id.json".to_string(),
+            })
+            .unwrap(),
         );
 
         // Create a default actions.json file
@@ -72,7 +72,7 @@ pub fn run(name: &String, dry_run: &bool) {
         // Create a .gitignore file.
         write_file(
             workspace_dir.join(".gitignore").as_path(),
-            &String::from("/target\n.znap/.tmp*\nnode_modules"),
+            &String::from("/target\n.znap\nnode_modules"),
         );
 
         // Create a package.json file.
@@ -156,13 +156,13 @@ export interface Metadata {
   label: string;
   disabled: boolean;
   error: null;
-  links: { actions: Action[] };
+  links: { actions: Action[] } | null;
 }
 
-export function createClient(baseUrl: string) {
+export function createActionClient(actionUrl: string) {
   return {
-    async getMetadata(actionName: string) {
-      const url = new URL(`${baseUrl}/api/${actionName}`);
+    async getMetadata() {
+      const url = new URL(actionUrl);
       const response = await fetch(url.toString(), {
         method: "GET",
         headers: {
@@ -173,15 +173,11 @@ export function createClient(baseUrl: string) {
 
       return responseJson;
     },
-    async getTransaction<T extends {}>(
-      actionName: string,
-      account: string,
-      params: T
-    ) {
-      const url = new URL(`${baseUrl}/api/${actionName}`);
+    async getTransaction<T extends {}>(account: string, query: T) {
+      const url = new URL(actionUrl);
 
-      Object.keys(params).forEach((paramName) =>
-        url.searchParams.set(paramName, params[paramName])
+      Object.keys(query).forEach((name) =>
+        url.searchParams.set(name, query[name])
       );
 
       const response = await fetch(url.toString(), {
@@ -210,11 +206,8 @@ export function createClient(baseUrl: string) {
             &String::from(
                 r#"
 import { assert } from "chai";
-import { Metadata, createClient } from "./utils";
 
 describe("My tests", () => {
-  const znapClient = createClient("http://localhost:3000");
-
   it("should hello world", async () => {
     const hello = "world";
 

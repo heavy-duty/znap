@@ -236,7 +236,7 @@ pub fn add_action_identity_proof(transaction: Transaction) -> Transaction {
 
                     match transaction
                         .message
-                        .is_writable(*account_index as usize)
+                        .is_maybe_writable(*account_index as usize, None)
                     {
                         true => AccountMeta::new(
                             pubkey,

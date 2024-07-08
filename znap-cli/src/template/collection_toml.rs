@@ -1,15 +1,28 @@
 use heck::ToKebabCase;
 
 pub fn template(name: &String) -> String {
-    format!("[package]\n\
-        name = \"{}\"\n\
-        version = \"0.1.0\"\n\
-        edition = \"2021\"\n\
-        \n[dependencies]\n\
-        axum = \"0.7.5\"\n\
-        serde = \"1.0.203\"\n\
-        solana-sdk = \"1.18.17\"\n\
-        znap = \"0.1.25\"\n\
-    ", name.to_kebab_case())
-}
+    format!(
+        r#"
+    
+# binaries dependencies
+colored = "2.1.0"
+console = "0.15.8"
 
+# serve dependencies
+tokio = {{ version = "1", features = ["full"] }}
+
+# deploy dependencies
+shuttle-axum = "0.46.0"
+shuttle-runtime = "0.46.0"
+
+[[bin]]
+name = "{}"
+path = "src/bin/deploy.rs"
+
+[[bin]]
+name = "serve"
+path = "src/bin/serve.rs"
+"#,     
+        name.to_kebab_case()
+    )
+}

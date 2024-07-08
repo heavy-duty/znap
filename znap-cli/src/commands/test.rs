@@ -1,15 +1,25 @@
 use crate::utils::{
-    generate_server_files, get_config, run_test_suite, start_server, wait_for_server,
+    generate_collection_executable_files, get_collections, get_config, run_test_suite,
+    start_server, wait_for_server,
 };
 
-pub fn run(address: &str, port: &u16, protocol: &str) {
+pub fn run(name: &String, address: &String, port: &u16, protocol: &String) {
     let config = get_config();
 
+    let collections = get_collections(&config);
+
+    if collections
+        .iter()
+        .all(|collection| &collection.name != name)
+    {
+        panic!("Collection not found.")
+    }
+
     // Generate all server
-    generate_server_files(&config, address, port, protocol);
+    generate_collection_executable_files(name);
 
     // Start server in background
-    let mut start_server_process = start_server(&config);
+    let mut start_server_process = start_server(name, &config, address, port, protocol);
 
     // While true with a sleep until server is online
     wait_for_server(address, port, protocol);

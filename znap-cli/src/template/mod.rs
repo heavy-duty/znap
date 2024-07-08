@@ -1,6 +1,5 @@
-pub mod server_toml;
-pub mod server_api;
-pub mod deploy_toml;
-pub mod deploy_api;
 pub mod collection_toml;
-pub mod collection_body;
+pub mod new_collection_body;
+pub mod new_collection_toml;
+pub mod collection_serve_binary;
+pub mod collection_deploy_binary;
