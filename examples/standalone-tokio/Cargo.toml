@@ -10,7 +10,7 @@ solana-sdk = "2.0.1"
 spl-associated-token-account = "3.0.2"
 spl-token = "4.0.1"
 tokio = { version = "1", features = ["full"] }
-znap = { path = "../../znap" }
+znap = "1"
 
 [workspace]
 members = []
