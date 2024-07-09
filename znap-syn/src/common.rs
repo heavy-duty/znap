@@ -67,10 +67,10 @@ pub fn extract_action_ident(f: &ItemFn) -> Option<&Ident> {
             if let PathArguments::AngleBracketed(inner_path) =
                 &type_path.path.segments.first()?.arguments
             {
-                if let GenericArgument::Type(inner_type) = inner_path.args.first()? {
-                    if let Type::Path(inner_type_path) = inner_type {
-                        return inner_type_path.path.segments.first().map(|seg| &seg.ident);
-                    }
+                if let GenericArgument::Type(Type::Path(inner_type_path)) =
+                    inner_path.args.first()?
+                {
+                    return inner_type_path.path.segments.first().map(|seg| &seg.ident);
                 }
             }
         }
@@ -78,8 +78,8 @@ pub fn extract_action_ident(f: &ItemFn) -> Option<&Ident> {
     None
 }
 
-pub fn action_name_without_suffix(action_name: &String) -> String {
-    let action_name_splitted: Vec<&str> = action_name.split('_').collect();
+pub fn action_name_without_suffix(action_name: &str) -> String {
+    let action_name_splitted: Vec<_> = action_name.split('_').collect();
     let (_, action_name_without_suffix) = action_name_splitted.split_last().unwrap();
 
     action_name_without_suffix.join("_")
@@ -91,10 +91,10 @@ pub fn extract_fn_result_type(f: &ItemFn) -> Option<&Ident> {
             if let PathArguments::AngleBracketed(inner_path) =
                 &type_path.path.segments.first().unwrap().arguments
             {
-                if let GenericArgument::Type(inner_type) = inner_path.args.first().unwrap() {
-                    if let Type::Path(inner_type_path) = inner_type {
-                        return Some(&inner_type_path.path.segments.first().unwrap().ident);
-                    }
+                if let GenericArgument::Type(Type::Path(inner_type_path)) =
+                    inner_path.args.first().unwrap()
+                {
+                    return Some(&inner_type_path.path.segments.first().unwrap().ident);
                 }
             }
         }
@@ -102,7 +102,7 @@ pub fn extract_fn_result_type(f: &ItemFn) -> Option<&Ident> {
     None
 }
 
-pub fn create_query(action: &String) -> Ident {
+pub fn create_query(action: &str) -> Ident {
     Ident::new(
         &format!(
             "{}Query",
@@ -112,7 +112,7 @@ pub fn create_query(action: &String) -> Ident {
     )
 }
 
-pub fn create_params(action: &String) -> Ident {
+pub fn create_params(action: &str) -> Ident {
     Ident::new(
         &format!(
             "{}Params",
@@ -122,7 +122,7 @@ pub fn create_params(action: &String) -> Ident {
     )
 }
 
-pub fn create_get_handler(action: &String) -> Ident {
+pub fn create_get_handler(action: &str) -> Ident {
     Ident::new(
         &format!(
             "handle_get_{}",
@@ -132,7 +132,7 @@ pub fn create_get_handler(action: &String) -> Ident {
     )
 }
 
-pub fn create_post_handler(action: &String) -> Ident {
+pub fn create_post_handler(action: &str) -> Ident {
     Ident::new(
         &format!(
             "handle_post_{}",
@@ -142,11 +142,11 @@ pub fn create_post_handler(action: &String) -> Ident {
     )
 }
 
-pub fn create_route_path(action: &String) -> String {
+pub fn create_route_path(action: &str) -> String {
     format!("/api/{}", &action.to_snek_case())
 }
 
-pub fn create_post_context(action: &String) -> Ident {
+pub fn create_post_context(action: &str) -> Ident {
     Ident::new(
         &format!(
             "{}PostContext",
@@ -156,7 +156,7 @@ pub fn create_post_context(action: &String) -> Ident {
     )
 }
 
-pub fn create_transaction(action: &String) -> Ident {
+pub fn create_transaction(action: &str) -> Ident {
     Ident::new(
         &format!(
             "{}_create_transaction",
@@ -166,7 +166,7 @@ pub fn create_transaction(action: &String) -> Ident {
     )
 }
 
-pub fn create_metadata(action: &String) -> Ident {
+pub fn create_metadata(action: &str) -> Ident {
     Ident::new(
         &format!(
             "{}_create_metadata",
@@ -176,7 +176,7 @@ pub fn create_metadata(action: &String) -> Ident {
     )
 }
 
-pub fn create_get_context(action: &String) -> Ident {
+pub fn create_get_context(action: &str) -> Ident {
     Ident::new(
         &format!(
             "{}GetContext",
@@ -186,7 +186,7 @@ pub fn create_get_context(action: &String) -> Ident {
     )
 }
 
-pub fn create_get_context_with_metadata(action: &String) -> Ident {
+pub fn create_get_context_with_metadata(action: &str) -> Ident {
     Ident::new(
         &format!(
             "{}GetContextWithMetadata",
@@ -196,7 +196,7 @@ pub fn create_get_context_with_metadata(action: &String) -> Ident {
     )
 }
 
-pub fn create_path(action: &String) -> Ident {
+pub fn create_path(action: &str) -> Ident {
     Ident::new(
         &format!(
             "{}_path",

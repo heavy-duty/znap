@@ -65,36 +65,36 @@ fn process_command(opts: Opts) -> Result<()> {
         Command::Build { name } => {
             commands::build::run(name);
             Ok(())
-        },
+        }
         Command::Serve {
             name,
             address,
             port,
             protocol,
         } => {
-            commands::serve::run(name, address, port, protocol);
+            commands::serve::run(name, address.as_deref(), port.as_ref(), protocol.as_deref());
             Ok(())
-        },
+        }
         Command::Test => {
             commands::test::run();
             Ok(())
-        },
+        }
         Command::Clean => {
             commands::clean::run();
             Ok(())
-        },
+        }
         Command::Init { name, dry_run } => {
             commands::init::run(name, dry_run);
             Ok(())
-        },
+        }
         Command::New { name, dry_run } => {
             commands::new::run(name, dry_run);
             Ok(())
-        },
+        }
         Command::Deploy { name, project } => {
             commands::deploy::run(name, project);
             Ok(())
-        },
+        }
     }
 }
 

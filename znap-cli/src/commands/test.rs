@@ -20,9 +20,9 @@ pub fn run() {
         let server_process = start_server(
             &collection.name,
             &get_identity(&config.identity),
-            &Some(collection.address.clone()),
-            &Some(collection.port),
-            &Some(collection.protocol.clone()),
+            Some(&collection.address),
+            Some(&collection.port),
+            Some(&collection.protocol),
         );
 
         // While true with a sleep until server is online
