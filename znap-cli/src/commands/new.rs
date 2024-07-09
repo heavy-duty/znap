@@ -52,7 +52,7 @@ pub fn run(name: &String, dry_run: &bool) {
         // Create a Cargo.toml for the collection.
         write_file(
             collection_dir.join("Cargo.toml").as_path(),
-            &template::new_collection_toml::template(&name),
+            &template::new_collection_toml::template(name),
         );
 
         // Create a src folder.
@@ -61,12 +61,12 @@ pub fn run(name: &String, dry_run: &bool) {
         // Create a lib.rs in the src folder.
         write_file(
             collection_src_dir.join("lib.rs").as_path(),
-            &template::new_collection_body::template(&name),
+            &template::new_collection_body::template(name),
         );
 
         // Add to collections list in Znap.toml.
         write_file(
-            &znap_toml_path.as_path(),
+            znap_toml_path.as_path(),
             &toml::to_string(&Config {
                 collections,
                 identity: "~/.config/solana/id.json".to_string(),
@@ -84,7 +84,7 @@ pub fn run(name: &String, dry_run: &bool) {
         "      {}",
         format!("+ collections/{}/src/lib.rs", &name).green()
     );
-    println!("");
+    println!();
     println!("  Modified:\n");
     println!("      {}", "* ./Znap.toml".green());
 

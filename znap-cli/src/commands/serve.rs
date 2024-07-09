@@ -4,7 +4,7 @@ use crate::utils::{
 
 pub fn run(name: &String, address: &Option<String>, port: &Option<u16>, protocol: &Option<String>) {
     let config = get_config();
-    let collections = config.collections.unwrap_or(vec![]);
+    let collections = config.collections.unwrap_or_default();
     let collection = collections
         .iter()
         .find(|collection| collection.name == *name);

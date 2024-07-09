@@ -20,7 +20,7 @@ pub fn run(name: &String, dry_run: &bool) {
 
 "#;
     println!("{}", message.bold().yellow());
-    println!("");
+    println!();
     println!("Someone is about to get some action...");
     println!(
         "No worries, we got you. {}{}{}",
@@ -28,7 +28,7 @@ pub fn run(name: &String, dry_run: &bool) {
         "BLINK BLINK".bold().italic(),
         Emoji("✨", "")
     );
-    println!("");
+    println!();
     println!(
         "You are about to create a {} named: {}\n",
         "Znap workspace".bold(),
@@ -57,7 +57,7 @@ pub fn run(name: &String, dry_run: &bool) {
 
         write_file(
             workspace_dir.join("Znap.toml").as_path(),
-            &format!("identity = \"~/.config/solana/id.json\""),
+            &"identity = \"~/.config/solana/id.json\"".to_string(),
         );
 
         // Create a default actions.json file
@@ -121,7 +121,7 @@ pub fn run(name: &String, dry_run: &bool) {
         );
 
         // Create a collections folder.
-        create_dir(&collections_dir).unwrap();
+        create_dir(collections_dir).unwrap();
 
         // Create a .gitkeep in the collections folder.
         write_file(
@@ -130,7 +130,7 @@ pub fn run(name: &String, dry_run: &bool) {
         );
 
         // Create a tests folder.
-        create_dir(&tests_dir).unwrap();
+        create_dir(tests_dir).unwrap();
 
         // Create a tests/utils.ts file.
         write_file(
@@ -216,7 +216,7 @@ describe("My tests", () => {
         );
 
         // Create a .znap folder.
-        create_dir(&znap_dir).unwrap();
+        create_dir(znap_dir).unwrap();
 
         // Create a .gitkeep in the .znap folder.
         write_file(znap_dir.join(".gitkeep").as_path(), &String::from(""));

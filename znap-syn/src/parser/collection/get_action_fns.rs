@@ -19,7 +19,7 @@ pub fn parse(collection_mod: &ItemMod) -> ParseResult<Vec<ActionFn>> {
         .iter()
         .filter_map(|item| match item {
             Item::Fn(item_fn) => {
-                if extract_fn_result_type(&item_fn).unwrap() == "ActionMetadata" {
+                if extract_fn_result_type(item_fn).unwrap() == "ActionMetadata" {
                     return Some(item_fn);
                 }
 
@@ -28,7 +28,7 @@ pub fn parse(collection_mod: &ItemMod) -> ParseResult<Vec<ActionFn>> {
             _ => None,
         })
         .map(|method: &ItemFn| {
-            let action_ident = extract_action_ident(&method).unwrap();
+            let action_ident = extract_action_ident(method).unwrap();
 
             Ok(ActionFn {
                 raw_method: method.clone(),

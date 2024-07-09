@@ -24,7 +24,7 @@ fn generate_parameter(parameters: &[ActionLinkParameterStruct]) -> TokenStream {
     }
 }
 
-fn generate_links(links: &Vec<ActionLinkStruct>) -> TokenStream {
+fn generate_links(links: &[ActionLinkStruct]) -> TokenStream {
     let links: Vec<_> = links
         .iter()
         .map(|l| {
@@ -42,7 +42,7 @@ fn generate_links(links: &Vec<ActionLinkStruct>) -> TokenStream {
         })
         .collect();
 
-    if links.len() == 0 {
+    if links.is_empty() {
         quote! {
             None
         }

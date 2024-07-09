@@ -51,14 +51,14 @@ pub fn get_identity(identity: &String) -> String {
 }
 
 pub fn write_file(path: &Path, content: &String) {
-    let mut file = File::create(&path).expect("Should be able to open file");
+    let mut file = File::create(path).expect("Should be able to open file");
     file.write_all(content.as_bytes())
         .expect("Should be able to write file");
 }
 
 pub fn start_server_blocking(
-    name: &String,
-    identity: &String,
+    name: &str,
+    identity: &str,
     address: &Option<String>,
     port: &Option<u16>,
     protocol: &Option<String>,
@@ -100,7 +100,7 @@ pub fn start_server(
         .envs(env_vars)
         .arg("run")
         .arg("--manifest-path")
-        .arg(get_cwd().join(&format!(".znap/collections/{name}/Cargo.toml")))
+        .arg(get_cwd().join(format!(".znap/collections/{name}/Cargo.toml")))
         .arg("--bin")
         .arg("serve")
         .stdout(Stdio::inherit())
@@ -147,7 +147,7 @@ pub fn deploy_to_shuttle(name: &String, project: &String) {
         .arg("--name")
         .arg(project)
         .arg("--working-directory")
-        .arg(get_cwd().join(&format!(".znap/collections/{name}")))
+        .arg(get_cwd().join(format!(".znap/collections/{name}")))
         .stdout(Stdio::inherit())
         .stderr(Stdio::inherit())
         .spawn()
@@ -197,32 +197,24 @@ pub fn generate_collection_executable_files(collection: &Collection) {
     let znap_collection_path = znap_collections_path.join(&collection.name);
 
     if znap_collection_path.exists() {
-        remove_dir_all(&znap_collection_path).expect(&format!(
-            "Could not delete .znap/{} folder",
-            &collection.name
-        ))
+        remove_dir_all(&znap_collection_path).unwrap_or_else(|_| panic!("Could not delete .znap/{} folder",
+            &collection.name))
     }
 
-    create_dir(&znap_collection_path).expect(&format!(
-        "Could not create .znap/{} folder",
-        &collection.name
-    ));
+    create_dir(&znap_collection_path).unwrap_or_else(|_| panic!("Could not create .znap/{} folder",
+        &collection.name));
 
     let znap_collection_src_path = znap_collection_path.join("src");
 
-    create_dir(&znap_collection_src_path).expect(&format!(
-        "Could not create .znap/{}/src folder",
-        &collection.name
-    ));
+    create_dir(&znap_collection_src_path).unwrap_or_else(|_| panic!("Could not create .znap/{}/src folder",
+        &collection.name));
 
     let znap_collection_src_bin_path = znap_collection_src_path.join("bin");
 
-    create_dir(&znap_collection_src_bin_path).expect(&format!(
-        "Could not create .znap/{}/src/bin folder",
-        &collection.name
-    ));
+    create_dir(&znap_collection_src_bin_path).unwrap_or_else(|_| panic!("Could not create .znap/{}/src/bin folder",
+        &collection.name));
 
-    let collection_path = cwd.join(&format!("collections/{}", &collection.name));
+    let collection_path = cwd.join(format!("collections/{}", &collection.name));
     let collection_src_path = collection_path.join("src");
 
     copy_recursively(collection_src_path, znap_collection_src_path);
@@ -257,7 +249,7 @@ pub fn build_for_release(name: &String) {
     std::process::Command::new("cargo")
         .arg("build")
         .arg("--manifest-path")
-        .arg(get_cwd().join(&format!(".znap/collections/{name}/Cargo.toml")))
+        .arg(get_cwd().join(format!(".znap/collections/{name}/Cargo.toml")))
         .arg("--release")
         .arg("--bin")
         .arg("serve")

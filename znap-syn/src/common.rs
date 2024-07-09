@@ -11,7 +11,7 @@ pub fn extract_attrs_by_name(
     action_struct.attrs.iter().find_map(|attr| {
         if let Ok(meta) = attr.meta.require_list() {
             if let Some(first_segment) = meta.path.segments.first() {
-                if first_segment.ident.to_string() == name {
+                if first_segment.ident == name {
                     let idents: &Vec<Ident> = &meta
                         .tokens
                         .clone()
@@ -25,7 +25,7 @@ pub fn extract_attrs_by_name(
                                 return Some(parsed_ident);
                             }
 
-                            return None;
+                            None
                         })
                         .collect();
                     let chunked_idents = idents.chunks(2);
@@ -43,7 +43,7 @@ pub fn extract_attrs_by_name(
             }
         }
 
-        return None;
+        None
     })
 }
 
@@ -51,13 +51,13 @@ pub fn has_action(action_struct: &ItemStruct) -> bool {
     action_struct.attrs.iter().any(|attr| {
         if let Ok(meta) = attr.meta.require_list() {
             if let Some(first_segment) = meta.path.segments.first() {
-                if first_segment.ident.to_string() == "action" {
+                if first_segment.ident == "action" {
                     return true;
                 }
             }
         }
 
-        return false;
+        false
     })
 }
 
@@ -79,7 +79,7 @@ pub fn extract_action_ident(f: &ItemFn) -> Option<&Ident> {
 }
 
 pub fn action_name_without_suffix(action_name: &String) -> String {
-    let action_name_splitted: Vec<&str> = action_name.split("_").collect();
+    let action_name_splitted: Vec<&str> = action_name.split('_').collect();
     let (_, action_name_without_suffix) = action_name_splitted.split_last().unwrap();
 
     action_name_without_suffix.join("_")

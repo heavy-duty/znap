@@ -15,7 +15,7 @@ pub fn generate(action_struct: &ActionStruct) -> TokenStream {
         let mut segments: Vec<String> = vec!["/api".to_string(), action_name];
 
         for (param_name, _) in params_attrs {
-            segments.push(format!(":{}", param_name.to_string()));
+            segments.push(format!(":{}", param_name));
         }
 
         let action_path = segments.join("/");

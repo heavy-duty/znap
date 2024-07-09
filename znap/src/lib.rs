@@ -213,9 +213,9 @@ pub fn add_action_identity_proof(transaction: Transaction) -> Transaction {
     let identity_signature = identity_keypair.sign_message(&reference_pubkey.to_bytes());
     let identity_message = format!(
         "solana-action:{}:{}:{}",
-        identity_pubkey.to_string(),
-        reference_pubkey.to_string(),
-        identity_signature.to_string()
+        identity_pubkey,
+        reference_pubkey,
+        identity_signature
     );
 
     let mut identity_added = false;
@@ -285,9 +285,9 @@ where
     let mut handlebars = Handlebars::new();
 
     assert!(handlebars
-        .register_template_string(&"template", &source)
+        .register_template_string("template", source)
         .is_ok());
-    let output = handlebars.render(&"template", &data).unwrap();
+    let output = handlebars.render("template", &data).unwrap();
 
     handlebars.clear_templates();
 

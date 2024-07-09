@@ -2,7 +2,7 @@ use crate::utils::{build_for_release, generate_collection_executable_files, get_
 
 pub fn run(name: &String) {
     let config = get_config();
-    let collections = config.collections.unwrap_or(vec![]);
+    let collections = config.collections.unwrap_or_default();
     let collection = collections
         .iter()
         .find(|collection| collection.name == *name);

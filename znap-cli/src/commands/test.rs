@@ -7,7 +7,7 @@ use std::process::Child;
 pub fn run() {
     // get config
     let config = get_config();
-    let collections = config.collections.unwrap_or(vec![]);
+    let collections = config.collections.unwrap_or_default();
 
     // start and wait for each server to be running
     let mut server_processes: Vec<Child> = vec![];
@@ -21,7 +21,7 @@ pub fn run() {
             &collection.name,
             &get_identity(&config.identity),
             &Some(collection.address.clone()),
-            &Some(collection.port.clone()),
+            &Some(collection.port),
             &Some(collection.protocol.clone()),
         );
 
