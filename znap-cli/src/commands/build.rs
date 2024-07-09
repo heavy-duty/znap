@@ -1,6 +1,6 @@
 use crate::utils::{build_for_release, generate_collection_executable_files, get_config};
 
-pub fn run(name: &String) {
+pub fn run(name: &str) {
     let config = get_config();
     let collections = config.collections.unwrap_or_default();
     let collection = collections

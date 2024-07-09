@@ -1,6 +1,6 @@
 use crate::utils::{deploy_to_shuttle, generate_collection_executable_files, get_config};
 
-pub fn run(name: &String, project: &String) {
+pub fn run(name: &str, project: &str) {
     let config = get_config();
     let collections = config.collections.unwrap_or_default();
     let collection = collections

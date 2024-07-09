@@ -213,9 +213,7 @@ pub fn add_action_identity_proof(transaction: Transaction) -> Transaction {
     let identity_signature = identity_keypair.sign_message(&reference_pubkey.to_bytes());
     let identity_message = format!(
         "solana-action:{}:{}:{}",
-        identity_pubkey,
-        reference_pubkey,
-        identity_signature
+        identity_pubkey, reference_pubkey, identity_signature
     );
 
     let mut identity_added = false;

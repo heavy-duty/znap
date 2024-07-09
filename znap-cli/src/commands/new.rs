@@ -6,10 +6,10 @@ use colored::Colorize;
 use heck::ToKebabCase;
 use std::fs::{create_dir, read_to_string};
 
-pub fn run(name: &String, dry_run: &bool) {
+pub fn run(name: &str, dry_run: bool) {
     println!(
         "\nYou are about to create a collection named: {}\n",
-        &name.cyan()
+        name.cyan()
     );
 
     // Create a folder for the collection in the collections folder.
@@ -78,11 +78,11 @@ pub fn run(name: &String, dry_run: &bool) {
     println!("  Added:\n");
     println!(
         "      {}",
-        format!("+ collections/{}/Cargo.toml", &name).green()
+        format!("+ collections/{name}/Cargo.toml").green()
     );
     println!(
         "      {}",
-        format!("+ collections/{}/src/lib.rs", &name).green()
+        format!("+ collections/{name}/src/lib.rs").green()
     );
     println!();
     println!("  Modified:\n");
@@ -90,7 +90,7 @@ pub fn run(name: &String, dry_run: &bool) {
 
     println!(
         "\nCollection created at {}\n",
-        format!("file://{}", &collection_dir.to_str().unwrap())
+        format!("file://{}", collection_dir.to_str().unwrap())
             .italic()
             .bold()
     );

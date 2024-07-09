@@ -1,6 +1,6 @@
 use heck::ToKebabCase;
 
-pub fn template(name: &String) -> String {
+pub fn template(name: &str) -> String {
     format!(
         "[package]\n\
         name = \"{}\"\n\

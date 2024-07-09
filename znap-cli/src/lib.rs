@@ -84,11 +84,11 @@ fn process_command(opts: Opts) -> Result<()> {
             Ok(())
         }
         Command::Init { name, dry_run } => {
-            commands::init::run(name, dry_run);
+            commands::init::run(name, *dry_run);
             Ok(())
         }
         Command::New { name, dry_run } => {
-            commands::new::run(name, dry_run);
+            commands::new::run(name, *dry_run);
             Ok(())
         }
         Command::Deploy { name, project } => {

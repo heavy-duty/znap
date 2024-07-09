@@ -46,11 +46,11 @@ pub fn get_config() -> Config {
     }
 }
 
-pub fn get_identity(identity: &String) -> String {
+pub fn get_identity(identity: &str) -> String {
     shellexpand::tilde(identity).into()
 }
 
-pub fn write_file(path: &Path, content: &String) {
+pub fn write_file(path: &Path, content: &str) {
     let mut file = File::create(path).expect("Should be able to open file");
     file.write_all(content.as_bytes())
         .expect("Should be able to write file");
@@ -139,7 +139,7 @@ pub fn wait_for_server(address: &str, port: &u16, protocol: &str) {
     }
 }
 
-pub fn deploy_to_shuttle(name: &String, project: &String) {
+pub fn deploy_to_shuttle(name: &str, project: &str) {
     std::process::Command::new("cargo")
         .arg("shuttle")
         .arg("deploy")
@@ -183,9 +183,7 @@ pub fn generate_collection_executable_files(collection: &Collection) {
 
     write_file(
         &znap_toml_path,
-        &String::from(
-            "[workspace]\nmembers = [\"collections/*\"]\nresolver = \"2\"\n\n[patch.crates-io]\ncurve25519-dalek = { git = \"https://github.com/dalek-cryptography/curve25519-dalek\", rev = \"8274d5cbb6fc3f38cdc742b4798173895cd2a290\" }",
-        ),
+        "[workspace]\nmembers = [\"collections/*\"]\nresolver = \"2\"\n\n[patch.crates-io]\ncurve25519-dalek = { git = \"https://github.com/dalek-cryptography/curve25519-dalek\", rev = \"8274d5cbb6fc3f38cdc742b4798173895cd2a290\" }",
     );
 
     let znap_collections_path = znap_path.join("collections");

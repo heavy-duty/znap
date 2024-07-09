@@ -4,7 +4,7 @@ use console::Emoji;
 use heck::ToKebabCase;
 use std::fs::create_dir;
 
-pub fn run(name: &String, dry_run: &bool) {
+pub fn run(name: &str, dry_run: bool) {
     std::process::Command::new("clear").status().unwrap();
     println!("\n");
     let message = r#"
@@ -32,7 +32,7 @@ pub fn run(name: &String, dry_run: &bool) {
     println!(
         "You are about to create a {} named: {}\n",
         "Znap workspace".bold(),
-        &name.cyan()
+        name.cyan()
     );
 
     let cwd = std::env::current_dir().unwrap();
@@ -47,36 +47,33 @@ pub fn run(name: &String, dry_run: &bool) {
 
         // Create a Cargo.toml file.
         write_file(
-            workspace_dir.join("Cargo.toml").as_path(),
-            &String::from(
+            &workspace_dir.join("Cargo.toml"),
                 "[workspace]\nmembers = [\"collections/*\"]\nresolver = \"2\"\n\n[patch.crates-io]\ncurve25519-dalek = { git = \"https://github.com/dalek-cryptography/curve25519-dalek\", rev = \"8274d5cbb6fc3f38cdc742b4798173895cd2a290\" }",
-            ),
         );
 
         // Create a Znap.toml file.
 
         write_file(
-            workspace_dir.join("Znap.toml").as_path(),
-            &"identity = \"~/.config/solana/id.json\"".to_string(),
+            &workspace_dir.join("Znap.toml"),
+            "identity = \"~/.config/solana/id.json\"",
         );
 
         // Create a default actions.json file
         write_file(
-            workspace_dir.join("actions.json").as_path(),
-            &String::from("{\"rules\":[{\"pathPattern\":\"/**\",\"apiPath\":\"/api/**\"}]}"),
+            &workspace_dir.join("actions.json"),
+            "{\"rules\":[{\"pathPattern\":\"/**\",\"apiPath\":\"/api/**\"}]}",
         );
 
         // Create a .gitignore file.
         write_file(
-            workspace_dir.join(".gitignore").as_path(),
-            &String::from("/target\n.znap\nnode_modules"),
+            &workspace_dir.join(".gitignore"),
+            "/target\n.znap\nnode_modules",
         );
 
         // Create a package.json file.
         write_file(
-            workspace_dir.join("package.json").as_path(),
-            &String::from(
-                r#"
+            &workspace_dir.join("package.json"),
+            r#"
 {
     "scripts": {
         "lint:fix": "prettier */*.js \"*/**/*{.js,.ts}\" -w",
@@ -98,14 +95,12 @@ pub fn run(name: &String, dry_run: &bool) {
     }
 }
 "#,
-            ),
         );
 
         // Create a tsconfig.json file.
         write_file(
-            workspace_dir.join("tsconfig.json").as_path(),
-            &String::from(
-                r#"
+            &workspace_dir.join("tsconfig.json"),
+            r#"
 {
   "compilerOptions": {
     "types": ["mocha", "chai", "node"],
@@ -117,26 +112,21 @@ pub fn run(name: &String, dry_run: &bool) {
   }
 }
 "#,
-            ),
         );
 
         // Create a collections folder.
         create_dir(collections_dir).unwrap();
 
         // Create a .gitkeep in the collections folder.
-        write_file(
-            collections_dir.join(".gitkeep").as_path(),
-            &String::from(""),
-        );
+        write_file(&collections_dir.join(".gitkeep"), "");
 
         // Create a tests folder.
         create_dir(tests_dir).unwrap();
 
         // Create a tests/utils.ts file.
         write_file(
-            tests_dir.join("utils.ts").as_path(),
-            &String::from(
-                r#"
+            &tests_dir.join("utils.ts"),
+            r#"
 export interface Action {
   label: string;
   href: string;
@@ -194,14 +184,12 @@ export function createActionClient(actionUrl: string) {
   };
 }
 "#,
-            ),
         );
 
         // Create a tests/e2e.ts file.
         write_file(
-            tests_dir.join("e2e.ts").as_path(),
-            &String::from(
-                r#"
+            &tests_dir.join("e2e.ts"),
+            r#"
 import { assert } from "chai";
 
 describe("My tests", () => {
@@ -212,30 +200,26 @@ describe("My tests", () => {
   });
 });
 "#,
-            ),
         );
 
         // Create a .znap folder.
         create_dir(znap_dir).unwrap();
 
         // Create a .gitkeep in the .znap folder.
-        write_file(znap_dir.join(".gitkeep").as_path(), &String::from(""));
+        write_file(&znap_dir.join(".gitkeep"), "");
     }
 
     println!("  Added:\n");
-    println!("      {}", format!("+ {}/Cargo.toml", &name).green());
-    println!("      {}", format!("+ {}/Znap.toml", &name).green());
-    println!("      {}", format!("+ {}/package.json", &name).green());
-    println!("      {}", format!("+ {}/tsconfig.json", &name).green());
-    println!("      {}", format!("+ {}/actions.json", &name).green());
-    println!("      {}", format!("+ {}/.gitignore", &name).green());
-    println!("      {}", format!("+ {}/.znap/.gitkeep", &name).green());
-    println!(
-        "      {}",
-        format!("+ {}/collections/.gitkeep", &name).green()
-    );
-    println!("      {}", format!("+ {}/tests/utils.ts", &name).green());
-    println!("      {}", format!("+ {}/tests/e2e.ts", &name).green());
+    println!("      {}", format!("+ {name}/Cargo.toml").green());
+    println!("      {}", format!("+ {name}/Znap.toml").green());
+    println!("      {}", format!("+ {name}/package.json").green());
+    println!("      {}", format!("+ {name}/tsconfig.json").green());
+    println!("      {}", format!("+ {name}/actions.json").green());
+    println!("      {}", format!("+ {name}/.gitignore").green());
+    println!("      {}", format!("+ {name}/.znap/.gitkeep").green());
+    println!("      {}", format!("+ {name}/collections/.gitkeep").green());
+    println!("      {}", format!("+ {name}/tests/utils.ts").green());
+    println!("      {}", format!("+ {name}/tests/e2e.ts").green());
 
     println!(
         "\nZnap workspace created at {}\n",
