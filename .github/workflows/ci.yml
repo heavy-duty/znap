@@ -1,0 +1,115 @@
+name: CI
+on:
+  workflow_call:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - master
+    paths-ignore:
+      - "LICENSE*"
+      - "**.md"
+      - "**.png"
+    tags-ignore:
+      - "**"
+  pull_request:
+    branches:
+      - main
+      - master
+      - dev
+    paths-ignore:
+      - "LICENSE*"
+      - "**.md"
+      - "**.png"
+
+jobs:
+  # Run cargo clippy -- -D warnings
+  clippy_check:
+    name: Clippy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+      - uses: Swatinem/rust-cache@v2
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Run clippy
+        run: cargo clippy -- -D warnings
+
+  # Run cargo fmt --all -- --check
+  format:
+    name: Format
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Run cargo fmt
+        run: cargo fmt --all -- --check
+
+  # Run cargo test
+  test:
+    name: Run API Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+      - uses: Swatinem/rust-cache@v2
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Run tests
+        run: cargo test
+
+  get-tests:
+    name: Get all Tests as output
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+      files: ${{ steps.list-tests.outputs.files }}
+    steps:
+      - id: set-matrix
+        run: |
+          FOLDERS=$(ls -d tests/*/ | jq -R -s -c 'split("\n")[:-1]')
+          echo "matrix={\"folder\":$FOLDERS}" >> $GITHUB_OUTPUT
+      - name: List tests files
+        id: list-tests
+        run: |
+          echo "files=$(ls -d tests/*/)" >> $GITHUB_OUTPUT
+
+
+  build-znap:
+    name: Build Znap Cli
+    needs: [get-tests]
+    runs-on: ubuntu-latest
+    if: ${{ needs.get-tests.outputs.files != '' }}
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+      - uses: Swatinem/rust-cache@v2
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Build
+        run: cargo b -r -p znap-cli
+      - uses: actions/upload-artifact@v3
+        name: Upload Artifact
+        with:
+          name: znap-cli
+          path: ./target/release/znap
+          retention-days: 1
+
+  run-tests:
+    name: Run Tests
+    needs: [get-tests, build-znap]
+    runs-on: ubuntu-latest
+    strategy:
+      matrix: ${{ fromJSON(needs.get-tests.outputs.matrix) }}
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+      - uses: Swatinem/rust-cache@v2
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: actions/download-artifact@v4
+        with:
+          name: znap-cli
+          path: bin
+      - name: Run Tests on folder ${{ matrix.folder }}
+        run: |
+          echo "Running tests..."
+          cd "${{ matrix.folder }}" && ${{ github.workspace }}/bin/znap test
