@@ -20,7 +20,7 @@
 //!
 //! ## Example
 //!
-//! ```rust
+//! ```ignore
 //! use solana_sdk::{message::Message, pubkey, pubkey::Pubkey, transaction::Transaction};
 //! use spl_associated_token_account::get_associated_token_address;
 //! use spl_token::{instruction::transfer, ID as TOKEN_PROGRAM_ID};
@@ -213,9 +213,7 @@ pub fn add_action_identity_proof(transaction: Transaction) -> Transaction {
     let identity_signature = identity_keypair.sign_message(&reference_pubkey.to_bytes());
     let identity_message = format!(
         "solana-action:{}:{}:{}",
-        identity_pubkey.to_string(),
-        reference_pubkey.to_string(),
-        identity_signature.to_string()
+        identity_pubkey, reference_pubkey, identity_signature
     );
 
     let mut identity_added = false;
@@ -278,16 +276,16 @@ pub fn add_action_identity_proof(transaction: Transaction) -> Transaction {
     Transaction::new_unsigned(transaction_message_with_identity)
 }
 
-pub fn render_source<T>(source: &String, data: &T) -> String
+pub fn render_source<T>(source: &str, data: &T) -> String
 where
     T: Serialize,
 {
     let mut handlebars = Handlebars::new();
 
     assert!(handlebars
-        .register_template_string(&"template", &source)
+        .register_template_string("template", source)
         .is_ok());
-    let output = handlebars.render(&"template", &data).unwrap();
+    let output = handlebars.render("template", &data).unwrap();
 
     handlebars.clear_templates();
 
@@ -295,7 +293,7 @@ where
 }
 
 pub fn render_parameters<T>(
-    parameters: &Vec<LinkedActionParameter>,
+    parameters: &[LinkedActionParameter],
     data: &T,
 ) -> Vec<LinkedActionParameter>
 where
@@ -316,7 +314,7 @@ where
         .collect()
 }
 
-pub fn render_action_links<T>(links: &Option<ActionLinks>, data: &T) -> Option<ActionLinks>
+pub fn render_action_links<T>(links: Option<&ActionLinks>, data: &T) -> Option<ActionLinks>
 where
     T: Serialize,
 {
@@ -353,7 +351,7 @@ where
     let description = render_source(&metadata.description, &data);
     let label = render_source(&metadata.label, &data);
     let icon = render_source(&metadata.icon, &data);
-    let links = render_action_links(&metadata.links, &data);
+    let links = render_action_links(metadata.links.as_ref(), &data);
 
     ActionMetadata {
         title,

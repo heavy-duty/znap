@@ -46,22 +46,22 @@ pub fn get_config() -> Config {
     }
 }
 
-pub fn get_identity(identity: &String) -> String {
+pub fn get_identity(identity: &str) -> String {
     shellexpand::tilde(identity).into()
 }
 
-pub fn write_file(path: &Path, content: &String) {
-    let mut file = File::create(&path).expect("Should be able to open file");
+pub fn write_file(path: &Path, content: &str) {
+    let mut file = File::create(path).expect("Should be able to open file");
     file.write_all(content.as_bytes())
         .expect("Should be able to write file");
 }
 
 pub fn start_server_blocking(
-    name: &String,
-    identity: &String,
-    address: &Option<String>,
-    port: &Option<u16>,
-    protocol: &Option<String>,
+    name: &str,
+    identity: &str,
+    address: Option<&str>,
+    port: Option<&u16>,
+    protocol: Option<&str>,
 ) {
     let start_server_process = start_server(name, identity, address, port, protocol);
     let exit = start_server_process
@@ -74,33 +74,33 @@ pub fn start_server_blocking(
 }
 
 pub fn start_server(
-    name: &String,
-    identity: &String,
-    address: &Option<String>,
-    port: &Option<u16>,
-    protocol: &Option<String>,
+    name: &str,
+    identity: &str,
+    address: Option<&str>,
+    port: Option<&u16>,
+    protocol: Option<&str>,
 ) -> Child {
-    let mut env_vars: HashMap<String, String> = HashMap::new();
+    let mut env_vars: HashMap<&str, String> = HashMap::new();
 
-    env_vars.insert("IDENTITY_KEYPAIR_PATH".to_string(), identity.clone());
+    env_vars.insert("IDENTITY_KEYPAIR_PATH", identity.to_owned());
 
     if let Some(address) = address {
-        env_vars.insert("COLLECTION_ADDRESS".to_string(), address.clone());
+        env_vars.insert("COLLECTION_ADDRESS", address.to_owned());
     }
 
-    if let Some(port) = port {
-        env_vars.insert("COLLECTION_PORT".to_string(), port.to_string());
+    if let Some(port) = port.map(|p| p.to_string()) {
+        env_vars.insert("COLLECTION_PORT", port);
     }
 
     if let Some(protocol) = protocol {
-        env_vars.insert("COLLECTION_PROTOCOL".to_string(), protocol.clone());
+        env_vars.insert("COLLECTION_PROTOCOL", protocol.to_owned());
     }
 
     std::process::Command::new("cargo")
         .envs(env_vars)
         .arg("run")
         .arg("--manifest-path")
-        .arg(get_cwd().join(&format!(".znap/collections/{name}/Cargo.toml")))
+        .arg(get_cwd().join(format!(".znap/collections/{name}/Cargo.toml")))
         .arg("--bin")
         .arg("serve")
         .stdout(Stdio::inherit())
@@ -123,7 +123,7 @@ pub fn run_test_suite() {
         .expect("Should wait until the tests are over");
 }
 
-pub fn wait_for_server(address: &String, port: &u16, protocol: &String) {
+pub fn wait_for_server(address: &str, port: &u16, protocol: &str) {
     let url = format!("{protocol}://{address}:{port}/status");
 
     loop {
@@ -139,7 +139,7 @@ pub fn wait_for_server(address: &String, port: &u16, protocol: &String) {
     }
 }
 
-pub fn deploy_to_shuttle(name: &String, project: &String) {
+pub fn deploy_to_shuttle(name: &str, project: &str) {
     std::process::Command::new("cargo")
         .arg("shuttle")
         .arg("deploy")
@@ -147,7 +147,7 @@ pub fn deploy_to_shuttle(name: &String, project: &String) {
         .arg("--name")
         .arg(project)
         .arg("--working-directory")
-        .arg(get_cwd().join(&format!(".znap/collections/{name}")))
+        .arg(get_cwd().join(format!(".znap/collections/{name}")))
         .stdout(Stdio::inherit())
         .stderr(Stdio::inherit())
         .spawn()
@@ -183,9 +183,7 @@ pub fn generate_collection_executable_files(collection: &Collection) {
 
     write_file(
         &znap_toml_path,
-        &String::from(
-            "[workspace]\nmembers = [\"collections/*\"]\nresolver = \"2\"\n\n[patch.crates-io]\ncurve25519-dalek = { git = \"https://github.com/dalek-cryptography/curve25519-dalek\", rev = \"8274d5cbb6fc3f38cdc742b4798173895cd2a290\" }",
-        ),
+        "[workspace]\nmembers = [\"collections/*\"]\nresolver = \"2\"\n\n[patch.crates-io]\ncurve25519-dalek = { git = \"https://github.com/dalek-cryptography/curve25519-dalek\", rev = \"8274d5cbb6fc3f38cdc742b4798173895cd2a290\" }",
     );
 
     let znap_collections_path = znap_path.join("collections");
@@ -197,32 +195,24 @@ pub fn generate_collection_executable_files(collection: &Collection) {
     let znap_collection_path = znap_collections_path.join(&collection.name);
 
     if znap_collection_path.exists() {
-        remove_dir_all(&znap_collection_path).expect(&format!(
-            "Could not delete .znap/{} folder",
-            &collection.name
-        ))
+        remove_dir_all(&znap_collection_path)
+            .unwrap_or_else(|_| panic!("Could not delete .znap/{} folder", &collection.name))
     }
 
-    create_dir(&znap_collection_path).expect(&format!(
-        "Could not create .znap/{} folder",
-        &collection.name
-    ));
+    create_dir(&znap_collection_path)
+        .unwrap_or_else(|_| panic!("Could not create .znap/{} folder", &collection.name));
 
     let znap_collection_src_path = znap_collection_path.join("src");
 
-    create_dir(&znap_collection_src_path).expect(&format!(
-        "Could not create .znap/{}/src folder",
-        &collection.name
-    ));
+    create_dir(&znap_collection_src_path)
+        .unwrap_or_else(|_| panic!("Could not create .znap/{}/src folder", &collection.name));
 
     let znap_collection_src_bin_path = znap_collection_src_path.join("bin");
 
-    create_dir(&znap_collection_src_bin_path).expect(&format!(
-        "Could not create .znap/{}/src/bin folder",
-        &collection.name
-    ));
+    create_dir(&znap_collection_src_bin_path)
+        .unwrap_or_else(|_| panic!("Could not create .znap/{}/src/bin folder", &collection.name));
 
-    let collection_path = cwd.join(&format!("collections/{}", &collection.name));
+    let collection_path = cwd.join(format!("collections/{}", &collection.name));
     let collection_src_path = collection_path.join("src");
 
     copy_recursively(collection_src_path, znap_collection_src_path);
@@ -253,11 +243,11 @@ pub fn generate_collection_executable_files(collection: &Collection) {
     );
 }
 
-pub fn build_for_release(name: &String) {
+pub fn build_for_release(name: &str) {
     std::process::Command::new("cargo")
         .arg("build")
         .arg("--manifest-path")
-        .arg(get_cwd().join(&format!(".znap/collections/{name}/Cargo.toml")))
+        .arg(get_cwd().join(format!(".znap/collections/{name}/Cargo.toml")))
         .arg("--release")
         .arg("--bin")
         .arg("serve")

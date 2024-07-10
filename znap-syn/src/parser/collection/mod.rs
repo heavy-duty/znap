@@ -5,9 +5,9 @@ mod get_action_fns;
 mod post_action_fns;
 
 pub fn parse(collection_mod: &ItemMod) -> ParseResult<CollectionMod> {
-    let post_action_fns = post_action_fns::parse(&collection_mod)?;
-    let get_action_fns = get_action_fns::parse(&collection_mod)?;
-    let actions = actions::parse(&collection_mod)?;
+    let post_action_fns = post_action_fns::parse(collection_mod)?;
+    let get_action_fns = get_action_fns::parse(collection_mod)?;
+    let actions = actions::parse(collection_mod)?;
 
     Ok(CollectionMod {
         actions,

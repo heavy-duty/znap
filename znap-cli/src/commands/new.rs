@@ -6,10 +6,10 @@ use colored::Colorize;
 use heck::ToKebabCase;
 use std::fs::{create_dir, read_to_string};
 
-pub fn run(name: &String, dry_run: &bool) {
+pub fn run(name: &str, dry_run: bool) {
     println!(
         "\nYou are about to create a collection named: {}\n",
-        &name.cyan()
+        name.cyan()
     );
 
     // Create a folder for the collection in the collections folder.
@@ -52,7 +52,7 @@ pub fn run(name: &String, dry_run: &bool) {
         // Create a Cargo.toml for the collection.
         write_file(
             collection_dir.join("Cargo.toml").as_path(),
-            &template::new_collection_toml::template(&name),
+            &template::new_collection_toml::template(name),
         );
 
         // Create a src folder.
@@ -61,12 +61,12 @@ pub fn run(name: &String, dry_run: &bool) {
         // Create a lib.rs in the src folder.
         write_file(
             collection_src_dir.join("lib.rs").as_path(),
-            &template::new_collection_body::template(&name),
+            &template::new_collection_body::template(name),
         );
 
         // Add to collections list in Znap.toml.
         write_file(
-            &znap_toml_path.as_path(),
+            znap_toml_path.as_path(),
             &toml::to_string(&Config {
                 collections,
                 identity: "~/.config/solana/id.json".to_string(),
@@ -78,19 +78,19 @@ pub fn run(name: &String, dry_run: &bool) {
     println!("  Added:\n");
     println!(
         "      {}",
-        format!("+ collections/{}/Cargo.toml", &name).green()
+        format!("+ collections/{name}/Cargo.toml").green()
     );
     println!(
         "      {}",
-        format!("+ collections/{}/src/lib.rs", &name).green()
+        format!("+ collections/{name}/src/lib.rs").green()
     );
-    println!("");
+    println!();
     println!("  Modified:\n");
     println!("      {}", "* ./Znap.toml".green());
 
     println!(
         "\nCollection created at {}\n",
-        format!("file://{}", &collection_dir.to_str().unwrap())
+        format!("file://{}", collection_dir.to_str().unwrap())
             .italic()
             .bold()
     );

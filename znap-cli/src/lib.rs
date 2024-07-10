@@ -62,18 +62,39 @@ pub enum Command {
 
 fn process_command(opts: Opts) -> Result<()> {
     match &opts.command {
-        Command::Build { name } => Ok(commands::build::run(name)),
+        Command::Build { name } => {
+            commands::build::run(name);
+            Ok(())
+        }
         Command::Serve {
             name,
             address,
             port,
             protocol,
-        } => Ok(commands::serve::run(name, address, port, protocol)),
-        Command::Test => Ok(commands::test::run()),
-        Command::Clean => Ok(commands::clean::run()),
-        Command::Init { name, dry_run } => Ok(commands::init::run(name, dry_run)),
-        Command::New { name, dry_run } => Ok(commands::new::run(name, dry_run)),
-        Command::Deploy { name, project } => Ok(commands::deploy::run(name, project)),
+        } => {
+            commands::serve::run(name, address.as_deref(), port.as_ref(), protocol.as_deref());
+            Ok(())
+        }
+        Command::Test => {
+            commands::test::run();
+            Ok(())
+        }
+        Command::Clean => {
+            commands::clean::run();
+            Ok(())
+        }
+        Command::Init { name, dry_run } => {
+            commands::init::run(name, *dry_run);
+            Ok(())
+        }
+        Command::New { name, dry_run } => {
+            commands::new::run(name, *dry_run);
+            Ok(())
+        }
+        Command::Deploy { name, project } => {
+            commands::deploy::run(name, project);
+            Ok(())
+        }
     }
 }
 

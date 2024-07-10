@@ -10,5 +10,5 @@ pub fn run() {
 
     // Create a new .znap folder with a .gitkeep
     create_dir(&znap_path).expect("Should be able to create a .znap folder");
-    File::create(&znap_gitkeep_path).expect("Should be able to create a .znap/.gitkeep file");
+    File::create(znap_gitkeep_path).expect("Should be able to create a .znap/.gitkeep file");
 }

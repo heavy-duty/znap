@@ -1,6 +1,6 @@
 use heck::ToSnekCase;
 
-pub fn template(name: &String) -> String {
+pub fn template(name: &str) -> String {
     format!(
         r#"use znap::prelude::*;
 
