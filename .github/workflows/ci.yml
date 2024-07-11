@@ -107,15 +107,32 @@ jobs:
         uses: actions/checkout@v4
       - uses: Swatinem/rust-cache@v2
       - uses: dtolnay/rust-toolchain@stable
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+      - name: Cache Node.js modules
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.OS }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.OS }}-node-${{ hashFiles('**/package-lock.json') }}
+
       - uses: actions/download-artifact@v4
         id: download-cli
         with:
           path: /tmp/artifacts
       - name: fix excecution file
         run: chmod +x ${{ steps.download-cli.outputs.download-path }}/znap-cli/znap
+      - name: Install dependencies and run tests
+        run: |
+          echo "Installing dependencies..."
+          npm ci --prefix "${{ matrix.folder }}"
       - name: Run Tests on folder ${{ matrix.folder }}
         env:
           ZNAP_LIB: ${{ github.workspace }}/znap
+          ZNAP_CWD: ${{ matrix.folder }}
         run: |
           echo "Running tests..."
           cd "${{ matrix.folder }}" && ${{ steps.download-cli.outputs.download-path }}/znap-cli/znap test
