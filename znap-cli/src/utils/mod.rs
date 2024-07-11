@@ -234,7 +234,16 @@ pub fn generate_collection_executable_files(collection: &Collection) {
     let znap_collection_toml_path = znap_collection_path.join("Cargo.toml");
     let collection_toml_path = collection_path.join("Cargo.toml");
 
-    let collection_toml = read_to_string(collection_toml_path).unwrap();
+    let mut collection_toml = read_to_string(collection_toml_path).expect("Cargo.toml not found");
+    if let Ok(new_path) = std::env::var("ZNAP_LIB") {
+        if let Some(line) = collection_toml
+            .lines()
+            .find(|l| l.trim().starts_with("znap = { path ="))
+        {
+            collection_toml =
+                collection_toml.replace(line, &format!("znap = {{ path = \"{new_path}\" }}"));
+        }
+    }
     let znap_toml_extras = template::collection_toml::template(&collection.name);
 
     write_file(
