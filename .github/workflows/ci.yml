@@ -65,6 +65,8 @@ jobs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
       files: ${{ steps.list-tests.outputs.files }}
     steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
       - id: set-matrix
         run: |
           FOLDERS=$(ls -d tests/*/ | jq -R -s -c 'split("\n")[:-1]')
