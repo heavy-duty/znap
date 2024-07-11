@@ -111,15 +111,9 @@ pub fn start_server(
 }
 
 pub fn run_test_suite() {
-    let mut args = vec!["run".to_owned(), "test".to_owned()];
-
-    // TODO: This should come from a flag in the command test
-    if let Ok(znap_cwd) = std::env::var("ZNAP_CWD") {
-        args.push("--prefix".to_owned());
-        args.push(znap_cwd);
-    }
     std::process::Command::new("npm")
-        .args(&args)
+        .arg("run")
+        .arg("test")
         .stdout(Stdio::inherit())
         .stderr(Stdio::inherit())
         .spawn()
