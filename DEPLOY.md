@@ -14,16 +14,16 @@ In this tutorial, we will assume that you have already created your Znap project
 - `<NAME>`: The name of the collection
 - `<PROJECT>`: The name of the project in shuttle
 
-Let's suppose we have a collection called alice-donation and a project with the same name in Shuttle. Once we have tested our project in our local environment to ensure that everything works correctly, we use the following command: `znap deploy alice-donation alice-donation`.
+Let's suppose we have a collection called alice-donation and a project called alice-solana-action-api in Shuttle. Once we have tested our project in our local environment to ensure that everything works correctly, we use the following command: `znap deploy alice-donation alice-solana-action-api`.
 
 If you used the correct name for your collection and the correct name for your project in Shuttle, the deployment of your project will start and, in the end, you will get an output similar to the following:
 
 ```bash
-Service Name:  alice-donation
+Service Name:  alice-solana-action-api
 Deployment ID: 6f52214b-34cd-4010-8d53-073254f721b7
 Status:        running
 Last Updated:  2024-07-11T19:09:01Z
-URI:           https://alice-donation.shuttleapp.rs
+URI:           https://alice-solana-action-api.shuttleapp.rs
 ```
 
 ## Let's test our Solana Action API
@@ -34,7 +34,7 @@ For example, in this case, it would be as follows and we would get the following
 
 **GET REQUEST**
 
-`https://alice-donation.shuttleapp.rs/api/send_donation?amount=1`
+`https://alice-solana-action-api.shuttleapp.rs/api/send_donation?amount=1`
 
 **GET RESPONSE**
 
@@ -76,7 +76,7 @@ For example, in this case, it would be as follows and we would get the following
 
 **POST REQUEST**
 
-`POST: https://alice-donation.shuttleapp.rs/api/send_donation?amount=1`
+`POST: https://alice-solana-action-api.shuttleapp.rs/api/send_donation?amount=1`
 
 **POST RESPONSE**
 
