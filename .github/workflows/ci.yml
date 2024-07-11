@@ -88,12 +88,12 @@ jobs:
       - uses: Swatinem/rust-cache@v2
       - uses: dtolnay/rust-toolchain@stable
       - name: Build
-        run: cargo b -r -p znap-cli
-      - uses: actions/upload-artifact@v3
+        run: cargo b -r -p znap-cli && mkdir -p bin && mv ./target/release/znap bin
+      - uses: actions/upload-artifact@v4
         name: Upload Artifact
         with:
           name: znap-cli
-          path: ./target/release/znap
+          path: bin/
           retention-days: 1
 
   run-tests:
@@ -108,12 +108,14 @@ jobs:
       - uses: Swatinem/rust-cache@v2
       - uses: dtolnay/rust-toolchain@stable
       - uses: actions/download-artifact@v4
+        id: download-cli
         with:
-          name: znap-cli
-          path: bin
+          path: /tmp/artifacts
+      - name: fix excecution file
+        run: chmod +x ${{ steps.download-cli.outputs.download-path }}/znap-cli/znap
       - name: Run Tests on folder ${{ matrix.folder }}
         env:
           ZNAP_LIB: ${{ github.workspace }}/znap
         run: |
           echo "Running tests..."
-          cd "${{ matrix.folder }}" && ${{ github.workspace }}/bin/znap test
+          cd "${{ matrix.folder }}" && ${{ steps.download-cli.outputs.download-path }}/znap-cli/znap test
