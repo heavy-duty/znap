@@ -110,6 +110,8 @@ jobs:
           name: znap-cli
           path: bin
       - name: Run Tests on folder ${{ matrix.folder }}
+        env:
+          ZNAP_LIB: ${{ github.workspace }}/znap
         run: |
           echo "Running tests..."
           cd "${{ matrix.folder }}" && ${{ github.workspace }}/bin/znap test
