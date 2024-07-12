@@ -84,7 +84,7 @@ use solana_sdk::instruction::{AccountMeta, Instruction};
 use solana_sdk::message::Message;
 use solana_sdk::pubkey;
 use solana_sdk::signature::Keypair;
-use solana_sdk::signer::{EncodableKey, Signer};
+use solana_sdk::signer::Signer;
 use solana_sdk::transaction::Transaction;
 pub extern crate base64;
 pub extern crate bincode;

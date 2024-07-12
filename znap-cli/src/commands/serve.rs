@@ -16,7 +16,7 @@ pub fn run(name: &str, address: Option<&str>, port: Option<&u16>, protocol: Opti
         // Run the server
         start_server_blocking(
             name,
-            &get_identity(&config.identity),
+            config.identity.as_deref().map(get_identity).as_deref(),
             address,
             port,
             protocol,
