@@ -213,13 +213,13 @@ struct ErrorResponse {
     message: String,
 }
 
-pub fn add_action_identity_proof(transaction: Transaction, env: &env::Env) -> Transaction {
-    let identity_pubkey = env.keypair.pubkey();
+pub fn add_action_identity_proof(transaction: Transaction, keypair: &Keypair) -> Transaction {
+    let identity_pubkey = keypair.pubkey();
 
     let reference_keypair = Keypair::new();
     let reference_pubkey = reference_keypair.pubkey();
 
-    let identity_signature = env.keypair.sign_message(&reference_pubkey.to_bytes());
+    let identity_signature = keypair.sign_message(&reference_pubkey.to_bytes());
     let identity_message = format!(
         "solana-action:{}:{}:{}",
         identity_pubkey, reference_pubkey, identity_signature

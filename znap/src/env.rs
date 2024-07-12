@@ -2,6 +2,7 @@ use std::env::var;
 
 use solana_sdk::signature::Keypair;
 
+#[derive(Debug)]
 pub struct Env {
     pub identity: Vec<u8>,
     pub keypair: Keypair,

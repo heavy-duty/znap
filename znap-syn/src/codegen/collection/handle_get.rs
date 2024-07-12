@@ -26,15 +26,15 @@ pub fn generate(collection_mod: &CollectionMod) -> TokenStream {
                         #[derive(Debug, serde::Serialize, serde::Deserialize)]
                         pub struct #context {
                             params: #params,
-                            #[serde::skip]
-                            env: znap::Env,
+                            #[serde(skip)]
+                            env: znap::env::Env,
                         }
 
                         #[derive(Debug, serde::Serialize, serde::Deserialize)]
                         pub struct #context_with_metadata {
                             params: #params,
-                            #[serde::skip]
-                            env: znap::Env,
+                            #[serde(skip)]
+                            env: znap::env::Env,
                             metadata: znap::ActionMetadata,
                         }
 
@@ -48,7 +48,7 @@ pub fn generate(collection_mod: &CollectionMod) -> TokenStream {
                             let raw_metadata = #action::to_metadata();
                             let context = #context {
                                 params,
-                                env: znap::Env::default(),
+                                env: znap::env::Env::default(),
                             };
                             let rendered_metadata = znap::render_metadata(&raw_metadata, &context, false, None);
                             let context_with_metadata = #context_with_metadata {
@@ -67,8 +67,8 @@ pub fn generate(collection_mod: &CollectionMod) -> TokenStream {
                         #[derive(Debug, serde::Serialize, serde::Deserialize)]
                         pub struct #context {
                             params: #params,
-                            #[serde::skip]
-                            env: znap::Env,
+                            #[serde(skip)]
+                            env: znap::env::Env,
                         }
 
                         pub async fn #handler(
@@ -77,7 +77,7 @@ pub fn generate(collection_mod: &CollectionMod) -> TokenStream {
                             let raw_metadata = #action::to_metadata();
                             let context = #context {
                                 params,
-                                env: znap::Env::default(),
+                                env: znap::env::Env::default(),
                             };
                             let rendered_metadata = znap::render_metadata(&raw_metadata, &context, false, None);
 

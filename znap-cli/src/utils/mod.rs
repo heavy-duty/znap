@@ -82,7 +82,11 @@ pub fn start_server(
 ) -> Child {
     let mut env_vars: HashMap<&str, String> = HashMap::new();
 
-    if let Some(i) = identity {
+    if let Ok(path) = std::env::var("IDENTITY_KEYPAIR_PATH") {
+        env_vars.insert("IDENTITY_KEYPAIR_PATH", path);
+    } else if let Ok(v) = std::env::var("IDENTITY_KEYPAIR") {
+        env_vars.insert("IDENTITY_KEYPAIR", v);
+    } else if let Some(i) = identity {
         env_vars.insert("IDENTITY_KEYPAIR_PATH", i.to_owned());
     }
 

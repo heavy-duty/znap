@@ -24,9 +24,9 @@ pub fn generate(collection_mod: &CollectionMod) -> TokenStream {
                 pub struct #context {
                     query: #query,
                     params: #params,
-                    payload: znap::CreateActionPayload
-                    #[serde::skip]
-                    env: znap::Env,
+                    payload: znap::CreateActionPayload,
+                    #[serde(skip)]
+                    env: znap::env::Env,
                 }
 
                 pub async fn #create_transaction_fn(ctx: &#context) -> znap::Result<znap::ActionTransaction> {
@@ -42,10 +42,10 @@ pub fn generate(collection_mod: &CollectionMod) -> TokenStream {
                         payload,
                         query,
                         params,
-                        env: znap::Env::default(),
+                        env: znap::env::Env::default(),
                     };
                     let znap::ActionTransaction { transaction, message } = #create_transaction_fn(&context).await?;
-                    let transaction_with_identity = znap::add_action_identity_proof(transaction, &context.env);
+                    let transaction_with_identity = znap::add_action_identity_proof(transaction, &context.env.keypair);
                     let serialized_transaction = bincode::serialize(&transaction_with_identity).unwrap();
                     let encoded_transaction = BASE64_STANDARD.encode(serialized_transaction);
 
