@@ -84,16 +84,27 @@ use solana_sdk::instruction::{AccountMeta, Instruction};
 use solana_sdk::message::Message;
 use solana_sdk::pubkey;
 use solana_sdk::signature::Keypair;
-use solana_sdk::signer::{EncodableKey, Signer};
+use solana_sdk::signer::Signer;
 use solana_sdk::transaction::Transaction;
-use std::env;
 pub extern crate base64;
 pub extern crate bincode;
 pub extern crate colored;
 pub extern crate tower_http;
 pub extern crate znap_macros;
 
-pub mod prelude;
+pub mod env;
+pub mod prelude {
+    pub use super::env::Env;
+    pub use super::{
+        Action, ActionLinks, ActionMetadata, ActionResponse, ActionTransaction, Error, ErrorCode,
+        LinkedAction, LinkedActionParameter, Result, ToMetadata,
+    };
+    pub use base64;
+    pub use bincode;
+    pub use colored;
+    pub use tower_http;
+    pub use znap_macros::{collection, Action, ErrorCode};
+}
 
 /// Trait used to transform a struct into an Action.
 pub trait Action {}
@@ -202,15 +213,13 @@ struct ErrorResponse {
     message: String,
 }
 
-pub fn add_action_identity_proof(transaction: Transaction) -> Transaction {
-    let identity_keypair =
-        Keypair::read_from_file(env::var("IDENTITY_KEYPAIR_PATH").unwrap()).unwrap();
-    let identity_pubkey = identity_keypair.pubkey();
+pub fn add_action_identity_proof(transaction: Transaction, keypair: &Keypair) -> Transaction {
+    let identity_pubkey = keypair.pubkey();
 
     let reference_keypair = Keypair::new();
     let reference_pubkey = reference_keypair.pubkey();
 
-    let identity_signature = identity_keypair.sign_message(&reference_pubkey.to_bytes());
+    let identity_signature = keypair.sign_message(&reference_pubkey.to_bytes());
     let identity_message = format!(
         "solana-action:{}:{}:{}",
         identity_pubkey, reference_pubkey, identity_signature

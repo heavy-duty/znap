@@ -19,7 +19,7 @@ pub fn run() {
         // Start server in background
         let server_process = start_server(
             &collection.name,
-            &get_identity(&config.identity),
+            config.identity.as_deref().map(get_identity).as_deref(),
             Some(&collection.address),
             Some(&collection.port),
             Some(&collection.protocol),

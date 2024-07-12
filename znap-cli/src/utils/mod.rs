@@ -25,7 +25,7 @@ pub struct Collection {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Config {
     pub collections: Option<Vec<Collection>>,
-    pub identity: String,
+    pub identity: Option<String>,
 }
 
 pub fn get_cwd() -> PathBuf {
@@ -58,7 +58,7 @@ pub fn write_file(path: &Path, content: &str) {
 
 pub fn start_server_blocking(
     name: &str,
-    identity: &str,
+    identity: Option<&str>,
     address: Option<&str>,
     port: Option<&u16>,
     protocol: Option<&str>,
@@ -75,14 +75,20 @@ pub fn start_server_blocking(
 
 pub fn start_server(
     name: &str,
-    identity: &str,
+    identity: Option<&str>,
     address: Option<&str>,
     port: Option<&u16>,
     protocol: Option<&str>,
 ) -> Child {
     let mut env_vars: HashMap<&str, String> = HashMap::new();
 
-    env_vars.insert("IDENTITY_KEYPAIR_PATH", identity.to_owned());
+    if let Ok(path) = std::env::var("IDENTITY_KEYPAIR_PATH") {
+        env_vars.insert("IDENTITY_KEYPAIR_PATH", path);
+    } else if let Ok(v) = std::env::var("IDENTITY_KEYPAIR") {
+        env_vars.insert("IDENTITY_KEYPAIR", v);
+    } else if let Some(i) = identity {
+        env_vars.insert("IDENTITY_KEYPAIR_PATH", i.to_owned());
+    }
 
     if let Some(address) = address {
         env_vars.insert("COLLECTION_ADDRESS", address.to_owned());
