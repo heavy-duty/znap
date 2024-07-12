@@ -69,7 +69,7 @@ pub fn run(name: &str, dry_run: bool) {
             znap_toml_path.as_path(),
             &toml::to_string(&Config {
                 collections,
-                identity: "~/.config/solana/id.json".to_string(),
+                identity: Some("~/.config/solana/id.json".to_string()),
             })
             .unwrap(),
         );

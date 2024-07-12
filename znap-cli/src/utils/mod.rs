@@ -25,7 +25,7 @@ pub struct Collection {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Config {
     pub collections: Option<Vec<Collection>>,
-    pub identity: String,
+    pub identity: Option<String>,
 }
 
 pub fn get_cwd() -> PathBuf {
@@ -58,7 +58,7 @@ pub fn write_file(path: &Path, content: &str) {
 
 pub fn start_server_blocking(
     name: &str,
-    identity: &str,
+    identity: Option<&str>,
     address: Option<&str>,
     port: Option<&u16>,
     protocol: Option<&str>,
@@ -75,14 +75,20 @@ pub fn start_server_blocking(
 
 pub fn start_server(
     name: &str,
-    identity: &str,
+    identity: Option<&str>,
     address: Option<&str>,
     port: Option<&u16>,
     protocol: Option<&str>,
 ) -> Child {
     let mut env_vars: HashMap<&str, String> = HashMap::new();
 
-    env_vars.insert("IDENTITY_KEYPAIR_PATH", identity.to_owned());
+    if let Ok(path) = std::env::var("IDENTITY_KEYPAIR_PATH") {
+        env_vars.insert("IDENTITY_KEYPAIR_PATH", path);
+    } else if let Ok(v) = std::env::var("IDENTITY_KEYPAIR") {
+        env_vars.insert("IDENTITY_KEYPAIR", v);
+    } else if let Some(i) = identity {
+        env_vars.insert("IDENTITY_KEYPAIR_PATH", i.to_owned());
+    }
 
     if let Some(address) = address {
         env_vars.insert("COLLECTION_ADDRESS", address.to_owned());
@@ -234,7 +240,16 @@ pub fn generate_collection_executable_files(collection: &Collection) {
     let znap_collection_toml_path = znap_collection_path.join("Cargo.toml");
     let collection_toml_path = collection_path.join("Cargo.toml");
 
-    let collection_toml = read_to_string(collection_toml_path).unwrap();
+    let mut collection_toml = read_to_string(collection_toml_path).expect("Cargo.toml not found");
+    if let Ok(new_path) = std::env::var("ZNAP_LIB") {
+        if let Some(line) = collection_toml
+            .lines()
+            .find(|l| l.trim().starts_with("znap = { path ="))
+        {
+            collection_toml =
+                collection_toml.replace(line, &format!("znap = {{ path = \"{new_path}\" }}"));
+        }
+    }
     let znap_toml_extras = template::collection_toml::template(&collection.name);
 
     write_file(
