@@ -126,6 +126,7 @@ jobs:
       - name: fix excecution file
         run: chmod +x ${{ steps.download-cli.outputs.download-path }}/znap-cli/znap
       - name: Install dependencies and run tests
+        id: prepare
         run: |
           echo "Installing dependencies..."
           npm ci --prefix "${{ matrix.folder }}"
@@ -134,5 +135,7 @@ jobs:
           ZNAP_LIB: ${{ github.workspace }}/znap
           ZNAP_CWD: ${{ matrix.folder }}
         run: |
+          echo "Set identity..."
+          export IDENTITY_KEYPAIR=$(echo "${{ secrets.IDENTITY_KEYPAIR }}" | base64 -d)
           echo "Running tests..."
           cd "${{ matrix.folder }}" && ${{ steps.download-cli.outputs.download-path }}/znap-cli/znap test
