@@ -130,12 +130,15 @@ jobs:
         run: |
           echo "Installing dependencies..."
           npm ci --prefix "${{ matrix.folder }}"
+
+          echo "Set identity..."
+          export IDENTITY=$(echo "${{ secrets.IDENTITY_KEYPAIR }}" | base64 -d)
+          echo "IDENTITY_KEYPAIR=$IDENTITY">>$GITHUB_ENV
       - name: Run Tests on folder ${{ matrix.folder }}
         env:
           ZNAP_LIB: ${{ github.workspace }}/znap
           ZNAP_CWD: ${{ matrix.folder }}
+          # IDENTITY_KEYPAIR: ${{ steps.prepare.env.IDENTITY_KEYPAIR }}
         run: |
-          echo "Set identity..."
-          export IDENTITY_KEYPAIR=$(echo "${{ secrets.IDENTITY_KEYPAIR }}" | base64 -d)
           echo "Running tests..."
           cd "${{ matrix.folder }}" && ${{ steps.download-cli.outputs.download-path }}/znap-cli/znap test
