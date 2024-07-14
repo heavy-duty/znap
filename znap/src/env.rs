@@ -10,21 +10,23 @@ pub struct Env {
 
 impl Default for Env {
     fn default() -> Self {
-        let identity = var("IDENTITY_KEYPAIR")
+        let keypair = var("IDENTITY_KEYPAIR")
             .or(var("IDENTITY_KEYPAIR_PATH").map(|path| std::fs::read_to_string(path).unwrap()))
             .map(|i| {
                 if i.starts_with('[') {
                     let i = i.trim_start_matches('[').trim_end_matches(']');
-                    i.split(',')
+                    let b = i
+                        .split(',')
                         .map(|b| b.trim().parse::<u8>().unwrap())
-                        .collect()
+                        .collect::<Vec<_>>();
+                    Keypair::from_bytes(&b).unwrap()
                 } else {
-                    i.as_bytes().to_vec()
+                    Keypair::from_base58_string(&i)
                 }
             })
             .expect("Cannot found `IDENTITY_KEYPAIR_PATH` or `IDENTITY_KEYPAIR` env var");
 
-        let keypair = Keypair::from_bytes(&identity).unwrap();
+        let identity = keypair.to_bytes().to_vec();
 
         Self { identity, keypair }
     }
