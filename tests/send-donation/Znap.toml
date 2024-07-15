@@ -1,0 +1,7 @@
+identity = "~/.config/solana/id.json"
+
+[[collections]]
+name = "my-actions"
+address = "localhost"
+port = 3000
+protocol = "http"
