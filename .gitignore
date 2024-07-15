@@ -1,10 +1,7 @@
-/target
 TODO.md
 .vscode
-examples/**/target
-examples/**/.znap
-examples/**/Cargo.lock
-examples/**/node_modules
-examples/**/package-lock.json
-.nx/cache
-examples/**/.nx/cache
+**/target
+**/.znap
+**/node_modules
+**/.nx/cache
+
