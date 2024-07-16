@@ -2,7 +2,7 @@ use crate::utils::{deploy_to_shuttle, generate_collection_executable_files, get_
 
 pub fn run(name: &str, project: &str) {
     let config = get_config();
-    let collections = config.collections.unwrap_or_default();
+    let collections = config.collections.as_deref().unwrap_or_default();
     let collection = collections
         .iter()
         .find(|collection| collection.name == *name);
@@ -12,7 +12,7 @@ pub fn run(name: &str, project: &str) {
         generate_collection_executable_files(collection);
 
         // Deploy to shuttle
-        deploy_to_shuttle(name, project);
+        deploy_to_shuttle(project, &config, collection);
     } else {
         panic!("Collection not found in the workspace.")
     }
