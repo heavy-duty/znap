@@ -15,8 +15,10 @@ pub fn generate(action_struct: &ActionStruct) -> (String, TokenStream) {
             let path = if !attr.custom_path.contains("{{prefix}}") {
                 format!(
                     "/{}/{}",
-                    attr.prefix,
-                    attr.custom_path.replace("{{action_name}}", &action_name)
+                    attr.prefix.trim_matches('/'),
+                    attr.custom_path
+                        .replace("{{action_name}}", &action_name)
+                        .trim_matches('/')
                 )
             } else {
                 format!(
@@ -24,6 +26,7 @@ pub fn generate(action_struct: &ActionStruct) -> (String, TokenStream) {
                     attr.custom_path
                         .replace("{{prefix}}", &attr.prefix)
                         .replace("{{action_name}}", &action_name)
+                        .trim_matches('/')
                 )
             };
             if !path.contains(&action_name) {
