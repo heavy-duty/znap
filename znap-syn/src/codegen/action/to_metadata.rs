@@ -29,11 +29,13 @@ fn generate_links(links: &[ActionLinkStruct], route: &str) -> TokenStream {
         .iter()
         .map(|l| {
             let label = &l.label;
-            let href = l.href.trim_matches('/');
-            let href = if href.starts_with(route) || href.starts_with("http") {
-                href.to_owned()
+            let href = if l.href.starts_with(route)
+                || l.href.starts_with("http")
+                || l.href.starts_with('/')
+            {
+                l.href.to_owned()
             } else {
-                format!("{route}/{href}")
+                format!("{route}/{}", l.href)
             };
             let params = generate_parameter(&l.parameters);
 
