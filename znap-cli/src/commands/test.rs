@@ -1,29 +1,21 @@
 use crate::utils::{
-    generate_collection_executable_files, get_config, get_identity, run_test_suite, start_server,
-    wait_for_server,
+    generate_collection_executable_files, get_config, run_test_suite, start_server, wait_for_server,
 };
-use std::process::Child;
 
 pub fn run() {
     // get config
     let config = get_config();
-    let collections = config.collections.unwrap_or_default();
+    let collections = config.collections.as_deref().unwrap_or_default();
 
     // start and wait for each server to be running
-    let mut server_processes: Vec<Child> = vec![];
+    let mut server_processes = vec![];
 
     for collection in collections {
         // Generate all server
-        generate_collection_executable_files(&collection);
+        generate_collection_executable_files(collection);
 
         // Start server in background
-        let server_process = start_server(
-            &collection.name,
-            config.identity.as_deref().map(get_identity).as_deref(),
-            Some(&collection.address),
-            Some(&collection.port),
-            Some(&collection.protocol),
-        );
+        let server_process = start_server(&config, collection, None, None, None);
 
         // While true with a sleep until server is online
         wait_for_server(&collection.address, &collection.port, &collection.protocol);

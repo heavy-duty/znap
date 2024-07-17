@@ -46,7 +46,7 @@ pub fn get_config() -> Config {
     }
 }
 
-pub fn get_identity(identity: &str) -> String {
+fn get_identity(identity: &str) -> String {
     shellexpand::tilde(identity).into()
 }
 
@@ -56,14 +56,46 @@ pub fn write_file(path: &Path, content: &str) {
         .expect("Should be able to write file");
 }
 
+pub fn get_envs(
+    config: &Config,
+    collection: &Collection,
+    address: Option<&str>,
+    port: Option<&u16>,
+    protocol: Option<&str>,
+) -> HashMap<&'static str, String> {
+    let mut env_vars: HashMap<&str, String> = HashMap::new();
+
+    if let Ok(path) = std::env::var("IDENTITY_KEYPAIR_PATH") {
+        env_vars.insert("IDENTITY_KEYPAIR_PATH", get_identity(&path));
+    } else if let Ok(v) = std::env::var("IDENTITY_KEYPAIR") {
+        env_vars.insert("IDENTITY_KEYPAIR", v);
+    } else if let Some(i) = config.identity.as_deref() {
+        env_vars.insert("IDENTITY_KEYPAIR_PATH", get_identity(i));
+    }
+
+    if let Some(address) = address.or(Some(&collection.address)) {
+        env_vars.insert("COLLECTION_ADDRESS", address.to_owned());
+    }
+
+    if let Some(port) = port.or(Some(&collection.port)) {
+        env_vars.insert("COLLECTION_PORT", port.to_string());
+    }
+
+    if let Some(protocol) = protocol.or(Some(&collection.protocol)) {
+        env_vars.insert("COLLECTION_PROTOCOL", protocol.to_owned());
+    }
+
+    env_vars
+}
+
 pub fn start_server_blocking(
-    name: &str,
-    identity: Option<&str>,
+    config: &Config,
+    collection: &Collection,
     address: Option<&str>,
     port: Option<&u16>,
     protocol: Option<&str>,
 ) {
-    let start_server_process = start_server(name, identity, address, port, protocol);
+    let start_server_process = start_server(config, collection, address, port, protocol);
     let exit = start_server_process
         .wait_with_output()
         .expect("Should be able to start server");
@@ -74,39 +106,17 @@ pub fn start_server_blocking(
 }
 
 pub fn start_server(
-    name: &str,
-    identity: Option<&str>,
+    config: &Config,
+    collection: &Collection,
     address: Option<&str>,
     port: Option<&u16>,
     protocol: Option<&str>,
 ) -> Child {
-    let mut env_vars: HashMap<&str, String> = HashMap::new();
-
-    if let Ok(path) = std::env::var("IDENTITY_KEYPAIR_PATH") {
-        env_vars.insert("IDENTITY_KEYPAIR_PATH", path);
-    } else if let Ok(v) = std::env::var("IDENTITY_KEYPAIR") {
-        env_vars.insert("IDENTITY_KEYPAIR", v);
-    } else if let Some(i) = identity {
-        env_vars.insert("IDENTITY_KEYPAIR_PATH", i.to_owned());
-    }
-
-    if let Some(address) = address {
-        env_vars.insert("COLLECTION_ADDRESS", address.to_owned());
-    }
-
-    if let Some(port) = port.map(|p| p.to_string()) {
-        env_vars.insert("COLLECTION_PORT", port);
-    }
-
-    if let Some(protocol) = protocol {
-        env_vars.insert("COLLECTION_PROTOCOL", protocol.to_owned());
-    }
-
     std::process::Command::new("cargo")
-        .envs(env_vars)
+        .envs(get_envs(config, collection, address, port, protocol))
         .arg("run")
         .arg("--manifest-path")
-        .arg(get_cwd().join(format!(".znap/collections/{name}/Cargo.toml")))
+        .arg(get_cwd().join(format!(".znap/collections/{}/Cargo.toml", collection.name)))
         .arg("--bin")
         .arg("serve")
         .stdout(Stdio::inherit())
@@ -145,15 +155,16 @@ pub fn wait_for_server(address: &str, port: &u16, protocol: &str) {
     }
 }
 
-pub fn deploy_to_shuttle(name: &str, project: &str) {
+pub fn deploy_to_shuttle(project: &str, config: &Config, collection: &Collection) {
     std::process::Command::new("cargo")
+        .envs(get_envs(config, collection, None, None, None))
         .arg("shuttle")
         .arg("deploy")
         .arg("--allow-dirty")
         .arg("--name")
         .arg(project)
         .arg("--working-directory")
-        .arg(get_cwd().join(format!(".znap/collections/{name}")))
+        .arg(get_cwd().join(format!(".znap/collections/{}", collection.name)))
         .stdout(Stdio::inherit())
         .stderr(Stdio::inherit())
         .spawn()
