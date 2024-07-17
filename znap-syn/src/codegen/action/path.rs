@@ -12,18 +12,18 @@ pub fn generate(action_struct: &ActionStruct) -> (String, TokenStream) {
         .attributes
         .as_ref()
         .map(|attr| {
-            let path = if !attr.custom_path.contains("{{prefix}}") {
+            let path = if !attr.path.contains("{{prefix}}") {
                 format!(
                     "/{}/{}",
                     attr.prefix.trim_matches('/'),
-                    attr.custom_path
+                    attr.path
                         .replace("{{action_name}}", &action_name)
                         .trim_matches('/')
                 )
             } else {
                 format!(
                     "/{}",
-                    attr.custom_path
+                    attr.path
                         .replace("{{prefix}}", &attr.prefix)
                         .replace("{{action_name}}", &action_name)
                         .trim_matches('/')

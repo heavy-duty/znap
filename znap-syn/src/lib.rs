@@ -98,7 +98,7 @@ pub struct ActionAttributesStruct {
     #[deluxe(default = "api".to_string())]
     pub prefix: String,
     #[deluxe(default = "{{prefix}}/{{action_name}}".to_string())]
-    pub custom_path: String,
+    pub path: String,
     #[deluxe(append, rename = link, default = Vec::new())]
     pub links: Vec<ActionLinkStruct>,
 }
