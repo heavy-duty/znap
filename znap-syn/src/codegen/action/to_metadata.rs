@@ -67,6 +67,7 @@ pub fn generate(action_struct: &ActionStruct) -> TokenStream {
             label,
             icon,
             links,
+            ..
         } = action_attributes;
 
         let links = generate_links(links);
