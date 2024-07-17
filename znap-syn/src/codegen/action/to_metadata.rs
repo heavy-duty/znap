@@ -30,7 +30,7 @@ fn generate_links(links: &[ActionLinkStruct], route: &str) -> TokenStream {
         .map(|l| {
             let label = &l.label;
             let href = l.href.trim_matches('/');
-            let href = if href.starts_with(route) {
+            let href = if href.starts_with(route) || href.starts_with("http") {
                 href.to_owned()
             } else {
                 format!("{route}/{href}")
