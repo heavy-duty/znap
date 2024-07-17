@@ -24,18 +24,23 @@ fn generate_parameter(parameters: &[ActionLinkParameterStruct]) -> TokenStream {
     }
 }
 
-fn generate_links(links: &[ActionLinkStruct]) -> TokenStream {
+fn generate_links(links: &[ActionLinkStruct], route: &str) -> TokenStream {
     let links: Vec<_> = links
         .iter()
         .map(|l| {
             let label = &l.label;
-            let href = &l.href;
+            let href = if l.href.starts_with('/') {
+                l.href.clone()
+            } else {
+                format!("/{}", l.href)
+            };
+            let href = format!("{route}{href}");
             let params = generate_parameter(&l.parameters);
 
             quote! {
                 LinkedAction {
                     label: #label.to_string(),
-                    href: #href.to_string(),
+                    href: #href,
                     parameters: #params,
                 }
             }
@@ -57,7 +62,7 @@ fn generate_links(links: &[ActionLinkStruct]) -> TokenStream {
     }
 }
 
-pub fn generate(action_struct: &ActionStruct) -> TokenStream {
+pub fn generate(action_struct: &ActionStruct, route: &str) -> TokenStream {
     let name = &action_struct.name;
 
     if let Some(action_attributes) = &action_struct.attributes {
@@ -70,7 +75,7 @@ pub fn generate(action_struct: &ActionStruct) -> TokenStream {
             ..
         } = action_attributes;
 
-        let links = generate_links(links);
+        let links = generate_links(links, route);
 
         quote! {
             impl ToMetadata for #name {
