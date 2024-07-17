@@ -42,14 +42,19 @@ pub fn generate(action_struct: &ActionStruct) -> (String, TokenStream) {
         segments.extend(
             params_attrs
                 .iter()
-                .map(|(param_name, _)| format!(":{param_name}"))
+                .filter_map(|(param_name, _)| {
+                    if route.contains(&param_name.to_string()) {
+                        return Some(format!(":{param_name}"));
+                    }
+                    None
+                })
                 .collect::<Vec<_>>(),
         );
 
         let action_path = segments.join("/");
 
         (
-            route,
+            action_path.clone(),
             quote! {
                 const #path: &str = #action_path;
             },
