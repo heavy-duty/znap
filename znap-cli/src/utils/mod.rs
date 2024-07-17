@@ -168,6 +168,7 @@ pub fn deploy_to_shuttle(project: &str, config: &Config, collection: &Collection
         .expect("Cannot create Secrets.toml to Shuttle deploy");
 
     std::process::Command::new("cargo")
+        .envs(get_envs(config, collection, None, None, None))
         .arg("shuttle")
         .arg("deploy")
         .arg("--allow-dirty")
