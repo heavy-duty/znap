@@ -34,7 +34,11 @@ fn generate_links(links: &[ActionLinkStruct], route: &str) -> TokenStream {
             } else {
                 format!("/{}", l.href)
             };
-            let href = format!("{route}{href}");
+            let href = if href.starts_with(route) {
+                href
+            } else {
+                format!("{route}{href}")
+            };
             let params = generate_parameter(&l.parameters);
 
             quote! {
