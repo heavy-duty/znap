@@ -35,7 +35,17 @@ fn generate_links(links: &[ActionLinkStruct], route: &str) -> TokenStream {
             {
                 l.href.to_owned()
             } else {
-                format!("{route}/{}", l.href)
+                let route = route
+                    .split('/')
+                    .map(|r| {
+                        if r.starts_with(':') {
+                            return format!("{{{{params.{}}}}}", r.replace(':', ""));
+                        }
+                        r.to_owned()
+                    })
+                    .collect::<Vec<_>>()
+                    .join("/");
+                format!("{route}{}", l.href)
             };
             let params = generate_parameter(&l.parameters);
 

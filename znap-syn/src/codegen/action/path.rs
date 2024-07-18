@@ -40,14 +40,14 @@ pub fn generate(action_struct: &ActionStruct) -> (String, TokenStream) {
             }
         })
         .unwrap_or_default();
-    let mut segments = vec![route.clone()];
 
     if let Some(params_attrs) = action_struct.params_attrs.as_ref() {
+        let mut segments = vec![route.clone()];
         segments.extend(
             params_attrs
                 .iter()
                 .filter_map(|(param_name, _)| {
-                    if route.contains(&param_name.to_string()) {
+                    if !route.contains(&param_name.to_string()) {
                         return Some(format!(":{param_name}"));
                     }
                     None
@@ -64,12 +64,10 @@ pub fn generate(action_struct: &ActionStruct) -> (String, TokenStream) {
             },
         )
     } else {
-        let action_path = segments.join("/");
-
         (
-            route,
+            route.clone(),
             quote! {
-                const #path: &str = #action_path;
+                const #path: &str = #route;
             },
         )
     }
