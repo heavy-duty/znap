@@ -42,7 +42,7 @@ fn generate_links(links: &[ActionLinkStruct], route: &str) -> TokenStream {
             quote! {
                 LinkedAction {
                     label: #label.to_string(),
-                    href: #href,
+                    href: #href.to_string(),
                     parameters: #params,
                 }
             }

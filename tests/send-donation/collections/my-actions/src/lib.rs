@@ -38,15 +38,15 @@ pub mod my_actions {
     prefix = "v1",
     link = {
         label = "Send 1 SOL",
-        href = "/{{params.receiver_address}}?amount=1",
+        href = "{{params.receiver_address}}?amount=1",
     },
     link = {
         label = "Send 5 SOL",
-        href = "/{{params.receiver_address}}?amount=5",
+        href = "{{params.receiver_address}}?amount=5",
     },
     link = {
         label = "Send SOL",
-        href = "/{{params.receiver_address}}?amount={amount}",
+        href = "{{params.receiver_address}}?amount={amount}",
         parameter = { label = "Amount in SOL", name = "amount" }
     },
 )]

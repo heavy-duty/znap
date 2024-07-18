@@ -12,11 +12,13 @@ pub fn generate(action_struct: &ActionStruct) -> (String, TokenStream) {
         .attributes
         .as_ref()
         .map(|attr| {
-            let path = if !attr.path.contains("{{prefix}}") {
+            let path = if !attr.path.as_ref().is_some_and(|p| p.contains("{{prefix}}")) {
                 format!(
                     "/{}/{}",
-                    attr.prefix.trim_matches('/'),
+                    attr.prefix.as_deref().unwrap_or("api").trim_matches('/'),
                     attr.path
+                        .as_deref()
+                        .unwrap_or("{{action_name}}")
                         .replace("{{action_name}}", &action_name)
                         .trim_matches('/')
                 )
@@ -24,7 +26,9 @@ pub fn generate(action_struct: &ActionStruct) -> (String, TokenStream) {
                 format!(
                     "/{}",
                     attr.path
-                        .replace("{{prefix}}", &attr.prefix)
+                        .as_deref()
+                        .unwrap_or("{{prefix}}/{{action_name}}")
+                        .replace("{{prefix}}", attr.prefix.as_deref().unwrap_or("api"))
                         .replace("{{action_name}}", &action_name)
                         .trim_matches('/')
                 )
@@ -38,7 +42,7 @@ pub fn generate(action_struct: &ActionStruct) -> (String, TokenStream) {
         .unwrap_or_default();
     let mut segments = vec![route.clone()];
 
-    if let Some(params_attrs) = &action_struct.params_attrs {
+    if let Some(params_attrs) = action_struct.params_attrs.as_ref() {
         segments.extend(
             params_attrs
                 .iter()
