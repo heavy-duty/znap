@@ -35,17 +35,18 @@ pub mod my_actions {
     title = "Send a Donation to {{params.receiver_address}}",
     description = "Send a donation to {{params.receiver_address}} using the Solana blockchain via a Blink.",
     label = "Send",
+    prefix = "v1",
     link = {
         label = "Send 1 SOL",
-        href = "/api/send_donation/{{params.receiver_address}}?amount=1",
+        href = "?amount=1",
     },
     link = {
         label = "Send 5 SOL",
-        href = "/api/send_donation/{{params.receiver_address}}?amount=5",
+        href = "?amount=5",
     },
     link = {
         label = "Send SOL",
-        href = "/api/send_donation/{{params.receiver_address}}?amount={amount}",
+        href = "?amount={amount}",
         parameter = { label = "Amount in SOL", name = "amount" }
     },
 )]
