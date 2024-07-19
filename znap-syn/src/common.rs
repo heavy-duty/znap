@@ -79,10 +79,7 @@ pub fn extract_action_ident(f: &ItemFn) -> Option<&Ident> {
 }
 
 pub fn action_name_without_suffix(action_name: &str) -> String {
-    let action_name_splitted: Vec<_> = action_name.split('_').collect();
-    let (_, action_name_without_suffix) = action_name_splitted.split_last().unwrap();
-
-    action_name_without_suffix.join("_")
+    action_name.to_snek_case().replace("_action", "")
 }
 
 pub fn extract_fn_result_type(f: &ItemFn) -> Option<&Ident> {
@@ -106,7 +103,7 @@ pub fn create_query(action: &str) -> Ident {
     Ident::new(
         &format!(
             "{}Query",
-            action_name_without_suffix(&action.to_snek_case()).to_upper_camel_case()
+            action_name_without_suffix(action).to_upper_camel_case()
         ),
         Span::call_site(),
     )
@@ -116,7 +113,7 @@ pub fn create_params(action: &str) -> Ident {
     Ident::new(
         &format!(
             "{}Params",
-            action_name_without_suffix(&action.to_snek_case()).to_upper_camel_case()
+            action_name_without_suffix(action).to_upper_camel_case()
         ),
         Span::call_site(),
     )
@@ -124,20 +121,14 @@ pub fn create_params(action: &str) -> Ident {
 
 pub fn create_get_handler(action: &str) -> Ident {
     Ident::new(
-        &format!(
-            "handle_get_{}",
-            action_name_without_suffix(&action.to_snek_case())
-        ),
+        &format!("handle_get_{}", action_name_without_suffix(action)),
         Span::call_site(),
     )
 }
 
 pub fn create_post_handler(action: &str) -> Ident {
     Ident::new(
-        &format!(
-            "handle_post_{}",
-            action_name_without_suffix(&action.to_snek_case())
-        ),
+        &format!("handle_post_{}", action_name_without_suffix(action)),
         Span::call_site(),
     )
 }
@@ -150,7 +141,7 @@ pub fn create_post_context(action: &str) -> Ident {
     Ident::new(
         &format!(
             "{}PostContext",
-            action_name_without_suffix(&action.to_snek_case()).to_upper_camel_case()
+            action_name_without_suffix(action).to_upper_camel_case()
         ),
         Span::call_site(),
     )
@@ -158,20 +149,14 @@ pub fn create_post_context(action: &str) -> Ident {
 
 pub fn create_transaction(action: &str) -> Ident {
     Ident::new(
-        &format!(
-            "{}_create_transaction",
-            action_name_without_suffix(&action.to_snek_case())
-        ),
+        &format!("{}_create_transaction", action_name_without_suffix(action)),
         Span::call_site(),
     )
 }
 
 pub fn create_metadata(action: &str) -> Ident {
     Ident::new(
-        &format!(
-            "{}_create_metadata",
-            action_name_without_suffix(&action.to_snek_case())
-        ),
+        &format!("{}_create_metadata", action_name_without_suffix(action)),
         Span::call_site(),
     )
 }
@@ -180,7 +165,7 @@ pub fn create_get_context(action: &str) -> Ident {
     Ident::new(
         &format!(
             "{}GetContext",
-            action_name_without_suffix(&action.to_snek_case()).to_upper_camel_case()
+            action_name_without_suffix(action).to_upper_camel_case()
         ),
         Span::call_site(),
     )
@@ -190,7 +175,7 @@ pub fn create_get_context_with_metadata(action: &str) -> Ident {
     Ident::new(
         &format!(
             "{}GetContextWithMetadata",
-            action_name_without_suffix(&action.to_snek_case()).to_upper_camel_case()
+            action_name_without_suffix(action).to_upper_camel_case()
         ),
         Span::call_site(),
     )
@@ -198,11 +183,7 @@ pub fn create_get_context_with_metadata(action: &str) -> Ident {
 
 pub fn create_path(action: &str) -> Ident {
     Ident::new(
-        &format!(
-            "{}_path",
-            action_name_without_suffix(&action.to_snek_case())
-        )
-        .to_uppercase(),
+        &format!("{}_path", action_name_without_suffix(action)).to_uppercase(),
         Span::call_site(),
     )
 }
