@@ -63,25 +63,23 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
-      files: ${{ steps.list-tests.outputs.files }}
+      has_tests: ${{ steps.set-matrix.outputs.has_tests }}
     steps:
       - name: Checkout sources
         uses: actions/checkout@v4
       - id: set-matrix
         run: |
-          FOLDERS=$(ls -d tests/*/ | jq -R -s -c 'split("\n")[:-1]')
-          echo "matrix={\"folder\":$FOLDERS}" >> $GITHUB_OUTPUT
-      - name: List tests files
-        id: list-tests
-        run: |
-          echo "files=$(ls -d tests/*/)" >> $GITHUB_OUTPUT
-
+          FOLDERS=$(ls -d tests/*/)
+          HAS_FOLDERS=$((${#FOLDERS[@]} > 0 ? 1 : 0))
+          JSON_FOLDERS=$(echo "$FOLDERS" | jq -R -s -c 'split("\n")[:-1]')
+          echo "has_tests=$HAS_FOLDERS" >> $GITHUB_OUTPUT
+          echo "matrix={\"folder\":$JSON_FOLDERS}" >> $GITHUB_OUTPUT
 
   build-znap:
     name: Build Znap Cli
     needs: [get-tests]
     runs-on: ubuntu-latest
-    if: ${{ needs.get-tests.outputs.files != '' }}
+    if: ${{ needs.get-tests.outputs.has_tests == 1 }}
     steps:
       - name: Checkout sources
         uses: actions/checkout@v4
