@@ -1,0 +1,5 @@
+[workspace]
+members = ["collections/my-actions"]
+
+[patch.crates-io]
+curve25519-dalek = { git = "https://github.com/dalek-cryptography/curve25519-dalek", rev = "8274d5cbb6fc3f38cdc742b4798173895cd2a290" }
