@@ -7,7 +7,7 @@ port = 3000
 protocol = "http"
 
 [[collections]]
-name = "path"
+name = "paths"
 address = "localhost"
 port = 3000
 protocol = "http"

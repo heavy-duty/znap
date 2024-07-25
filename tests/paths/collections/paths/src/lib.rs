@@ -6,10 +6,10 @@ use std::str::FromStr;
 use znap::prelude::*;
 
 #[collection]
-pub mod path {
+pub mod paths {
     use super::*;
 
-    pub fn send_donation(ctx: Context<SendDonationAction>) -> Result<ActionTransaction> {
+    pub fn send_donation(ctx: Context<PathsAction>) -> Result<ActionTransaction> {
         let account_pubkey = Pubkey::from_str(&ctx.payload.account)
             .or_else(|_| Err(Error::from(ActionError::InvalidAccountPublicKey)))?;
         let receiver_pubkey = Pubkey::from_str(&ctx.params.receiver_address)
@@ -52,7 +52,7 @@ pub mod path {
 )]
 #[query(amount: u64)]
 #[params(receiver_address: String)]
-pub struct SendDonationAction;
+pub struct PathsAction;
 
 #[derive(ErrorCode)]
 enum ActionError {

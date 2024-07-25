@@ -15,7 +15,7 @@ describe("Paths Tests", () => {
   const aliceKeypair = Keypair.generate();
   const bobKeypair = Keypair.generate();
   const sendDonationClient = createActionClient(
-    `${baseUrl}/api/v1/test/send_donation/${aliceKeypair.publicKey.toBase58()}`
+    `${baseUrl}/api/v1/test/paths/${aliceKeypair.publicKey.toBase58()}`
   );
   const actionMetadata: Metadata = {
     icon: "https://media.discordapp.net/attachments/1205590693041541181/1212566609202520065/icon.png?ex=667eb568&is=667d63e8&hm=0f247078545828c0a5cf8300a5601c56bbc9b59d3d87a0c74b082df0f3a6d6bd&=&format=webp&quality=lossless&width=660&height=660",
@@ -26,12 +26,12 @@ describe("Paths Tests", () => {
       actions: [
         {
           label: "Send 1 SOL",
-          href: `/api/v1/test/send_donation/${aliceKeypair.publicKey.toBase58()}?amount=1`,
+          href: `/api/v1/test/paths/${aliceKeypair.publicKey.toBase58()}?amount=1`,
           parameters: [],
         },
         {
           label: "Send 5 SOL",
-          href: `/api/v1/test/send_donation/${aliceKeypair.publicKey.toBase58()}?amount=5`,
+          href: `/api/v1/test/paths/${aliceKeypair.publicKey.toBase58()}?amount=5`,
           parameters: [],
         },
         {
@@ -50,7 +50,7 @@ describe("Paths Tests", () => {
     error: null,
   };
 
-  it("should fetch the metadata of the send donation action", async () => {
+  it("should fetch the metadata of the paths action", async () => {
     const response = await sendDonationClient.getMetadata();
 
     assert.equal(response.title, actionMetadata.title);
@@ -81,7 +81,7 @@ describe("Paths Tests", () => {
     });
   });
 
-  it("should create a valid send donation transaction", async () => {
+  it("should create a valid paths transaction", async () => {
     const amount = 5_000;
     const response = await sendDonationClient.getTransaction(
       bobKeypair.publicKey.toBase58(),

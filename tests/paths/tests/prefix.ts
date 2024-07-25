@@ -15,7 +15,7 @@ describe("Prefix Tests", () => {
   const aliceKeypair = Keypair.generate();
   const bobKeypair = Keypair.generate();
   const sendDonationClient = createActionClient(
-    `${baseUrl}/v1-api/send_donation/${aliceKeypair.publicKey.toBase58()}`
+    `${baseUrl}/v1-api/prefix/${aliceKeypair.publicKey.toBase58()}`
   );
   const actionMetadata: Metadata = {
     icon: "https://media.discordapp.net/attachments/1205590693041541181/1212566609202520065/icon.png?ex=667eb568&is=667d63e8&hm=0f247078545828c0a5cf8300a5601c56bbc9b59d3d87a0c74b082df0f3a6d6bd&=&format=webp&quality=lossless&width=660&height=660",
@@ -26,17 +26,17 @@ describe("Prefix Tests", () => {
       actions: [
         {
           label: "Send 1 SOL",
-          href: `/v1-api/send_donation/${aliceKeypair.publicKey.toBase58()}?amount=1`,
+          href: `/v1-api/prefix/${aliceKeypair.publicKey.toBase58()}?amount=1`,
           parameters: [],
         },
         {
           label: "Send 5 SOL",
-          href: `/v1-api/send_donation/${aliceKeypair.publicKey.toBase58()}?amount=5`,
+          href: `/v1-api/prefix/${aliceKeypair.publicKey.toBase58()}?amount=5`,
           parameters: [],
         },
         {
           label: "Send SOL",
-          href: `/v1-api/send_donation/${aliceKeypair.publicKey.toBase58()}?amount={amount}`,
+          href: `/v1-api/prefix/${aliceKeypair.publicKey.toBase58()}?amount={amount}`,
           parameters: [
             {
               label: "Amount in SOL",
@@ -50,7 +50,7 @@ describe("Prefix Tests", () => {
     error: null,
   };
 
-  it("should fetch the metadata of the send donation action", async () => {
+  it("should fetch the metadata of the prefix action", async () => {
     const response = await sendDonationClient.getMetadata();
 
     assert.equal(response.title, actionMetadata.title);
@@ -81,7 +81,7 @@ describe("Prefix Tests", () => {
     });
   });
 
-  it("should create a valid send donation transaction", async () => {
+  it("should create a valid prefix transaction", async () => {
     const amount = 5_000;
     const response = await sendDonationClient.getTransaction(
       bobKeypair.publicKey.toBase58(),
