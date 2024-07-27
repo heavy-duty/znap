@@ -9,7 +9,7 @@ pub fn run(name: &str, address: Option<&str>, port: Option<&u16>, protocol: Opti
 
     if let Some(collection) = collection {
         // Generate all the required files
-        generate_collection_executable_files(collection);
+        generate_collection_executable_files(&config, collection);
 
         // Run the server
         start_server_blocking(&config, collection, address, port, protocol);

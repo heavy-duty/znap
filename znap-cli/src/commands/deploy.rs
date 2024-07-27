@@ -9,7 +9,7 @@ pub fn run(name: &str, project: &str) {
 
     if let Some(collection) = collection {
         // Generate all the required files
-        generate_collection_executable_files(collection);
+        generate_collection_executable_files(&config, collection);
 
         // Deploy to shuttle
         deploy_to_shuttle(project, &config, collection);

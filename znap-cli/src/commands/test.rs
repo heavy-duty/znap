@@ -12,7 +12,7 @@ pub fn run() {
 
     for collection in collections {
         // Generate all server
-        generate_collection_executable_files(collection);
+        generate_collection_executable_files(&config, collection);
 
         // Start server in background
         let server_process = start_server(&config, collection, None, None, None);
