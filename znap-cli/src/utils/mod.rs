@@ -156,21 +156,26 @@ pub fn wait_for_server(address: &str, port: &u16, protocol: &str) {
 }
 
 pub fn deploy_to_shuttle(project: &str, config: &Config, collection: &Collection) {
+    let secrets_content = get_envs(config, collection, None, None, None)
+        .iter()
+        .map(|(k, v)| format!("{k}=\"{v}\""))
+        .collect::<Vec<_>>()
+        .join("\n");
+    let working_dir = get_cwd().join(format!(".znap/collections/{}", collection.name));
+    let secrets_path = working_dir.join("Secrets.toml");
+
+    std::fs::write(secrets_path, secrets_content)
+        .expect("Cannot create Secrets.toml to Shuttle deploy");
+
     std::process::Command::new("cargo")
-        .envs(get_envs(config, collection, None, None, None))
         .arg("shuttle")
         .arg("deploy")
         .arg("--allow-dirty")
         .arg("--name")
         .arg(project)
         .arg("--working-directory")
-        .arg(get_cwd().join(format!(".znap/collections/{}", collection.name)))
-        .stdout(Stdio::inherit())
-        .stderr(Stdio::inherit())
-        .spawn()
-        .map_err(anyhow::Error::from)
-        .expect("Make sure you are logged into shuttle.")
-        .wait_with_output()
+        .arg(&working_dir)
+        .output()
         .expect("Should wait until the deploy is over");
 }
 
