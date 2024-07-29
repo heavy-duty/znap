@@ -53,7 +53,7 @@ fn get_identity(identity: &str) -> String {
 pub fn write_file(path: &Path, content: &str) {
     let mut file = File::create(path).expect("Should be able to open file");
     file.write_all(content.as_bytes())
-        .expect("Should be able to write file");
+        .unwrap_or_else(|_| panic!("Should be able to write file: {path:?}"));
 }
 
 pub fn get_envs(
@@ -155,6 +155,8 @@ pub fn wait_for_server(address: &str, port: &u16, protocol: &str) {
 }
 
 pub fn deploy_to_shuttle(project: &str, config: &Config, collection: &Collection) {
+    let working_dir = get_cwd().join(format!(".znap/collections/{}", collection.name));
+
     std::process::Command::new("cargo")
         .envs(get_envs(config, collection, None, None, None))
         .arg("shuttle")
@@ -163,13 +165,8 @@ pub fn deploy_to_shuttle(project: &str, config: &Config, collection: &Collection
         .arg("--name")
         .arg(project)
         .arg("--working-directory")
-        .arg(get_cwd().join(format!(".znap/collections/{}", collection.name)))
-        .stdout(Stdio::inherit())
-        .stderr(Stdio::inherit())
-        .spawn()
-        .map_err(anyhow::Error::from)
-        .expect("Make sure you are logged into shuttle.")
-        .wait_with_output()
+        .arg(&working_dir)
+        .output()
         .expect("Should wait until the deploy is over");
 }
 
@@ -186,9 +183,8 @@ pub fn copy_recursively(source: impl AsRef<Path>, destination: impl AsRef<Path>)
     }
 }
 
-pub fn generate_collection_executable_files(collection: &Collection) {
+pub fn generate_collection_executable_files(config: &Config, collection: &Collection) {
     let cwd = get_cwd();
-
     let znap_path = cwd.join(".znap");
 
     if !znap_path.exists() {
@@ -217,6 +213,15 @@ pub fn generate_collection_executable_files(collection: &Collection) {
 
     create_dir(&znap_collection_path)
         .unwrap_or_else(|_| panic!("Could not create .znap/{} folder", &collection.name));
+
+    let secrets_content = get_envs(config, collection, None, None, None)
+        .iter()
+        .map(|(k, v)| format!("{k}=\"{v}\""))
+        .collect::<Vec<_>>()
+        .join("\n");
+    let secrets_path = znap_collection_path.join("Secrets.toml");
+
+    write_file(&secrets_path, &secrets_content);
 
     let znap_collection_src_path = znap_collection_path.join("src");
 
