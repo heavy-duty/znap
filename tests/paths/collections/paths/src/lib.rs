@@ -35,7 +35,7 @@ pub mod paths {
     title = "Send a Donation to {{params.receiver_address}}",
     description = "Send a donation to {{params.receiver_address}} using the Solana blockchain via a Blink.",
     label = "Send",
-    path = "{{prefix}}/v1/test/{{action}}",
+    path = "{{prefix}}/v1/test/{{action_name}}",
     link = {
         label = "Send 1 SOL",
         href = "?amount=1",
