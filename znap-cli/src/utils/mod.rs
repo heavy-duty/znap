@@ -127,16 +127,15 @@ pub fn start_server(
 }
 
 pub fn run_test_suite() {
-    std::process::Command::new("npm")
+    let output = std::process::Command::new("npm")
         .arg("run")
         .arg("test")
-        .stdout(Stdio::inherit())
-        .stderr(Stdio::inherit())
-        .spawn()
-        .map_err(anyhow::Error::from)
-        .expect("Should be able to run tests")
-        .wait_with_output()
+        .output()
         .expect("Should wait until the tests are over");
+
+    if !output.status.success() {
+        panic!("Test failed: {}", String::from_utf8_lossy(&output.stdout));
+    }
 }
 
 pub fn wait_for_server(address: &str, port: &u16, protocol: &str) {
