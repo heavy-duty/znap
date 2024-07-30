@@ -9,5 +9,5 @@ protocol = "http"
 [[collections]]
 name = "paths"
 address = "localhost"
-port = 3000
+port = 3001
 protocol = "http"

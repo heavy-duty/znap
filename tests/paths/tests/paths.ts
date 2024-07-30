@@ -11,7 +11,7 @@ import nacl from "tweetnacl";
 import bs58 from "bs58";
 
 describe("Paths Tests", () => {
-  const baseUrl = "http://localhost:3000";
+  const baseUrl = "http://localhost:3001";
   const aliceKeypair = Keypair.generate();
   const bobKeypair = Keypair.generate();
   const sendDonationClient = createActionClient(
