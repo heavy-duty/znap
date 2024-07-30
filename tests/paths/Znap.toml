@@ -1,0 +1,13 @@
+identity = "~/.config/solana/id.json"
+
+[[collections]]
+name = "prefix"
+address = "localhost"
+port = 3000
+protocol = "http"
+
+[[collections]]
+name = "paths"
+address = "localhost"
+port = 3001
+protocol = "http"

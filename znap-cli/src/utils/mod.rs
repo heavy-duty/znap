@@ -130,6 +130,8 @@ pub fn run_test_suite() {
     let output = std::process::Command::new("npm")
         .arg("run")
         .arg("test")
+        .stdout(Stdio::inherit())
+        .stderr(Stdio::inherit())
         .output()
         .expect("Should wait until the tests are over");
 

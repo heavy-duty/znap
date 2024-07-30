@@ -1,0 +1,10 @@
+[package]
+name = "prefix"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+axum = "0.7.5"
+serde = "1.0.203"
+solana-sdk = "2.0.1"
+znap = { path = "../../../../znap" }
