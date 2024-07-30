@@ -34,16 +34,16 @@ describe("Paths Tests", () => {
           href: `/api/v1/test/paths/${aliceKeypair.publicKey.toBase58()}?amount=5`,
           parameters: [],
         },
-        // {
-        //   label: "Send SOL",
-        //   href: `https://localhost:3000/api/send_donation?amount={amount}`,
-        //   parameters: [
-        //     {
-        //       label: "Amount in SOL",
-        //       name: "amount",
-        //     },
-        //   ],
-        // },
+        {
+          label: "Send SOL",
+          href: `http://localhost:3000/api/send_donation?amount={amount}`,
+          parameters: [
+            {
+              label: "Amount in SOL",
+              name: "amount",
+            },
+          ],
+        },
       ],
     },
     disabled: false,

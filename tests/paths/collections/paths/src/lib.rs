@@ -46,7 +46,7 @@ pub mod paths {
     },
     link = {
         label = "Send SOL",
-        href = "https://localhost:3000/api/send_donation?amount={amount}",
+        href = "http://localhost:3000/api/send_donation?amount={amount}",
         parameter = { label = "Amount in SOL", name = "amount" }
     },
 )]
