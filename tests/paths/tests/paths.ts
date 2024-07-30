@@ -14,7 +14,7 @@ describe("Paths Tests", () => {
   const baseUrl = "http://localhost:3001";
   const aliceKeypair = Keypair.generate();
   const bobKeypair = Keypair.generate();
-  const sendDonationClient = createActionClient(
+  const actionClient = createActionClient(
     `${baseUrl}/api/v1/test/paths/${aliceKeypair.publicKey.toBase58()}`
   );
   const actionMetadata: Metadata = {
@@ -51,7 +51,7 @@ describe("Paths Tests", () => {
   };
 
   it("should fetch the metadata of the paths action", async () => {
-    const response = await sendDonationClient.getMetadata();
+    const response = await actionClient.getMetadata();
 
     assert.equal(response.title, actionMetadata.title);
     assert.equal(response.description, actionMetadata.description);
@@ -83,7 +83,7 @@ describe("Paths Tests", () => {
 
   it("should create a valid paths transaction", async () => {
     const amount = 5_000;
-    const response = await sendDonationClient.getTransaction(
+    const response = await actionClient.getTransaction(
       bobKeypair.publicKey.toBase58(),
       { amount }
     );

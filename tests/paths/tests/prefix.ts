@@ -14,7 +14,7 @@ describe("Prefix Tests", () => {
   const baseUrl = "http://localhost:3000";
   const aliceKeypair = Keypair.generate();
   const bobKeypair = Keypair.generate();
-  const sendDonationClient = createActionClient(
+  const actionClient = createActionClient(
     `${baseUrl}/v1-api/prefix/${aliceKeypair.publicKey.toBase58()}`
   );
   const actionMetadata: Metadata = {
@@ -51,7 +51,7 @@ describe("Prefix Tests", () => {
   };
 
   it("should fetch the metadata of the prefix action", async () => {
-    const response = await sendDonationClient.getMetadata();
+    const response = await actionClient.getMetadata();
 
     assert.equal(response.title, actionMetadata.title);
     assert.equal(response.description, actionMetadata.description);
@@ -83,7 +83,7 @@ describe("Prefix Tests", () => {
 
   it("should create a valid prefix transaction", async () => {
     const amount = 5_000;
-    const response = await sendDonationClient.getTransaction(
+    const response = await actionClient.getTransaction(
       bobKeypair.publicKey.toBase58(),
       { amount }
     );
