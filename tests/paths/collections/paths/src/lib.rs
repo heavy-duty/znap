@@ -9,7 +9,7 @@ use znap::prelude::*;
 pub mod paths {
     use super::*;
 
-    pub fn send_donation(ctx: Context<PathsAction>) -> Result<ActionTransaction> {
+    pub fn paths(ctx: Context<PathsAction>) -> Result<ActionTransaction> {
         let account_pubkey = Pubkey::from_str(&ctx.payload.account)
             .or_else(|_| Err(Error::from(ActionError::InvalidAccountPublicKey)))?;
         let receiver_pubkey = Pubkey::from_str(&ctx.params.receiver_address)
