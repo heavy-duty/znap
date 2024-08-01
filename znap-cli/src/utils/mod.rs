@@ -1,5 +1,6 @@
 use crate::template;
 use serde::{Deserialize, Serialize};
+use solana_sdk::signature::Keypair;
 use std::collections::HashMap;
 use std::fs::{copy, create_dir, create_dir_all, read_dir, remove_dir_all};
 use std::io::Write;
@@ -168,6 +169,8 @@ pub fn deploy_to_shuttle(project: &str, config: &Config, collection: &Collection
         .arg(project)
         .arg("--working-directory")
         .arg(&working_dir)
+        .stdout(Stdio::inherit())
+        .stderr(Stdio::inherit())
         .output()
         .expect("Should wait until the deploy is over");
 }
@@ -182,6 +185,28 @@ pub fn copy_recursively(source: impl AsRef<Path>, destination: impl AsRef<Path>)
         } else {
             copy(entry.path(), destination.as_ref().join(entry.file_name())).unwrap();
         }
+    }
+}
+
+pub fn get_identity_keypair(config: &Config, collection: &Collection) -> Keypair {
+    let envs = get_envs(config, collection, None, None, None);
+
+    match envs.get("IDENTITY_KEYPAIR") {
+        Some(keypair) => Keypair::from_base58_string(keypair),
+        _ => match envs.get("IDENTITY_KEYPAIR_PATH") {
+            Some(path) => {
+                let keypair_file = std::fs::read_to_string(path).unwrap();
+                let keypair_bytes = keypair_file
+                    .trim_start_matches('[')
+                    .trim_end_matches(']')
+                    .split(',')
+                    .map(|b| b.trim().parse::<u8>().unwrap())
+                    .collect::<Vec<_>>();
+
+                Keypair::from_bytes(&keypair_bytes).unwrap()
+            }
+            _ => panic!("Identity not valid."),
+        },
     }
 }
 
@@ -216,11 +241,11 @@ pub fn generate_collection_executable_files(config: &Config, collection: &Collec
     create_dir(&znap_collection_path)
         .unwrap_or_else(|_| panic!("Could not create .znap/{} folder", &collection.name));
 
-    let secrets_content = get_envs(config, collection, None, None, None)
-        .iter()
-        .map(|(k, v)| format!("{k}=\"{v}\""))
-        .collect::<Vec<_>>()
-        .join("\n");
+    let identity_keypair = get_identity_keypair(config, collection);
+    let secrets_content = format!(
+        "IDENTITY_KEYPAIR=\"{}\"",
+        identity_keypair.to_base58_string()
+    );
     let secrets_path = znap_collection_path.join("Secrets.toml");
 
     write_file(&secrets_path, &secrets_content);
