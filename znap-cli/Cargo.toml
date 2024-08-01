@@ -17,6 +17,7 @@ heck = { workspace = true }
 serde = { workspace = true }
 colored = { workspace = true }
 console = { workspace = true }
+solana-sdk = { workspace = true }
 
 # crate specific
 anyhow = "1.0.86"
