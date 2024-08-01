@@ -192,7 +192,7 @@ pub fn get_identity_keypair(config: &Config, collection: &Collection) -> Keypair
     let envs = get_envs(config, collection, None, None, None);
 
     match envs.get("IDENTITY_KEYPAIR") {
-        Some(keypair) => Keypair::from_base58_string(&keypair),
+        Some(keypair) => Keypair::from_base58_string(keypair),
         _ => match envs.get("IDENTITY_KEYPAIR_PATH") {
             Some(path) => {
                 let keypair_file = std::fs::read_to_string(path).unwrap();
