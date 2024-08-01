@@ -3,6 +3,8 @@ use heck::ToSnekCase;
 pub fn template(name: &str) -> String {
     format!(
         r#"
+use shuttle_runtime::SecretStore;
+
 #[shuttle_runtime::main]
 async fn main(
     #[shuttle_runtime::Secrets] secrets: SecretStore,
