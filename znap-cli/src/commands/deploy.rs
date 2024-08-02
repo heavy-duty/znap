@@ -12,7 +12,7 @@ pub fn run(name: &str, project: &str) {
         generate_collection_executable_files(&config, collection);
 
         // Deploy to shuttle
-        deploy_to_shuttle(project, &config, collection);
+        deploy_to_shuttle(project, collection);
     } else {
         panic!("Collection not found in the workspace.")
     }

@@ -157,18 +157,15 @@ pub fn wait_for_server(address: &str, port: &u16, protocol: &str) {
     }
 }
 
-pub fn deploy_to_shuttle(project: &str, config: &Config, collection: &Collection) {
-    let working_dir = get_cwd().join(format!(".znap/collections/{}", collection.name));
-
+pub fn deploy_to_shuttle(project: &str, collection: &Collection) {
     std::process::Command::new("cargo")
-        .envs(get_envs(config, collection, None, None, None))
         .arg("shuttle")
         .arg("deploy")
         .arg("--allow-dirty")
         .arg("--name")
         .arg(project)
         .arg("--working-directory")
-        .arg(&working_dir)
+        .arg(get_cwd().join(format!(".znap/collections/{}", collection.name)))
         .stdout(Stdio::inherit())
         .stderr(Stdio::inherit())
         .output()
