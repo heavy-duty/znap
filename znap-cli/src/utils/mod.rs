@@ -27,6 +27,7 @@ pub struct Collection {
 pub struct Config {
     pub collections: Option<Vec<Collection>>,
     pub identity: Option<String>,
+    pub rpc_url: Option<String>,
 }
 
 pub fn get_cwd() -> PathBuf {
@@ -38,13 +39,8 @@ pub fn get_config() -> Config {
     let znap_file_path = cwd.join("Znap.toml");
     let znap_file = read_to_string(znap_file_path)
         .expect("Should be able to read Znap.toml file. Make sure you are in a Znap workspace.");
-    let config: Config =
-        toml::from_str(&znap_file).expect("Znap.toml file should have the proper format");
 
-    Config {
-        collections: config.collections,
-        identity: config.identity,
-    }
+    toml::from_str(&znap_file).expect("Znap.toml file should have the proper format")
 }
 
 fn get_identity(identity: &str) -> String {

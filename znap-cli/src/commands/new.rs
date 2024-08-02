@@ -70,6 +70,7 @@ pub fn run(name: &str, dry_run: bool) {
             &toml::to_string(&Config {
                 collections,
                 identity: Some("~/.config/solana/id.json".to_string()),
+                rpc_url: Some("http://localhost:8899".to_string()),
             })
             .unwrap(),
         );

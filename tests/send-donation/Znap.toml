@@ -1,4 +1,5 @@
 identity = "~/.config/solana/id.json"
+rpc_url = "http://api.devnet.solana.com"
 
 [[collections]]
 name = "my-actions"
