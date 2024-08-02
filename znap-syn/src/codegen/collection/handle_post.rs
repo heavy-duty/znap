@@ -45,7 +45,19 @@ pub fn generate(collection_mod: &CollectionMod) -> TokenStream {
                         env: znap::env::Env::default(),
                     };
                     let znap::ActionTransaction { transaction, message } = #create_transaction_fn(&context).await?;
-                    let transaction_with_identity = znap::add_action_identity_proof(transaction, &context.env.keypair);
+                    let mut transaction_with_identity = znap::add_action_identity_proof(transaction, &context.env.keypair);
+                    let rpc_client = solana_client::rpc_client::RpcClient::new_with_commitment(
+                        context.env.rpc_url,
+                        solana_sdk::commitment_config::CommitmentConfig::confirmed(),
+                    );
+                    let recent_blockhash = rpc_client
+                        .get_latest_blockhash()
+                        .or_else(|_| Err(Error::new(
+                            axum::http::StatusCode::INTERNAL_SERVER_ERROR,
+                            "FetchBlockhashRequestFailed".to_string(),
+                            "The server could not fetch the blockhash".to_string(),
+                        )))?;
+                    transaction_with_identity.message.recent_blockhash = recent_blockhash;
                     let serialized_transaction = bincode::serialize(&transaction_with_identity).unwrap();
                     let encoded_transaction = BASE64_STANDARD.encode(serialized_transaction);
 

@@ -89,6 +89,7 @@ use solana_sdk::transaction::Transaction;
 pub extern crate base64;
 pub extern crate bincode;
 pub extern crate colored;
+pub extern crate solana_client;
 pub extern crate tower_http;
 pub extern crate znap_macros;
 
@@ -102,6 +103,7 @@ pub mod prelude {
     pub use base64;
     pub use bincode;
     pub use colored;
+    pub use solana_client;
     pub use tower_http;
     pub use znap_macros::{collection, Action, ErrorCode};
 }

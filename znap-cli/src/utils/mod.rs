@@ -27,6 +27,7 @@ pub struct Collection {
 pub struct Config {
     pub collections: Option<Vec<Collection>>,
     pub identity: Option<String>,
+    pub rpc_url: Option<String>,
 }
 
 pub fn get_cwd() -> PathBuf {
@@ -38,13 +39,8 @@ pub fn get_config() -> Config {
     let znap_file_path = cwd.join("Znap.toml");
     let znap_file = read_to_string(znap_file_path)
         .expect("Should be able to read Znap.toml file. Make sure you are in a Znap workspace.");
-    let config: Config =
-        toml::from_str(&znap_file).expect("Znap.toml file should have the proper format");
 
-    Config {
-        collections: config.collections,
-        identity: config.identity,
-    }
+    toml::from_str(&znap_file).expect("Znap.toml file should have the proper format")
 }
 
 fn get_identity(identity: &str) -> String {
@@ -72,6 +68,10 @@ pub fn get_envs(
         env_vars.insert("IDENTITY_KEYPAIR", v);
     } else if let Some(i) = config.identity.as_deref() {
         env_vars.insert("IDENTITY_KEYPAIR_PATH", get_identity(i));
+    }
+
+    if let Some(rpc_url) = &config.rpc_url {
+        env_vars.insert("RPC_URL", rpc_url.to_string());
     }
 
     if let Some(address) = address.or(Some(&collection.address)) {
@@ -157,18 +157,15 @@ pub fn wait_for_server(address: &str, port: &u16, protocol: &str) {
     }
 }
 
-pub fn deploy_to_shuttle(project: &str, config: &Config, collection: &Collection) {
-    let working_dir = get_cwd().join(format!(".znap/collections/{}", collection.name));
-
+pub fn deploy_to_shuttle(project: &str, collection: &Collection) {
     std::process::Command::new("cargo")
-        .envs(get_envs(config, collection, None, None, None))
         .arg("shuttle")
         .arg("deploy")
         .arg("--allow-dirty")
         .arg("--name")
         .arg(project)
         .arg("--working-directory")
-        .arg(&working_dir)
+        .arg(get_cwd().join(format!(".znap/collections/{}", collection.name)))
         .stdout(Stdio::inherit())
         .stderr(Stdio::inherit())
         .output()
@@ -242,9 +239,14 @@ pub fn generate_collection_executable_files(config: &Config, collection: &Collec
         .unwrap_or_else(|_| panic!("Could not create .znap/{} folder", &collection.name));
 
     let identity_keypair = get_identity_keypair(config, collection);
+    let rpc_url = config
+        .rpc_url
+        .as_ref()
+        .unwrap_or_else(|| panic!("RPC url is not defined"));
     let secrets_content = format!(
-        "IDENTITY_KEYPAIR=\"{}\"",
-        identity_keypair.to_base58_string()
+        "IDENTITY_KEYPAIR=\"{}\"\nRPC_URL=\"{}\"",
+        identity_keypair.to_base58_string(),
+        rpc_url,
     );
     let secrets_path = znap_collection_path.join("Secrets.toml");
 

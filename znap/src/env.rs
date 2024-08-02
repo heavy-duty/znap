@@ -6,6 +6,7 @@ use solana_sdk::signature::Keypair;
 pub struct Env {
     pub identity: Vec<u8>,
     pub keypair: Keypair,
+    pub rpc_url: String,
 }
 
 impl Default for Env {
@@ -28,6 +29,12 @@ impl Default for Env {
 
         let identity = keypair.to_bytes().to_vec();
 
-        Self { identity, keypair }
+        let rpc_url = var("RPC_URL").expect("Cannot found `RPC_URL` env var");
+
+        Self {
+            identity,
+            keypair,
+            rpc_url,
+        }
     }
 }
