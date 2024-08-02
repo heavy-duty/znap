@@ -70,6 +70,10 @@ pub fn get_envs(
         env_vars.insert("IDENTITY_KEYPAIR_PATH", get_identity(i));
     }
 
+    if let Some(rpc_url) = &config.rpc_url {
+        env_vars.insert("RPC_URL", rpc_url.to_string());
+    }
+
     if let Some(address) = address.or(Some(&collection.address)) {
         env_vars.insert("COLLECTION_ADDRESS", address.to_owned());
     }
@@ -238,9 +242,14 @@ pub fn generate_collection_executable_files(config: &Config, collection: &Collec
         .unwrap_or_else(|_| panic!("Could not create .znap/{} folder", &collection.name));
 
     let identity_keypair = get_identity_keypair(config, collection);
+    let rpc_url = config
+        .rpc_url
+        .as_ref()
+        .unwrap_or_else(|| panic!("RPC url is not defined"));
     let secrets_content = format!(
-        "IDENTITY_KEYPAIR=\"{}\"",
-        identity_keypair.to_base58_string()
+        "IDENTITY_KEYPAIR=\"{}\"\nRPC_URL=\"{}\"",
+        identity_keypair.to_base58_string(),
+        rpc_url,
     );
     let secrets_path = znap_collection_path.join("Secrets.toml");
 
