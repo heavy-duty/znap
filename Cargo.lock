@@ -5421,7 +5421,7 @@ dependencies = [
 
 [[package]]
 name = "znap"
-version = "0.1.35"
+version = "0.1.36"
 dependencies = [
  "axum",
  "base64 0.22.1",
@@ -5437,7 +5437,7 @@ dependencies = [
 
 [[package]]
 name = "znap-cli"
-version = "0.1.35"
+version = "0.1.36"
 dependencies = [
  "anyhow",
  "clap 4.5.7",
@@ -5453,7 +5453,7 @@ dependencies = [
 
 [[package]]
 name = "znap-macros"
-version = "0.1.35"
+version = "0.1.36"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -5463,7 +5463,7 @@ dependencies = [
 
 [[package]]
 name = "znap-syn"
-version = "0.1.35"
+version = "0.1.36"
 dependencies = [
  "anyhow",
  "colored",

@@ -3,7 +3,7 @@ members = ["znap-syn", "znap-macros", "znap", "znap-cli"]
 resolver = "2"
 
 [workspace.package]
-version = "0.1.35"
+version = "0.1.36"
 
 [workspace.dependencies]
 # znap specific
@@ -12,7 +12,7 @@ serde = { version = "1.0.203", features = ["derive"] }
 tower-http = { version = "0.5.2", features = ["cors", "fs"] }
 
 # solana
-solana-sdk = "2.0.1"
+solana-sdk = "2.0.4"
 
 # macros
 proc-macro2 = "1.0"

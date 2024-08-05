@@ -19,7 +19,7 @@ solana-sdk = { workspace = true }
 base64 = "0.22.1"
 bincode = "1.3.3"
 handlebars = "5.1.2"
-solana-client = "2.0.1"
+solana-client = "2.0.4"
 
 # local
-znap-macros = { path = "../znap-macros", version = "0.1.35" }
+znap-macros = { path = "../znap-macros", version = "0.1.36" }
