@@ -10,7 +10,7 @@ pub fn template(name: &str) -> String {
         axum = \"0.7.5\"\n\
         serde = \"1.0.203\"\n\
         solana-sdk = \"2.0.1\"\n\
-        znap = \"0.1.30\"\n\
+        znap = \"0.1.35\"\n\
     ",
         name.to_kebab_case()
     )

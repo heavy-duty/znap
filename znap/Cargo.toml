@@ -22,4 +22,4 @@ handlebars = "5.1.2"
 solana-client = "2.0.1"
 
 # local
-znap-macros = { path = "../znap-macros", version = "0.1.30" }
+znap-macros = { path = "../znap-macros", version = "0.1.35" }
