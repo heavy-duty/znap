@@ -1,10 +1,12 @@
+use znap_common::get_config;
+
 use crate::utils::{
-    generate_collection_executable_files, get_config, run_test_suite, start_server, wait_for_server,
+    generate_collection_executable_files, run_test_suite, start_server, wait_for_server,
 };
 
 pub fn run() {
     // get config
-    let config = get_config();
+    let config = get_config(None);
     let collections = config.collections.as_deref().unwrap_or_default();
 
     // start and wait for each server to be running

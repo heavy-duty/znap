@@ -105,7 +105,7 @@ pub mod prelude {
     pub use colored;
     pub use solana_client;
     pub use tower_http;
-    pub use znap_macros::{collection, Action, ErrorCode};
+    pub use znap_macros::{collection, main, Action, ErrorCode};
 }
 
 /// Trait used to transform a struct into an Action.

@@ -1,5 +1,5 @@
 [workspace]
-members = ["znap-syn", "znap-macros", "znap", "znap-cli"]
+members = ["znap-syn", "znap-macros", "znap", "znap-cli", "common"]
 resolver = "2"
 
 [workspace.package]
@@ -21,5 +21,6 @@ syn = "2.0"
 
 # utilities
 heck = "0.5.0"
+toml = "0.8.14"
 colored = "2.1.0"
 console = "0.15.8"

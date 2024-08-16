@@ -1,10 +1,8 @@
-use crate::{
-    template,
-    utils::{write_file, Collection, Config},
-};
+use crate::{template, utils::write_file};
 use colored::Colorize;
 use heck::ToKebabCase;
 use std::fs::{create_dir, read_to_string};
+use znap_common::{Collection, Config};
 
 pub fn run(name: &str, dry_run: bool) {
     println!(

@@ -1,5 +1,5 @@
-use crate::utils::get_cwd;
 use std::fs::{create_dir, remove_dir_all, File};
+use znap_common::get_cwd;
 
 pub fn run() {
     let znap_path = get_cwd().join(".znap");

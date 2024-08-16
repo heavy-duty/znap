@@ -1,7 +1,9 @@
-use crate::utils::{generate_collection_executable_files, get_config, start_server_blocking};
+use znap_common::get_config;
+
+use crate::utils::{generate_collection_executable_files, start_server_blocking};
 
 pub fn run(name: &str, address: Option<&str>, port: Option<&u16>, protocol: Option<&str>) {
-    let config = get_config();
+    let config = get_config(None);
     let collections = config.collections.as_deref().unwrap_or_default();
     let collection = collections
         .iter()

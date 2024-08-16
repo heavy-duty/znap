@@ -1,6 +1,5 @@
 use heck::ToSnekCase;
-
-use crate::utils::Collection;
+use znap_common::Collection;
 
 pub fn template(collection: &Collection) -> String {
     format!(
