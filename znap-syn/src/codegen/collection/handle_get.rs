@@ -53,7 +53,7 @@ pub fn generate(collection_mod: &CollectionMod) -> TokenStream {
                             let rendered_metadata = znap::render_metadata(&raw_metadata, &context, false, None);
                             let context_with_metadata = #context_with_metadata {
                                 params: context.params,
-                                env: znap::Env::default(),
+                                env: znap::env::Env::default(),
                                 metadata: rendered_metadata,
                             };
                             let metadata = #create_metadata_fn(context_with_metadata).await?;

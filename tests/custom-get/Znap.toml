@@ -1,0 +1,8 @@
+identity = "~/.config/solana/id.json"
+rpc_url = "http://api.devnet.solana.com"
+
+[[collections]]
+name = "actions"
+address = "localhost"
+port = 3000
+protocol = "http"
