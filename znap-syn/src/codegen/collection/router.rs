@@ -28,7 +28,7 @@ pub fn generate(collection_mod: &CollectionMod) -> TokenStream {
             Ok(axum::Json(znap::Status { active: true }))
         }
 
-        pub fn collection_router() -> axum::Router {
+        pub fn router() -> axum::Router {
             let cors = tower_http::cors::CorsLayer::new()
                 .allow_methods([
                     axum::http::Method::GET,

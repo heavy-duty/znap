@@ -18,7 +18,7 @@ pub fn generate(collection_mod: &CollectionMod) -> TokenStream {
         .collect();
 
     quote! {
-        pub fn display_collection_routes() {
+        pub fn display_routes() {
             let collection_name = #collection_ident;
             println!("\n[{}] endpoints: \n", collection_name.cyan());
             #(#routes)*

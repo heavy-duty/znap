@@ -9,11 +9,11 @@ description = "Collection of utilities for parsing and code generation that powe
 
 [dependencies]
 # workspace deps
-proc-macro2 = { workspace = true }
-syn = { workspace = true }
-quote = { workspace = true }
-heck = { workspace = true }
-colored = { workspace = true }
+proc-macro2.workspace = true
+syn.workspace = true
+quote.workspace = true
+heck.workspace = true
+znap-common = { package = "common", path = "../common" }
 
 # crate specific
 deluxe = { version = "0.5.0", features = ["full"] }

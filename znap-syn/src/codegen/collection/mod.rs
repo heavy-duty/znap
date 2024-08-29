@@ -1,6 +1,7 @@
 use crate::CollectionMod;
 use quote::quote;
 mod display_routes;
+mod entry;
 mod handle_get;
 mod handle_post;
 mod router;
@@ -10,6 +11,7 @@ pub fn generate(collection_mod: &CollectionMod) -> proc_macro2::TokenStream {
     let handle_get = handle_get::generate(collection_mod);
     let router = router::generate(collection_mod);
     let display_routes = display_routes::generate(collection_mod);
+    let main = entry::generate(collection_mod);
 
     quote! {
         use znap::base64::prelude::BASE64_STANDARD;
@@ -20,5 +22,6 @@ pub fn generate(collection_mod: &CollectionMod) -> proc_macro2::TokenStream {
         #handle_get
         #router
         #display_routes
+        #main
     }
 }
