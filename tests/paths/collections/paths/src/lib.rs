@@ -1,8 +1,4 @@
-use solana_sdk::{
-    message::Message, native_token::LAMPORTS_PER_SOL, pubkey::Pubkey, system_instruction::transfer,
-    transaction::Transaction,
-};
-use std::str::FromStr;
+use solana_sdk::{message::Message, transaction::Transaction};
 use znap::prelude::*;
 
 #[collection]
@@ -24,6 +20,34 @@ pub mod paths {
         Ok(ActionTransaction {
             transaction: Transaction::new_unsigned(Message::new(&[], None)),
             message: Some("send donation to alice".to_string()),
+        })
+    }
+
+    pub fn default_path_dynamic_metadata_post(
+        ctx: Context<DefaultPathWithDynamicMetadataAction>,
+    ) -> Result<ActionTransaction> {
+        Ok(ActionTransaction {
+            transaction: Transaction::new_unsigned(Message::new(&[], None)),
+            message: Some("send donation to alice".to_string()),
+        })
+    }
+
+    pub fn default_path_dynamic_metadata_get(
+        ctx: Context<DefaultPathWithDynamicMetadataAction>,
+    ) -> Result<ActionMetadata> {
+        let icon = "https://media.discordapp.net/attachments/1205590693041541181/1212566609202520065/icon.png?ex=667eb568&is=667d63e8&hm=0f247078545828c0a5cf8300a5601c56bbc9b59d3d87a0c74b082df0f3a6d6bd&=&format=webp&quality=lossless&width=660&height=660";
+        let title = "Default Path with Dynamic Metadata";
+        let description = "Use the default path configuration with dynamic metadata";
+        let label = "Send";
+
+        Ok(ActionMetadata {
+            title: title.to_string(),
+            description: description.to_string(),
+            icon: icon.to_string(),
+            label: label.to_string(),
+            disabled: false,
+            error: None,
+            links: None,
         })
     }
 }
@@ -50,3 +74,8 @@ pub struct CustomPathSingleParameterAction;
 #[query(amount: u64)]
 #[params(mint_address: String, receiver_address: String)]
 pub struct DefaultPathMultiParameterAction;
+
+#[derive(Action)]
+#[query(amount: u64)]
+#[params(mint_address: String, receiver_address: String)]
+pub struct DefaultPathWithDynamicMetadataAction;
