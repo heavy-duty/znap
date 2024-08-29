@@ -3,7 +3,7 @@ members = ["znap-syn", "znap-macros", "znap", "znap-cli"]
 resolver = "2"
 
 [workspace.package]
-version = "0.1.30"
+version = "0.1.36"
 
 [workspace.dependencies]
 # znap specific
