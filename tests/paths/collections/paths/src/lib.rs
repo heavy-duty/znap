@@ -83,7 +83,6 @@ pub mod paths {
     description = "Use a custom path configuration",
     label = "Send"
 )]
-#[query(amount: u64)]
 #[params(receiver_address: String)]
 #[action_path(template = "{{prefix}}/v1/test/{{action_name}}")]
 pub struct CustomPathAction;
@@ -95,15 +94,12 @@ pub struct CustomPathAction;
     description = "Use the default path configuration",
     label = "Send"
 )]
-#[query(amount: u64)]
 #[params(receiver_address: String)]
 pub struct DefaultPathAction;
 
 #[derive(Action)]
-#[query(amount: u64)]
-#[action_path(template = "{{prefix}}/super_custom/{{action_name}}")]
+#[action_path(template = "super_custom/{{action_name}}", prefix = "api")]
 pub struct CustomPathWithDynamicMetadataAction;
 
 #[derive(Action)]
-#[query(amount: u64)]
 pub struct DefaultPathWithDynamicMetadataAction;
