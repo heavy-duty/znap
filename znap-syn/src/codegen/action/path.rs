@@ -15,7 +15,7 @@ pub fn generate(action_struct: &ActionStruct) -> (String, TokenStream) {
                 prefix.trim_matches('/'),
                 template
                     .replace("{{action_name}}", &action_name)
-                    .replace("{{prefix}}", &prefix.trim_matches('/'))
+                    .replace("{{prefix}}", prefix.trim_matches('/'))
                     .trim_matches('/')
             ),
             (None, Some(template)) => format!(
