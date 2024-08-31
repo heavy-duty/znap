@@ -35,7 +35,6 @@ pub mod prefix {
     title = "Send a Donation to {{params.receiver_address}}",
     description = "Send a donation to {{params.receiver_address}} using the Solana blockchain via a Blink.",
     label = "Send",
-    prefix = "v1-api",
     link = {
         label = "Send 1 SOL",
         href = "?amount=1",
@@ -52,6 +51,7 @@ pub mod prefix {
 )]
 #[query(amount: u64)]
 #[params(receiver_address: String)]
+#[action_path(prefix = "v1-api")]
 pub struct PrefixAction;
 
 #[derive(ErrorCode)]
