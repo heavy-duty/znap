@@ -67,6 +67,7 @@ pub struct ActionStruct {
     pub attributes: Option<ActionAttributesStruct>,
     pub query_attrs: Option<Vec<(Ident, Ident)>>,
     pub params_attrs: Option<Vec<(Ident, Ident)>>,
+    pub path_attrs: Option<PathAttributesStruct>,
 }
 
 impl Parse for ActionStruct {
@@ -95,10 +96,6 @@ pub struct ActionAttributesStruct {
     pub title: String,
     pub description: String,
     pub label: String,
-    // #[deluxe(default = Some("api".to_string()))]
-    pub prefix: Option<String>,
-    // #[deluxe(default = Some("{{prefix}}/{{action_name}}".to_string()))]
-    pub path: Option<String>,
     #[deluxe(append, rename = link, default = Vec::new())]
     pub links: Vec<ActionLinkStruct>,
 }
@@ -117,6 +114,15 @@ pub struct ActionLinkParameterStruct {
     name: String,
     #[deluxe(default = false)]
     required: bool,
+}
+
+#[derive(Debug, ExtractAttributes)]
+#[deluxe(attributes(action_path))]
+pub struct PathAttributesStruct {
+    // #[deluxe(default = Some("api".to_string()))]
+    pub prefix: Option<String>,
+    // #[deluxe(default = Some("{{prefix}}/{{action_name}}".to_string()))]
+    pub template: Option<String>,
 }
 
 #[derive(Debug)]
