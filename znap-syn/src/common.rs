@@ -61,6 +61,20 @@ pub fn has_action(action_struct: &ItemStruct) -> bool {
     })
 }
 
+pub fn has_path(path_struct: &ItemStruct) -> bool {
+    path_struct.attrs.iter().any(|attr| {
+        if let Ok(meta) = attr.meta.require_list() {
+            if let Some(first_segment) = meta.path.segments.first() {
+                if first_segment.ident == "action_path" {
+                    return true;
+                }
+            }
+        }
+
+        false
+    })
+}
+
 pub fn extract_action_ident(f: &ItemFn) -> Option<&Ident> {
     if let FnArg::Typed(pt) = f.sig.inputs.first()? {
         if let Type::Path(type_path) = pt.ty.as_ref() {

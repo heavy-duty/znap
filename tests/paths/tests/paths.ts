@@ -1,135 +1,116 @@
-import {
-  Keypair,
-  LAMPORTS_PER_SOL,
-  PublicKey,
-  SystemInstruction,
-  Transaction,
-} from "@solana/web3.js";
+import { Keypair } from "@solana/web3.js";
 import { assert } from "chai";
 import { Metadata, createActionClient } from "./utils";
-import nacl from "tweetnacl";
-import bs58 from "bs58";
 
 describe("Paths Tests", () => {
   const baseUrl = "http://localhost:3001";
   const aliceKeypair = Keypair.generate();
-  const bobKeypair = Keypair.generate();
-  const actionClient = createActionClient(
-    `${baseUrl}/api/v1/test/paths/${aliceKeypair.publicKey.toBase58()}`
+  const customPathClient = createActionClient(
+    `${baseUrl}/api/v1/test/custom_path/${aliceKeypair.publicKey.toBase58()}`
   );
-  const actionMetadata: Metadata = {
+  const customPathMetadata: Metadata = {
     icon: "https://media.discordapp.net/attachments/1205590693041541181/1212566609202520065/icon.png?ex=667eb568&is=667d63e8&hm=0f247078545828c0a5cf8300a5601c56bbc9b59d3d87a0c74b082df0f3a6d6bd&=&format=webp&quality=lossless&width=660&height=660",
-    title: `Send a Donation to ${aliceKeypair.publicKey.toBase58()}`,
-    description: `Send a donation to ${aliceKeypair.publicKey.toBase58()} using the Solana blockchain via a Blink.`,
+    title: "Custom Path",
+    description: "Use a custom path configuration",
     label: "Send",
-    links: {
-      actions: [
-        {
-          label: "Send 1 SOL",
-          href: `/api/v1/test/paths/${aliceKeypair.publicKey.toBase58()}?amount=1`,
-          parameters: [],
-        },
-        {
-          label: "Send 5 SOL",
-          href: `/api/v1/test/paths/${aliceKeypair.publicKey.toBase58()}?amount=5`,
-          parameters: [],
-        },
-        {
-          label: "Send SOL",
-          href: `http://localhost:3000/api/send_donation?amount={amount}`,
-          parameters: [
-            {
-              label: "Amount in SOL",
-              name: "amount",
-            },
-          ],
-        },
-      ],
-    },
+    links: null,
+    disabled: false,
+    error: null,
+  };
+  const defaultPathClient = createActionClient(
+    `${baseUrl}/api/default_path/${aliceKeypair.publicKey.toBase58()}`
+  );
+  const defaultPathMetadata: Metadata = {
+    icon: "https://media.discordapp.net/attachments/1205590693041541181/1212566609202520065/icon.png?ex=667eb568&is=667d63e8&hm=0f247078545828c0a5cf8300a5601c56bbc9b59d3d87a0c74b082df0f3a6d6bd&=&format=webp&quality=lossless&width=660&height=660",
+    title: "Default Path",
+    description: "Use the default path configuration",
+    label: "Send",
+    links: null,
+    disabled: false,
+    error: null,
+  };
+  const customPathWithDynamicMetadataClient = createActionClient(
+    `${baseUrl}/api/super_custom/custom_path_with_dynamic_metadata`
+  );
+  const customPathWithDynamicMetadataMetadata: Metadata = {
+    icon: "https://media.discordapp.net/attachments/1205590693041541181/1212566609202520065/icon.png?ex=667eb568&is=667d63e8&hm=0f247078545828c0a5cf8300a5601c56bbc9b59d3d87a0c74b082df0f3a6d6bd&=&format=webp&quality=lossless&width=660&height=660",
+    title: "Custom Path with Dynamic Metadata",
+    description: "Use a custom path configuration with dynamic metadata",
+    label: "Send",
+    links: null,
+    disabled: false,
+    error: null,
+  };
+  const defaultPathWithDynamicMetadataClient = createActionClient(
+    `${baseUrl}/api/default_path_with_dynamic_metadata`
+  );
+  const defaultPathWithDynamicMetadataMetadata: Metadata = {
+    icon: "https://media.discordapp.net/attachments/1205590693041541181/1212566609202520065/icon.png?ex=667eb568&is=667d63e8&hm=0f247078545828c0a5cf8300a5601c56bbc9b59d3d87a0c74b082df0f3a6d6bd&=&format=webp&quality=lossless&width=660&height=660",
+    title: "Default Path with Dynamic Metadata",
+    description: "Use a default path configuration with dynamic metadata",
+    label: "Send",
+    links: null,
     disabled: false,
     error: null,
   };
 
-  it("should fetch the metadata of the paths action", async () => {
-    const response = await actionClient.getMetadata();
+  it("should fetch the metadata of the custom path action", async () => {
+    const response = await customPathClient.getMetadata();
 
-    assert.equal(response.title, actionMetadata.title);
-    assert.equal(response.description, actionMetadata.description);
-    assert.equal(response.icon, actionMetadata.icon);
-    assert.equal(response.label, actionMetadata.label);
-    assert.equal(response.disabled, actionMetadata.disabled);
-    assert.equal(response.error, actionMetadata.error);
-
-    response.links.actions.forEach((link, linkIndex) => {
-      assert.equal(link.href, actionMetadata.links.actions[linkIndex].href);
-      assert.equal(link.label, actionMetadata.links.actions[linkIndex].label);
-
-      actionMetadata.links.actions[linkIndex].parameters.forEach(
-        (parameter, parameterIndex) => {
-          assert.equal(
-            parameter.label,
-            actionMetadata.links.actions[linkIndex].parameters[parameterIndex]
-              .label
-          );
-          assert.equal(
-            parameter.name,
-            actionMetadata.links.actions[linkIndex].parameters[parameterIndex]
-              .name
-          );
-        }
-      );
-    });
+    assert.equal(response.title, customPathMetadata.title);
+    assert.equal(response.description, customPathMetadata.description);
+    assert.equal(response.icon, customPathMetadata.icon);
+    assert.equal(response.label, customPathMetadata.label);
+    assert.equal(response.disabled, customPathMetadata.disabled);
+    assert.equal(response.error, customPathMetadata.error);
+    assert.equal(response.links, customPathMetadata.links);
   });
 
-  it("should create a valid paths transaction", async () => {
-    const amount = 5_000;
-    const response = await actionClient.getTransaction(
-      bobKeypair.publicKey.toBase58(),
-      { amount }
-    );
-    const transaction = Transaction.from(
-      Buffer.from(response.transaction, "base64")
-    );
+  it("should fetch the metadata of the default path action", async () => {
+    const response = await defaultPathClient.getMetadata();
 
-    // check the transfer instruction
-    const transferInstruction = SystemInstruction.decodeTransfer(
-      transaction.instructions[0]
-    );
+    assert.equal(response.title, defaultPathMetadata.title);
+    assert.equal(response.description, defaultPathMetadata.description);
+    assert.equal(response.icon, defaultPathMetadata.icon);
+    assert.equal(response.label, defaultPathMetadata.label);
+    assert.equal(response.disabled, defaultPathMetadata.disabled);
+    assert.equal(response.error, defaultPathMetadata.error);
+    assert.equal(response.links, defaultPathMetadata.links);
+  });
 
-    assert.isTrue(transferInstruction.fromPubkey.equals(bobKeypair.publicKey));
-    assert.isTrue(transferInstruction.toPubkey.equals(aliceKeypair.publicKey));
+  it("should fetch the metadata of the custom path with dynamic metadata action", async () => {
+    const response = await customPathWithDynamicMetadataClient.getMetadata();
+
+    assert.equal(response.title, customPathWithDynamicMetadataMetadata.title);
     assert.equal(
-      transferInstruction.lamports,
-      BigInt(amount * LAMPORTS_PER_SOL)
+      response.description,
+      customPathWithDynamicMetadataMetadata.description
     );
-
-    // Verify there's a memo with a valid identity message
-    assert.isTrue(
-      transaction.instructions[1].programId.equals(
-        new PublicKey("MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr")
-      )
+    assert.equal(response.icon, customPathWithDynamicMetadataMetadata.icon);
+    assert.equal(response.label, customPathWithDynamicMetadataMetadata.label);
+    assert.equal(
+      response.disabled,
+      customPathWithDynamicMetadataMetadata.disabled
     );
+    assert.equal(response.error, customPathWithDynamicMetadataMetadata.error);
+    assert.equal(response.links, customPathWithDynamicMetadataMetadata.links);
+  });
 
-    const [, identityAddress, referenceAddress, identitySignature] =
-      transaction.instructions[1].data.toString("utf-8").split(":");
+  it("should fetch the metadata of the default path with dynamic metadata action", async () => {
+    const response = await defaultPathWithDynamicMetadataClient.getMetadata();
 
-    const identityPublicKey = new PublicKey(identityAddress);
-    const referencePublicKey = new PublicKey(referenceAddress);
-
-    assert.isTrue(
-      nacl.sign.detached.verify(
-        referencePublicKey.toBytes(),
-        bs58.decode(identitySignature),
-        identityPublicKey.toBytes()
-      )
+    assert.equal(response.title, defaultPathWithDynamicMetadataMetadata.title);
+    assert.equal(
+      response.description,
+      defaultPathWithDynamicMetadataMetadata.description
     );
-
-    // Verify the reference and identity are readonly non-signer keys of the transfer
-    assert.isTrue(
-      referencePublicKey.equals(transaction.instructions[0].keys[2].pubkey)
+    assert.equal(response.icon, defaultPathWithDynamicMetadataMetadata.icon);
+    assert.equal(response.label, defaultPathWithDynamicMetadataMetadata.label);
+    assert.equal(
+      response.disabled,
+      defaultPathWithDynamicMetadataMetadata.disabled
     );
-    assert.isTrue(
-      identityPublicKey.equals(transaction.instructions[0].keys[3].pubkey)
-    );
+    assert.equal(response.error, defaultPathWithDynamicMetadataMetadata.error);
+    assert.equal(response.links, defaultPathWithDynamicMetadataMetadata.links);
   });
 });

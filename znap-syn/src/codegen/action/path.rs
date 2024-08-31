@@ -8,38 +8,29 @@ use quote::quote;
 pub fn generate(action_struct: &ActionStruct) -> (String, TokenStream) {
     let path = create_path(&action_struct.name.to_string());
     let action_name = action_name_without_suffix(&action_struct.name.to_string());
-    let route = action_struct
-        .attributes
-        .as_ref()
-        .map(|attr| {
-            let path = if !attr.path.as_ref().is_some_and(|p| p.contains("{{prefix}}")) {
-                format!(
-                    "/{}/{}",
-                    attr.prefix.as_deref().unwrap_or("api").trim_matches('/'),
-                    attr.path
-                        .as_deref()
-                        .unwrap_or("{{action_name}}")
-                        .replace("{{action_name}}", &action_name)
-                        .trim_matches('/')
-                )
-            } else {
-                format!(
-                    "/{}",
-                    attr.path
-                        .as_deref()
-                        .unwrap_or("{{prefix}}/{{action_name}}")
-                        .replace("{{prefix}}", attr.prefix.as_deref().unwrap_or("api"))
-                        .replace("{{action_name}}", &action_name)
-                        .trim_matches('/')
-                )
-            };
-            if !path.contains(&action_name) {
-                format!("{path}/{action_name}")
-            } else {
-                path
-            }
-        })
-        .unwrap_or_default();
+    let route = if let Some(path) = &action_struct.path_attrs {
+        match (&path.prefix, &path.template) {
+            (Some(prefix), Some(template)) => format!(
+                "/{}/{}",
+                prefix.trim_matches('/'),
+                template
+                    .replace("{{action_name}}", &action_name)
+                    .replace("{{prefix}}", prefix.trim_matches('/'))
+                    .trim_matches('/')
+            ),
+            (None, Some(template)) => format!(
+                "/{}",
+                template
+                    .replace("{{action_name}}", &action_name)
+                    .replace("{{prefix}}", "api")
+                    .trim_matches('/')
+            ),
+            (Some(prefix), None) => format!("/{}/{}", prefix.trim_matches('/'), &action_name),
+            _ => format!("/{}", &action_name),
+        }
+    } else {
+        format!("/api/{}", action_name)
+    };
 
     if let Some(params_attrs) = action_struct.params_attrs.as_ref() {
         let mut segments = vec![route.clone()];

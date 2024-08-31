@@ -1,14 +1,15 @@
 import { assert } from "chai";
 import { Metadata, createActionClient } from "./utils";
+import { Keypair } from "@solana/web3.js";
 
-describe("Custom GET Tests", () => {
+describe("Dynamic Metadata Tests", () => {
   const baseUrl = "http://localhost:3000";
-  const actionClient = createActionClient(`${baseUrl}/api/get`);
+  const actionClient = createActionClient(`${baseUrl}/api/dynamic_metadata`);
   const actionMetadata: Metadata = {
     icon: "https://media.discordapp.net/attachments/1205590693041541181/1212566609202520065/icon.png?ex=667eb568&is=667d63e8&hm=0f247078545828c0a5cf8300a5601c56bbc9b59d3d87a0c74b082df0f3a6d6bd&=&format=webp&quality=lossless&width=660&height=660",
-    title: "Custom GET Action",
-    description: "Custom Get Action",
-    label: "Custom Get",
+    title: "Dynamic Metadata Action",
+    description: "An action with dynamic metadata",
+    label: "Send",
     links: null,
     disabled: false,
     error: null,
