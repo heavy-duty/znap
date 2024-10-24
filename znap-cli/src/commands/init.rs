@@ -1,4 +1,4 @@
-use crate::utils::write_file;
+use crate::utils::{init_git, write_file};
 use colored::Colorize;
 use console::Emoji;
 use heck::ToKebabCase;
@@ -209,6 +209,9 @@ describe("My tests", () => {
         write_file(&znap_dir.join(".gitkeep"), "");
     }
 
+    // Initialize a git project
+    init_git(&workspace_dir);   
+    
     println!("  Added:\n");
     println!("      {}", format!("+ {name}/Cargo.toml").green());
     println!("      {}", format!("+ {name}/Znap.toml").green());
