@@ -325,7 +325,7 @@ pub fn init_git(dir: &PathBuf) {
         .arg("init")
         .current_dir(dir)
         .status()
-        .unwrap();
+        .expect("Git project could not be initialized");
 
     // Rename the default branch to 'main'
     std::process::Command::new("git")
@@ -334,7 +334,7 @@ pub fn init_git(dir: &PathBuf) {
         .arg("main")
         .current_dir(dir)
         .status()
-        .unwrap();
+        .expect("Default branch could not be renamed to main");
 
     // Add all files to the staging area
     std::process::Command::new("git")
@@ -342,7 +342,7 @@ pub fn init_git(dir: &PathBuf) {
         .arg(".")
         .current_dir(dir)
         .status()
-        .unwrap();
+        .expect("Initial files could not be added to the staging area");
 
     // Commit the changes
     std::process::Command::new("git")
@@ -351,5 +351,5 @@ pub fn init_git(dir: &PathBuf) {
         .arg("initial commit")
         .current_dir(dir)
         .status()
-        .unwrap();
+        .expect("Initial commit could not be performed");
 }
