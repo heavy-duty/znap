@@ -210,8 +210,8 @@ describe("My tests", () => {
     }
 
     // Initialize a git project
-    init_git(&workspace_dir);   
-    
+    init_git(&workspace_dir);
+
     println!("  Added:\n");
     println!("      {}", format!("+ {name}/Cargo.toml").green());
     println!("      {}", format!("+ {name}/Znap.toml").green());
