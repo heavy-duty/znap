@@ -98,7 +98,8 @@ pub mod prelude {
     pub use super::env::Env;
     pub use super::{
         Action, ActionLinks, ActionMetadata, ActionResponse, ActionTransaction, Error, ErrorCode,
-        LinkedAction, LinkedActionParameter, Result, ToMetadata,
+        LinkedAction, LinkedActionLinkParameterTypeOption, LinkedActionParameter, Result,
+        ToMetadata,
     };
     pub use base64;
     pub use bincode;
@@ -171,11 +172,34 @@ pub struct LinkedAction {
     pub parameters: Vec<LinkedActionParameter>,
 }
 
+// #[derive(Debug, Deserialize, Serialize, PartialEq)]
+// enum ActionLinkParameterType {
+//     Text,
+//     Email,
+//     Url,
+//     Number,
+//     Date,
+//     Datetimelocal,
+//     Checkbox,
+//     Radio,
+//     Textarea,
+//     Select,
+//   }
+
 #[derive(Debug, Deserialize, Serialize, PartialEq)]
 pub struct LinkedActionParameter {
     pub label: String,
     pub name: String,
     pub required: bool,
+    #[serde(rename = "type")]
+    pub input_type: String,
+    pub options: Vec<LinkedActionLinkParameterTypeOption>,
+}
+
+#[derive(Debug, Deserialize, Serialize, PartialEq)]
+pub struct LinkedActionLinkParameterTypeOption {
+    pub label: String,
+    pub value: String,
 }
 
 /// Error occurred during the processing of the request.
@@ -303,6 +327,24 @@ where
     output
 }
 
+pub fn render_options<T>(
+    options: &[LinkedActionLinkParameterTypeOption],
+    data: &T,
+) -> Vec<LinkedActionLinkParameterTypeOption>
+where
+    T: Serialize,
+{
+    options
+        .iter()
+        .map(|option| {
+            let label = render_source(&option.label, &data);
+            let value = render_source(&option.value, &data);
+
+            LinkedActionLinkParameterTypeOption { label, value }
+        })
+        .collect()
+}
+
 pub fn render_parameters<T>(
     parameters: &[LinkedActionParameter],
     data: &T,
@@ -315,11 +357,14 @@ where
         .map(|parameter| {
             let name = render_source(&parameter.name, &data);
             let label = render_source(&parameter.label, &data);
+            let input_type = render_source(&parameter.input_type, &data);
 
             LinkedActionParameter {
                 label,
                 name,
                 required: parameter.required,
+                input_type,
+                options: render_options(&parameter.options, &data),
             }
         })
         .collect()

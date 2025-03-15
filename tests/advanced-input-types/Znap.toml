@@ -1,0 +1,8 @@
+identity = "~/.config/solana/id.json"
+rpc_url = "http://localhost:8899"
+
+[[collections]]
+name = "types"
+address = "127.0.0.1"
+port = 3000
+protocol = "http"

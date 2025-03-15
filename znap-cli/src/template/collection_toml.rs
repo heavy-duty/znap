@@ -12,8 +12,8 @@ console = "0.15.8"
 tokio = {{ version = "1", features = ["full"] }}
 
 # deploy dependencies
-shuttle-axum = "0.46.0"
-shuttle-runtime = "0.46.0"
+shuttle-axum = "0.48.0"
+shuttle-runtime = "0.48.0"
 
 [[bin]]
 name = "{}"

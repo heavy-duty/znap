@@ -114,6 +114,16 @@ pub struct ActionLinkParameterStruct {
     name: String,
     #[deluxe(default = false)]
     required: bool,
+    #[deluxe(rename = type, default = "text".to_string())]
+    input_type: String,
+    #[deluxe(append, rename = option, default = Vec::new())]
+    options: Vec<ActionLinkParameterTypeOption>,
+}
+
+#[derive(Debug, ParseMetaItem)]
+pub struct ActionLinkParameterTypeOption {
+    label: String,
+    value: String,
 }
 
 #[derive(Debug, ExtractAttributes)]
